@@ -17,3 +17,6 @@ local.properties
 # Firmas
 *.jks
 *.keystore
+
+# Worktrees locales de Claude Code
+.claude/worktrees/

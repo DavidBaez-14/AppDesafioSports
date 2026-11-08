@@ -438,7 +438,11 @@ Además, la pantalla de consentimiento de Google y los correos de Supabase muest
 
 1. **Responder el §9** en este archivo.
 2. **Liberar espacio en el disco C:**, al menos 15 GB. Sin eso el emulador no arranca y Impeccable no puede verificar.
-3. **Revisar y mergear la rama `mov-0001-estructura-base` a `main`** en GitHub. El repo estaba vacío, así que la rama se subió aparte; ver el README.
+3. **Crear `main` con la base MOV-0001.** El repo estaba vacío, así que la base quedó en la rama `mov-0001-estructura-base`, y GitHub la tomó como rama por defecto.
+   - Revísala.
+   - Corre `git push origin mov-0001-estructura-base:main`.
+   - En GitHub, en *Settings → Branches*, deja `main` como rama por defecto.
+   - Desde ahí, cada spec llega por PR. MOV-0001 pasa a `hecha`.
 4. **Pasar a tus compañeros los valores de `local.properties`** (URL y clave publicable de Supabase) por un canal privado, nunca en el repo. También la contraseña de los usuarios del seed.
 5. Si respondes "ahora" en P14: **crear el cliente OAuth Android** (Anexo A).
 

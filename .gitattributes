@@ -1,0 +1,12 @@
+# Finales de línea: LF en el repo; los scripts de Windows con CRLF.
+* text=auto eol=lf
+*.bat text eol=crlf
+gradlew text eol=lf
+
+# Binarios
+*.png binary
+*.jpg binary
+*.jar binary
+*.webp binary
+*.ttf binary
+*.otf binary

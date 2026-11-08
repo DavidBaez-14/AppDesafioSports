@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        Tema de la ventana (antes de que Compose dibuje). El tema visual real vive en
+        ui/theme (Compose). El fondo azul marino evita el destello blanco al abrir.
+    -->
+    <style name="Theme.DesafioSports" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/fondo_ventana</item>
+    </style>
+</resources>

@@ -1,0 +1,19 @@
+# Gradle y builds
+.gradle/
+.kotlin/
+build/
+/captures
+.externalNativeBuild
+.cxx
+
+# Configuración local: rutas del SDK y claves. NUNCA se sube.
+local.properties
+
+# Android Studio / IntelliJ
+*.iml
+.idea/
+.DS_Store
+
+# Firmas
+*.jks
+*.keystore

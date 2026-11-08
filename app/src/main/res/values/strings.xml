@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Desafío Sports</string>
+
+    <!-- Diagnóstico de conexión (MOV-0001). Pantalla temporal, sin diseño. -->
+    <string name="diagnostico_titulo">Diagnóstico de conexión</string>
+    <string name="diagnostico_aviso">Pantalla temporal para comprobar el entorno. Las pantallas reales se diseñan con Impeccable.</string>
+
+    <string name="diagnostico_config_titulo">Configuración incompleta</string>
+    <string name="diagnostico_config_detalle">Falta en local.properties: %1$s</string>
+
+    <string name="diagnostico_servidor_titulo">Servidor</string>
+    <string name="diagnostico_servidor_url">URL: %1$s</string>
+    <string name="diagnostico_servidor_comprobando">Comprobando…</string>
+    <string name="diagnostico_servidor_ok">En línea (%1$s)</string>
+    <string name="diagnostico_reintentar">Reintentar</string>
+
+    <string name="diagnostico_sesion_titulo">Sesión</string>
+    <string name="diagnostico_sesion_cargando">Cargando sesión…</string>
+    <string name="diagnostico_sesion_inactiva">Sin sesión</string>
+    <string name="diagnostico_sesion_activa">Sesión activa: %1$s</string>
+    <string name="diagnostico_correo">Correo</string>
+    <string name="diagnostico_clave">Contraseña</string>
+    <string name="diagnostico_iniciar_sesion">Iniciar sesión</string>
+    <string name="diagnostico_consultar_cuenta">Consultar mi cuenta</string>
+    <string name="diagnostico_cerrar_sesion">Cerrar sesión</string>
+
+    <string name="diagnostico_cuenta_titulo">Cuenta (GET /api/auth/me)</string>
+    <string name="diagnostico_cuenta_nombre">Nombre: %1$s</string>
+    <string name="diagnostico_cuenta_correo">Correo: %1$s</string>
+    <string name="diagnostico_cuenta_estado">Estado: %1$s</string>
+    <string name="diagnostico_cuenta_roles">Roles: %1$s</string>
+    <string name="diagnostico_cuenta_pendientes">Roles pendientes: %1$s</string>
+    <string name="diagnostico_ninguno">ninguno</string>
+</resources>

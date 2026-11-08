@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ícono PROVISIONAL: disco naranja con un rayo. Se reemplaza cuando exista el logo (docs/plan-ui-impeccable.md). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="@color/icono_marca"
+        android:pathData="M54,30a24,24 0,1 1,-0.01 0z" />
+    <path
+        android:fillColor="@color/icono_fondo"
+        android:pathData="M58.5,37 L45,57 L53,57 L49.5,71 L63,51 L55,51 Z" />
+</vector>

@@ -1,0 +1,15 @@
+# Copia este archivo como local.properties (en la raíz del proyecto) y completa los valores.
+# local.properties está en .gitignore: nunca subas tus claves.
+#
+# Android Studio agrega sdk.dir solo. Si compilas por consola, ponlo tú:
+# sdk.dir=C\:\\Users\\<tu-usuario>\\AppData\\Local\\Android\\Sdk
+
+# Supabase #1 (Project Settings → API). Solo la clave PUBLICABLE (sb_publishable_...).
+# La clave secreta (sb_secret_...) jamás va en la app.
+SUPABASE_URL=https://<proyecto>.supabase.co
+SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
+
+# BackendCodeCup. Termina en "/".
+#  - Emulador: http://10.0.2.2:8082/   (valor por defecto si no lo pones)
+#  - Teléfono por USB: corre "adb reverse tcp:8082 tcp:8082" y usa http://localhost:8082/
+API_BASE_URL=http://10.0.2.2:8082/

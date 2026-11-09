@@ -14,8 +14,10 @@ SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
 #  - Teléfono por USB: corre "adb reverse tcp:8082 tcp:8082" y usa http://localhost:8082/
 API_BASE_URL=http://10.0.2.2:8082/
 
-# Opcional: "Continuar con Google" (MOV-0006). Es el ID del cliente WEB de Google Cloud, el mismo que
-# está en Supabase → Authentication → Providers → Google. No es secreto, pero va aquí y no en el código.
-# Además hace falta un cliente OAuth ANDROID con el paquete co.edu.ufps.desafiosports y el SHA-1 de tu
-# llave de debug (cada integrante el suyo). Sin este valor, el botón de Google no aparece.
+# Opcional: "Continuar con Google" (MOV-0006). Sin este valor, el botón de Google no aparece.
+#  - Aquí va el ID del cliente de tipo "Aplicación web", el mismo del campo Client ID de
+#    Supabase → Authentication → Providers → Google. NO el del cliente Android.
+#  - El cliente "Android" (paquete co.edu.ufps.desafiosports + SHA-1 de tu llave de debug, cada
+#    integrante el suyo) también tiene que existir en Google Cloud, pero su ID no se copia en ningún lado.
+#  - Si pones el ID del cliente Android, el selector falla con "No pudimos continuar con Google".
 GOOGLE_WEB_CLIENT_ID=

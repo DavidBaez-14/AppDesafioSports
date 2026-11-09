@@ -3,12 +3,13 @@ package co.edu.ufps.desafiosports.presentacion.acceso
 import android.content.res.Configuration
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
@@ -94,13 +95,17 @@ fun LoginContenido(
     val habilitado = !state.enProceso
 
     Surface(color = MaterialTheme.colorScheme.background, modifier = modifier.fillMaxSize()) {
-        Box(contentAlignment = Alignment.TopCenter, modifier = Modifier.safeDrawingPadding().imePadding()) {
+        BoxWithConstraints(contentAlignment = Alignment.TopCenter, modifier = Modifier.safeDrawingPadding().imePadding()) {
+            val altoVisible = maxHeight
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier
                     .widthIn(max = 480.dp)
-                    .fillMaxSize()
+                    .fillMaxWidth()
                     .verticalScroll(rememberScrollState())
+                    // Ocupa al menos la pantalla para que los Spacer con peso repartan lo que sobra;
+                    // con el teclado abierto o la letra grande no sobra nada y todo se desplaza.
+                    .heightIn(min = altoVisible)
                     .padding(horizontal = 24.dp, vertical = 24.dp),
             ) {
                 Spacer(Modifier.height(32.dp))
@@ -117,8 +122,10 @@ fun LoginContenido(
                     text = stringResource(R.string.login_bienvenida),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = 4.dp, bottom = 20.dp),
+                    modifier = Modifier.padding(top = 4.dp, bottom = 8.dp),
                 )
+                // El logotipo queda arriba y el formulario baja hacia el pulgar cuando hay pantalla de sobra.
+                Spacer(Modifier.weight(1f))
 
                 OutlinedTextField(
                     value = state.correo,
@@ -176,20 +183,19 @@ fun LoginContenido(
                         .testTag("login_clave"),
                 )
 
-                state.error?.let { AvisoError(it, Modifier.testTag("login_error")) }
-
-                BotonPrincipal(
-                    texto = stringResource(R.string.login_entrar),
-                    textoEnProceso = stringResource(R.string.login_entrando),
-                    enProceso = state.enProceso,
-                    onClick = {
-                        foco.clearFocus()
-                        onEntrar()
-                    },
-                    modifier = Modifier
-                        .padding(top = 4.dp)
-                        .testTag("login_entrar"),
-                )
+                Column(modifier = Modifier.padding(top = 4.dp)) {
+                    AvisoErrorAnimado(state.error, Modifier.testTag("login_error"))
+                    BotonPrincipal(
+                        texto = stringResource(R.string.login_entrar),
+                        textoEnProceso = stringResource(R.string.login_entrando),
+                        enProceso = state.enProceso,
+                        onClick = {
+                            foco.clearFocus()
+                            onEntrar()
+                        },
+                        modifier = Modifier.testTag("login_entrar"),
+                    )
+                }
 
                 TextButton(
                     onClick = onRecuperarClave,
@@ -204,6 +210,7 @@ fun LoginContenido(
                         style = MaterialTheme.typography.labelLarge,
                     )
                 }
+                Spacer(Modifier.weight(0.35f))
             }
         }
     }

@@ -134,19 +134,19 @@ private fun Formulario(state: RecuperarClaveState, onCorreoChange: (String) -> U
                 .semantics { contentType = ContentType.EmailAddress }
                 .testTag("recuperar_correo"),
         )
-        state.error?.let { AvisoError(it, Modifier.testTag("recuperar_error")) }
-        BotonPrincipal(
-            texto = stringResource(R.string.recuperar_enviar),
-            textoEnProceso = stringResource(R.string.recuperar_enviando),
-            enProceso = state.enProceso,
-            onClick = {
-                foco.clearFocus()
-                onEnviar()
-            },
-            modifier = Modifier
-                .padding(top = 4.dp)
-                .testTag("recuperar_enviar"),
-        )
+        Column(modifier = Modifier.padding(top = 4.dp)) {
+            AvisoErrorAnimado(state.error, Modifier.testTag("recuperar_error"))
+            BotonPrincipal(
+                texto = stringResource(R.string.recuperar_enviar),
+                textoEnProceso = stringResource(R.string.recuperar_enviando),
+                enProceso = state.enProceso,
+                onClick = {
+                    foco.clearFocus()
+                    onEnviar()
+                },
+                modifier = Modifier.testTag("recuperar_enviar"),
+            )
+        }
     }
 }
 
@@ -166,7 +166,8 @@ private fun Enviado(correo: String, onVolver: () -> Unit) {
         Icon(
             painter = painterResource(R.drawable.ic_mark_email_read),
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
+            // Decorativo: el naranja queda solo para el botón "Volver a entrar".
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.size(56.dp),
         )
         Text(

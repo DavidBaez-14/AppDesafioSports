@@ -161,3 +161,4 @@ Los tests de Compose UI necesitan dependencias de `androidTest`, que entran con 
 |---|---|
 | 2026-11-08 | Borrador inicial y paso a en-curso por pedido del usuario ("empieza con el login funcional") |
 | 2026-11-09 | RED (26 tests nuevos fallando, `evidencias/MOV-0002/01-red.txt`) → GREEN (62 tests, 0 fallos). CA-1 suma el caso de configuración incompleta. Verificación en el emulador. Ajuste: espaciado de letras de Barlow en los textos de cuerpo y en las etiquetas pequeñas |
+| 2026-11-09 | Revisión final de Impeccable (disposición *fix*). Aplicado: el formulario baja hacia el pulgar cuando sobra pantalla, el ícono de "Revisa tu correo" sin naranja y el aviso de error con entrada y salida animadas. Declinado: el título de la barra en Barlow Condensed, porque el prototipo usa Barlow en las barras. Comprobado sin cambios: la semilla del sorteo y el correo conservado al volver de Recuperar |

@@ -1,5 +1,10 @@
 package co.edu.ufps.desafiosports.presentacion.acceso
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,6 +21,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -46,6 +56,27 @@ internal fun AvisoError(mensaje: String, modifier: Modifier = Modifier) {
             Icon(painterResource(R.drawable.ic_error), contentDescription = null, modifier = Modifier.size(20.dp))
             Text(mensaje, style = MaterialTheme.typography.bodyMedium)
         }
+    }
+}
+
+/**
+ * El aviso de error entra y sale desplegándose (el único movimiento de estas pantallas).
+ * Mientras se va conserva el último texto, para no encogerse vacío. Deja 12 dp debajo,
+ * pegado al botón que lo sigue. Con "Quitar animaciones" del sistema, Compose lo hace instantáneo.
+ */
+@Composable
+internal fun AvisoErrorAnimado(mensaje: String?, modifier: Modifier = Modifier) {
+    var ultimo by remember { mutableStateOf(mensaje.orEmpty()) }
+    LaunchedEffect(mensaje) {
+        if (mensaje != null) ultimo = mensaje
+    }
+    AnimatedVisibility(
+        visible = mensaje != null,
+        enter = fadeIn() + expandVertically(expandFrom = Alignment.Top),
+        exit = fadeOut() + shrinkVertically(shrinkTowards = Alignment.Top),
+        modifier = modifier,
+    ) {
+        AvisoError(mensaje ?: ultimo, Modifier.padding(bottom = 12.dp))
     }
 }
 

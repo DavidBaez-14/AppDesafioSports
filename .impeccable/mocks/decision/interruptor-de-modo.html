@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=390">
+<title>Inicio · Interruptor de modo</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;1,800&family=Barlow:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0..1,0">
+<style>
+:root{--bg:#04070F;--tint:#170B06;--s1:#0B0805;--s2:#0D1429;--s3:#151F3F;--line:#1E2D5A;--ink:#EEF0F7;--ink2:#A9B1CC;--or:#FF5500;--or-ink:#FF8A4C;--or-c:#4A1700;--on-or-c:#FFDBC9}
+*{box-sizing:border-box;margin:0}
+body{width:390px;height:844px;overflow:hidden;background:var(--bg);color:var(--ink);font:400 14px/20px Barlow,sans-serif;position:relative}
+.ms{font-family:'Material Symbols Rounded';font-size:24px;line-height:1;font-weight:400}
+.head{background:var(--tint);padding-bottom:12px}
+.status{height:28px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;font:500 13px Barlow}
+.status .ms{font-size:16px;margin-left:4px}
+.bar{height:64px;display:flex;align-items:center;padding:0 4px 0 16px;gap:4px}
+.mark{flex:1;font:italic 800 24px/1 'Barlow Condensed';text-transform:uppercase}
+.mark b{color:var(--or)}
+.ib{width:48px;height:48px;display:grid;place-items:center;color:var(--ink2)}
+.av{width:32px;height:32px;border-radius:50%;background:var(--s3);display:grid;place-items:center;font:600 13px Barlow;color:var(--ink)}
+.seg{display:flex;margin:0 16px;border:1px solid #5A2A12;border-radius:20px;overflow:hidden}
+.seg span{flex:1;height:40px;display:flex;align-items:center;justify-content:center;gap:6px;font:600 14px Barlow;color:var(--ink2)}
+.seg span+span{border-left:1px solid #5A2A12}
+.seg .on{background:var(--or-c);color:var(--on-or-c)}
+.seg .on .ms{font-size:18px}
+.h{font:700 22px/28px 'Barlow Condensed';text-transform:uppercase;letter-spacing:.02em;padding:16px 16px 8px}
+.row{display:flex;align-items:center;gap:14px;min-height:72px;padding:8px 8px 8px 16px}
+.row+.row{border-top:1px solid var(--line)}
+.lead{width:40px;height:40px;border-radius:50%;background:var(--s2);display:grid;place-items:center;color:var(--ink2);flex:none}
+.body{flex:1;min-width:0}
+.body h4{font:600 16px/22px Barlow;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.body p{color:var(--ink2);font-size:13px;line-height:18px}
+.tb{height:40px;padding:0 12px;display:inline-flex;align-items:center;font:600 14px Barlow;color:var(--or-ink)}
+.badge{min-width:24px;height:24px;padding:0 7px;border-radius:12px;background:var(--or);color:var(--bg);font:700 14px/24px 'Barlow Condensed';text-align:center;margin-right:8px}
+.ch{color:var(--ink2);padding:0 8px}
+.fab{position:absolute;right:16px;bottom:116px;height:56px;padding:0 20px 0 16px;border-radius:16px;background:var(--or);color:var(--bg);display:flex;align-items:center;gap:10px;font:600 16px Barlow;box-shadow:0 4px 10px rgba(0,0,0,.45)}
+.nav{position:absolute;left:0;right:0;bottom:0;height:100px;background:var(--s1);display:flex;padding:12px 0 24px}
+.nav div{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;font:600 12px Barlow;color:var(--ink2);position:relative}
+.nav .pill{width:64px;height:32px;border-radius:16px;display:grid;place-items:center}
+.nav .on{color:var(--ink)}
+.nav .on .pill{background:var(--or-c);color:var(--on-or-c)}
+.nav .on .ms{font-variation-settings:'FILL' 1}
+.nav .dot{position:absolute;top:0;left:calc(50% + 6px);min-width:16px;height:16px;border-radius:8px;background:var(--or);color:var(--bg);font:700 11px/16px Barlow;text-align:center;padding:0 4px}
+</style></head>
+<body>
+<div class="head">
+  <div class="status"><span>4:12</span><span><span class="ms">signal_cellular_alt</span><span class="ms">wifi</span><span class="ms">battery_full</span></span></div>
+  <header class="bar">
+    <div class="mark">Desafío <b>Sports</b></div>
+    <div class="ib"><span class="ms">search</span></div>
+    <div class="ib"><div class="av">AP</div></div>
+  </header>
+  <div class="seg"><span>Juego</span><span>Arbitro</span><span class="on"><span class="ms">check</span>Organizo</span></div>
+</div>
+
+<div class="h">Por revisar</div>
+<div class="row">
+  <div class="lead"><span class="ms">how_to_reg</span></div>
+  <div class="body"><h4>3 inscripciones</h4><p>Relámpago de Tenis de Mesa</p></div>
+  <span class="tb">Revisar</span>
+</div>
+<div class="row">
+  <div class="lead"><span class="ms">receipt_long</span></div>
+  <div class="body"><h4>1 comprobante de multa</h4><p>Relámpago de Tenis de Mesa</p></div>
+  <span class="tb">Revisar</span>
+</div>
+
+<div class="h">Mis torneos</div>
+<div class="row">
+  <div class="lead"><span class="ms">sports_tennis</span></div>
+  <div class="body"><h4>Relámpago de Tenis de Mesa</h4><p>Inscripciones abiertas · 12 de 16</p></div>
+  <span class="badge">3</span>
+</div>
+<div class="row">
+  <div class="lead"><span class="ms">sports_basketball</span></div>
+  <div class="body"><h4>Baloncesto 3x3 de Prueba</h4><p>Borrador · sin publicar</p></div>
+  <span class="ms ch">chevron_right</span>
+</div>
+
+<div class="fab"><span class="ms">add</span>Crear torneo</div>
+<nav class="nav">
+  <div class="on"><span class="pill"><span class="ms">emoji_events</span></span>Torneos</div>
+  <div><span class="pill"><span class="ms">inbox</span></span>Bandeja<span class="dot">4</span></div>
+  <div><span class="pill"><span class="ms">person</span></span>Perfil</div>
+</nav>
+</body></html>

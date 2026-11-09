@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=390">
+<title>Inicio · Una lista con filtro</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;1,800&family=Barlow:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0..1,0">
+<style>
+:root{--bg:#04070F;--s1:#090E1C;--s2:#0D1429;--s3:#151F3F;--line:#1E2D5A;--ink:#EEF0F7;--ink2:#A9B1CC;--or:#FF5500;--or-ink:#FF8A4C;--amber:#FACC15;--amber-c:#3A3000}
+*{box-sizing:border-box;margin:0}
+body{width:390px;height:844px;overflow:hidden;background:var(--bg);color:var(--ink);font:400 14px/20px Barlow,sans-serif;position:relative}
+.ms{font-family:'Material Symbols Rounded';font-size:24px;line-height:1;font-weight:400}
+.status{height:28px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;font:500 13px Barlow}
+.status .ms{font-size:16px;margin-left:4px}
+.bar{height:64px;display:flex;align-items:center;padding:0 4px 0 16px;gap:4px}
+.mark{flex:1;font:italic 800 24px/1 'Barlow Condensed';text-transform:uppercase}
+.mark b{color:var(--or)}
+.ib{width:48px;height:48px;display:grid;place-items:center;color:var(--ink2)}
+.av{width:32px;height:32px;border-radius:50%;background:var(--s3);display:grid;place-items:center;font:600 13px Barlow;color:var(--ink)}
+.chips{display:flex;gap:8px;padding:4px 16px 8px;white-space:nowrap;overflow:hidden}
+.fc{height:32px;padding:0 12px;border-radius:8px;border:1px solid var(--line);display:inline-flex;align-items:center;gap:6px;font:600 14px Barlow;color:var(--ink2);flex:none}
+.fc b{font:700 15px 'Barlow Condensed';color:var(--ink)}
+.fc.sel{background:var(--s3);border-color:var(--s3);color:var(--ink);padding-left:8px}
+.fc.sel .ms{font-size:18px}
+.g{font:700 20px/26px 'Barlow Condensed';text-transform:uppercase;letter-spacing:.02em;padding:16px 16px 4px}
+.row{display:flex;align-items:center;gap:14px;min-height:76px;padding:8px 8px 8px 16px}
+.row+.row{border-top:1px solid var(--line)}
+.when{width:52px;text-align:center;flex:none}
+.when small{display:block;font:600 11px/14px Barlow;letter-spacing:.06em;color:var(--ink2);text-transform:uppercase}
+.when b{display:block;font:700 24px/26px 'Barlow Condensed';font-variant-numeric:tabular-nums}
+.when.now small,.when.now b{color:var(--or-ink)}
+.lead{width:52px;display:grid;place-items:center;color:var(--ink2);flex:none}
+.body{flex:1;min-width:0}
+.body h4{font:600 16px/22px Barlow;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.body p{color:var(--ink2);font-size:13px;line-height:18px}
+.tb{height:40px;padding:0 12px;display:inline-flex;align-items:center;font:600 14px Barlow;color:var(--or-ink);flex:none}
+.tb.q{color:var(--ink)}
+.chip{height:28px;padding:0 10px;border-radius:8px;font:600 12px Barlow;display:inline-flex;align-items:center;margin-right:8px}
+.chip.amber{background:var(--amber-c);color:var(--amber)}
+.fab{position:absolute;right:16px;bottom:116px;height:56px;padding:0 20px 0 16px;border-radius:16px;background:var(--or);color:var(--bg);display:flex;align-items:center;gap:10px;font:600 16px Barlow;box-shadow:0 4px 10px rgba(0,0,0,.45)}
+.nav{position:absolute;left:0;right:0;bottom:0;height:100px;background:var(--s1);display:flex;padding:12px 0 24px}
+.nav div{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;font:600 12px Barlow;color:var(--ink2)}
+.nav .pill{width:64px;height:32px;border-radius:16px;display:grid;place-items:center}
+.nav .on{color:var(--ink)}
+.nav .on .pill{background:var(--s3)}
+.nav .on .ms{font-variation-settings:'FILL' 1}
+</style></head>
+<body>
+<div class="status"><span>4:12</span><span><span class="ms">signal_cellular_alt</span><span class="ms">wifi</span><span class="ms">battery_full</span></span></div>
+<header class="bar">
+  <div class="mark">Desafío <b>Sports</b></div>
+  <div class="ib"><span class="ms">search</span></div>
+  <div class="ib"><div class="av">DB</div></div>
+</header>
+
+<div class="chips">
+  <span class="fc sel"><span class="ms">check</span>Todo</span>
+  <span class="fc">Organizo <b>1</b></span>
+  <span class="fc">Arbitro <b>1</b></span>
+  <span class="fc">Juego <b>1</b></span>
+  <span class="fc">Delego <b>1</b></span>
+</div>
+
+<div class="g">Hoy</div>
+<div class="row">
+  <div class="when now"><small>pm</small><b>4:00</b></div>
+  <div class="body"><h4>Sistemas vs Civil</h4><p>Arbitras · Interfacultades Fútbol Sala</p></div>
+  <span class="tb">Planilla</span>
+</div>
+<div class="row">
+  <div class="lead"><span class="ms">how_to_reg</span></div>
+  <div class="body"><h4>3 inscripciones por aprobar</h4><p>Organizas · Relámpago de Tenis de Mesa</p></div>
+  <span class="tb">Revisar</span>
+</div>
+
+<div class="g">Esta semana</div>
+<div class="row">
+  <div class="when"><small>Sáb</small><b>10:00</b></div>
+  <div class="body"><h4>Bloqueo Total vs Remate Norte</h4><p>Juegas · Liga de Voleibol Mixto</p></div>
+  <span class="ms" style="color:var(--ink2);padding:0 8px">chevron_right</span>
+</div>
+<div class="row">
+  <div class="lead"><span class="ms">receipt_long</span></div>
+  <div class="body"><h4>Comprobante de inscripción</h4><p>Delegas · Los Pibes FC · Copa Sistemas</p></div>
+  <span class="chip amber">Pendiente</span>
+</div>
+
+<div class="g">Más adelante</div>
+<div class="row">
+  <div class="when"><small>21 nov</small><b>8:00</b></div>
+  <div class="body"><h4>Arranca el Relámpago de Tenis de Mesa</h4><p>Organizas · 12 de 16 inscritos</p></div>
+  <span class="tb q">Ver</span>
+</div>
+
+<div class="fab"><span class="ms">add</span>Crear torneo</div>
+<nav class="nav">
+  <div class="on"><span class="pill"><span class="ms">home</span></span>Inicio</div>
+  <div><span class="pill"><span class="ms">explore</span></span>Explorar</div>
+  <div><span class="pill"><span class="ms">person</span></span>Perfil</div>
+</nav>
+</body></html>

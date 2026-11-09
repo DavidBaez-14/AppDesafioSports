@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=390">
+<title>Inicio · Tres puertas</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;1,800&family=Barlow:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0..1,0">
+<style>
+:root{--bg:#04070F;--s1:#090E1C;--s2:#0D1429;--s3:#151F3F;--line:#1E2D5A;--ink:#EEF0F7;--ink2:#A9B1CC;--or:#FF5500;--or-ink:#FF8A4C;--or-c:#4A1700;--on-or-c:#FFDBC9}
+*{box-sizing:border-box;margin:0}
+body{width:390px;height:844px;overflow:hidden;background:var(--bg);color:var(--ink);font:400 14px/20px Barlow,sans-serif;position:relative}
+.ms{font-family:'Material Symbols Rounded';font-size:24px;line-height:1;font-weight:400}
+.status{height:28px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;font:500 13px Barlow}
+.status .ms{font-size:16px;margin-left:4px}
+.bar{height:64px;display:flex;align-items:center;padding:0 4px 0 16px;gap:4px}
+.mark{flex:1;font:italic 800 24px/1 'Barlow Condensed';text-transform:uppercase}
+.mark b{color:var(--or)}
+.ib{width:48px;height:48px;display:grid;place-items:center;color:var(--ink2)}
+.av{width:32px;height:32px;border-radius:50%;background:var(--s3);display:grid;place-items:center;font:600 13px Barlow;color:var(--ink)}
+.door{margin:12px 16px 0;background:var(--s2);border-radius:20px;padding:18px 16px 18px 18px;min-height:178px;display:flex;flex-direction:column;justify-content:space-between}
+.top{display:flex;align-items:center;justify-content:space-between}
+.top h2{font:800 40px/1 'Barlow Condensed';text-transform:uppercase;letter-spacing:.01em}
+.go{width:48px;height:48px;border-radius:24px;background:var(--s3);display:grid;place-items:center}
+.door h3{font:600 16px/22px Barlow;margin-top:14px}
+.door p{color:var(--ink2);font-size:13px;line-height:18px}
+.chip{display:inline-flex;align-items:center;gap:4px;height:28px;padding:0 10px;border-radius:8px;font:600 13px Barlow;margin-top:10px;align-self:flex-start}
+.chip.now{background:var(--or-c);color:var(--or-ink)}
+.chip.n{background:var(--s3);color:var(--ink2)}
+.chip .ms{font-size:16px}
+.nav{position:absolute;left:0;right:0;bottom:0;height:100px;background:var(--s1);display:flex;padding:12px 0 24px}
+.nav div{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;font:600 12px Barlow;color:var(--ink2)}
+.nav .pill{width:64px;height:32px;border-radius:16px;display:grid;place-items:center}
+.nav .on{color:var(--ink)}
+.nav .on .pill{background:var(--s3)}
+.nav .on .ms{font-variation-settings:'FILL' 1}
+</style></head>
+<body>
+<div class="status"><span>4:12</span><span><span class="ms">signal_cellular_alt</span><span class="ms">wifi</span><span class="ms">battery_full</span></span></div>
+<header class="bar">
+  <div class="mark">Desafío <b>Sports</b></div>
+  <div class="ib"><span class="ms">search</span></div>
+  <div class="ib"><div class="av">AP</div></div>
+</header>
+
+<section class="door">
+  <div class="top"><h2>Organizo</h2><span class="go"><span class="ms">arrow_forward</span></span></div>
+  <div><h3>Relámpago de Tenis de Mesa</h3><p>Inscripciones abiertas · 12 de 16</p></div>
+  <span class="chip now">3 inscripciones por aprobar</span>
+</section>
+
+<section class="door">
+  <div class="top"><h2>Arbitro</h2><span class="go"><span class="ms">arrow_forward</span></span></div>
+  <div><h3>Sistemas vs Civil</h3><p>Interfacultades Fútbol Sala · Cancha 2</p></div>
+  <span class="chip now"><span class="ms">schedule</span>Hoy 4:00 pm</span>
+</section>
+
+<section class="door">
+  <div class="top"><h2>Juego</h2><span class="go"><span class="ms">arrow_forward</span></span></div>
+  <div><h3>Bloqueo Total vs Remate Norte</h3><p>Liga de Voleibol Mixto · y delegas Los Pibes FC</p></div>
+  <span class="chip n"><span class="ms">schedule</span>Sáb 10:00 am</span>
+</section>
+
+<nav class="nav">
+  <div class="on"><span class="pill"><span class="ms">home</span></span>Inicio</div>
+  <div><span class="pill"><span class="ms">explore</span></span>Explorar</div>
+  <div><span class="pill"><span class="ms">person</span></span>Perfil</div>
+</nav>
+</body></html>

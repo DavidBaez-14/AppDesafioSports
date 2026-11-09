@@ -1,6 +1,6 @@
 # Plan de UI · Pantallas con Impeccable y el Design System
 
-> **Estado:** borrador para revisar (8 nov 2026).
+> **Estado:** en revisión (8 nov 2026). Respondidas: P1, P2, P12 y la estructura de roles (§6, regla 1). Prototipo navegable en [`prototipo-roles/index.html`](prototipo-roles/index.html).
 > **Cómo responder:** las preguntas están en el **§9**. Debajo de cada una hay un espacio **"Tu respuesta"**: escribe ahí, aunque sea "de acuerdo". Con esas respuestas se redacta la primera spec de diseño (MOV-0002).
 > **Base:** la estructura y la red ya funcionan ([MOV-0001](specs/MOV-0001-estructura-base.md)): la app inicia sesión en Supabase y consulta `GET /api/auth/me` en el emulador.
 
@@ -101,7 +101,7 @@ Comandos de Impeccable que se usarán:
 4. **Componentes base:**
    - botones: lleno, tonal, contorno y texto;
    - campos con error, tarjetas y estados vacío, cargando, error y sin conexión;
-   - barra superior, **barra inferior por modo** y selector de modo;
+   - barra superior, barra inferior (Inicio · Explorar · Perfil) y menú "Tus secciones";
    - **chips de estado**: pendiente, aprobado, rechazado, bloqueado e inhabilitado;
    - escudo o avatar con iniciales;
    - fila de tabla con cifras de ancho fijo.
@@ -151,9 +151,11 @@ Comandos de Impeccable que se usarán:
 
 Salen de decisiones anteriores; no se vuelven a discutir salvo que tú lo pidas.
 
-1. **Tres modos sobre una misma cuenta:** Jugador, Árbitro y Creador, más el Visitante sin sesión.
-   - El modo es la interfaz; **los permisos los decide el backend**.
+1. **Jugador de base, con secciones** (decisión del 8-nov, reemplaza "tres modos sobre una misma cuenta"): todos entran como jugador; **Creador** y **Árbitro** son secciones a las que se entra desde Inicio, desde la foto de perfil o al crear un torneo. No se elige modo al entrar ni se guarda.
+   - Inicio muestra "Tus secciones" con lo urgente de cada una; el torneo se ve igual desde cualquier sección y ofrece un acceso directo ("Abrir en Creador").
+   - Los permisos los decide el backend, por torneo, y en el móvil nadie solicita roles.
    - No hay administradores globales: el Creador administra **solo sus torneos**.
+   - Prototipo navegable, con la alternativa "sin modos" para comparar: [`prototipo-roles/index.html`](prototipo-roles/index.html).
 2. **Árbitros:** se asignan por partido. Solo pueden operar todo un torneo si el Creador les da ese permiso.
 3. **Neutral al deporte.** Los eventos **no llevan minuto**: la línea de tiempo va en orden.
 4. **Sin datos personales en vistas públicas:** se usa el nombre visible "Nombres A.", y no se muestra ningún nombre bajo los equipos en la clasificación.
@@ -183,7 +185,7 @@ Los IDs `N-x` vienen de la revisión de los mockups del 2-nov.
 | N-2 | Completar registro + solicitar rol | Con sesión | F0 | `POST /api/auth/registro`, `POST /api/auth/solicitar-rol` | Sí |
 | N-3 | Recuperar contraseña | Visitante | F0 | Supabase `resetPasswordForEmail` | Sí (el cambio de contraseña sigue en la web) |
 | N-5 | Cuenta bloqueada o solicitud pendiente | Con sesión | F0 | `GET /api/auth/me` | Sí |
-| N-7 | Elegir y cambiar modo | Con sesión | F0 | — (local) | Sí |
+| N-7 | Secciones Creador y Árbitro (antes: elegir y cambiar modo) | Con sesión | F0 | — (local) | Sí |
 | N-8 | Mi perfil e historial | Jugador | F1 | `GET /api/supercopa/mi-perfil` | Sí |
 | N-9 | Editar perfil deportivo (opcional) | Jugador | F1 | `PUT /api/supercopa/mi-perfil` | Sí |
 | N-10 | Unirme a un equipo y mis solicitudes | Jugador | F1 | torneos, equipos, `POST /solicitudes`, `mis-solicitudes` | Sí (roles globales) |
@@ -247,7 +249,7 @@ Los IDs `N-x` vienen de la revisión de los mockups del 2-nov.
 **Recomendación:** **(a)**. Así se puede avanzar ya, y el logo final se cambia en un solo lugar (el ícono y `strings.xml`).
 
 **Tu respuesta:**
->
+> **8-nov:** (a). La identidad de Desafío Sports conserva el azul marino oscuro y el naranja de la web; el logo, cuando exista, usa esos colores. Mientras tanto, logotipo tipográfico.
 
 ### P2 · Tema claro, oscuro o los dos
 
@@ -261,7 +263,7 @@ Los IDs `N-x` vienen de la revisión de los mockups del 2-nov.
 **Recomendación:** **(a)**, **sin** color dinámico (Material You), porque tapa los colores de la marca.
 
 **Tu respuesta:**
->
+> **8-nov:** (a), sin color dinámico. El oscuro es el principal, con el azul marino y el naranja de la web. El claro queda a criterio del diseño; en el prototipo: fondo gris azulado claro, tinta azul marino y naranja `#C23C00` en los botones.
 
 ### P3 · Contraste del naranja en los botones
 
@@ -375,7 +377,7 @@ Los IDs `N-x` vienen de la revisión de los mockups del 2-nov.
 - la barra del Creador queda en "Mis torneos · Perfil", o suma una tercera pestaña real si aparece una.
 
 **Tu respuesta:**
->
+> **8-nov:** de acuerdo, con un cambio por la estructura nueva (§6, regla 1): "Crear torneo" es el botón flotante de Inicio y de la sección Creador. Creador no tiene barra inferior propia: es una sección con Atrás.
 
 ### P13 · Las 12 preguntas abiertas de la revisión de mockups
 

@@ -75,6 +75,7 @@ fun AppNavigation(
                 } else {
                     null
                 },
+                googleWebClientId = BuildConfig.GOOGLE_WEB_CLIENT_ID.ifBlank { null },
             )
         }
         composable<RecuperarClave> {

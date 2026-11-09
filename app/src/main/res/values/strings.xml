@@ -23,6 +23,12 @@
     <string name="recuperar_volver">Volver a entrar</string>
     <string name="accion_atras">Atrás</string>
 
+    <!-- Continuar con Google (MOV-0006). -->
+    <string name="login_o">o</string>
+    <string name="login_google">Continuar con Google</string>
+    <string name="google_sin_cuenta">No hay una cuenta de Google en este teléfono. Agrégala en Ajustes y vuelve a intentarlo.</string>
+    <string name="google_error">No pudimos continuar con Google. Inténtalo de nuevo o entra con tu correo.</string>
+
     <!-- Crear cuenta, revisa tu correo y completar registro (MOV-0003). -->
     <string name="login_crear_cuenta">Crear cuenta</string>
     <string name="registro_titulo">Crear cuenta</string>

@@ -46,6 +46,15 @@ class FakeSesionRepository : SesionRepository {
         return resultadoInicio
     }
 
+    var resultadoGoogle: Result<Unit> = Result.success(Unit)
+    val llamadasGoogle = mutableListOf<Pair<String, String>>()
+
+    override suspend fun iniciarSesionConGoogle(idToken: String, nonce: String): Result<Unit> {
+        llamadasGoogle += idToken to nonce
+        if (resultadoGoogle.isSuccess) estado.value = EstadoSesion.Activa("google@prueba.local")
+        return resultadoGoogle
+    }
+
     override suspend fun recuperarClave(correo: String): Result<Unit> {
         llamadasRecuperacion += correo
         return resultadoRecuperacion

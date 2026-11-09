@@ -6,7 +6,9 @@ import co.edu.ufps.desafiosports.domain.model.ResultadoRegistro
 import co.edu.ufps.desafiosports.domain.repository.SesionRepository
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.OtpType
+import io.github.jan.supabase.auth.providers.Google
 import io.github.jan.supabase.auth.providers.builtin.Email
+import io.github.jan.supabase.auth.providers.builtin.IDToken
 import io.github.jan.supabase.auth.status.SessionStatus
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -27,6 +29,16 @@ class SesionRepositoryImpl(private val auth: Auth) : SesionRepository {
         auth.signInWith(Email) {
             email = correo
             password = clave
+        }
+    }
+
+    // Login nativo con Google (MOV-0006): el ID token viene de Credential Manager; Supabase verifica
+    // que el hash del nonce coincida con el que lleva el token.
+    override suspend fun iniciarSesionConGoogle(idToken: String, nonce: String): Result<Unit> = llamarSupabase {
+        auth.signInWith(IDToken) {
+            this.idToken = idToken
+            provider = Google
+            this.nonce = nonce
         }
     }
 

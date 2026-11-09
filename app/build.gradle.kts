@@ -37,6 +37,8 @@ android {
         buildConfigField("String", "SUPABASE_PUBLISHABLE_KEY", "\"${configLocal("SUPABASE_PUBLISHABLE_KEY")}\"")
         // Desde el emulador, 10.0.2.2 es el localhost del PC. Con teléfono por USB: adb reverse.
         buildConfigField("String", "API_BASE_URL", "\"${configLocal("API_BASE_URL", "http://10.0.2.2:8082/")}\"")
+        // ID del cliente WEB de Google (el que usa Supabase). Vacío = la app no ofrece Google (MOV-0006).
+        buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"${configLocal("GOOGLE_WEB_CLIENT_ID")}\"")
     }
 
     buildTypes {
@@ -78,6 +80,10 @@ dependencies {
     implementation(platform(libs.supabase.bom))
     implementation(libs.supabase.auth)
     implementation(libs.ktor.client.okhttp)
+
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services)
+    implementation(libs.googleid)
 
     implementation(libs.retrofit)
     implementation(libs.retrofit.kotlinx.serialization)

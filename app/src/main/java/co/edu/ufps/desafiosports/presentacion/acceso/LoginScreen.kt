@@ -1,6 +1,17 @@
 package co.edu.ufps.desafiosports.presentacion.acceso
 
 import android.content.res.Configuration
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import kotlinx.coroutines.launch
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -62,9 +73,13 @@ fun LoginScreen(
     onCrearCuenta: () -> Unit,
     onCompletarRegistro: () -> Unit,
     onAbrirDiagnostico: (() -> Unit)?,
+    /** ID del cliente web de Google; null = la app no ofrece Google (MOV-0006 · CA-1). */
+    googleWebClientId: String?,
     viewModel: LoginViewModel = viewModel(factory = LoginViewModel.Factory),
 ) {
     val state = viewModel.state
+    val contexto = LocalContext.current
+    val alcance = rememberCoroutineScope()
     LaunchedEffect(state.ingresado) {
         if (state.ingresado) {
             viewModel.onIngresoAtendido()
@@ -86,6 +101,12 @@ fun LoginScreen(
         onRecuperarClave = { onRecuperarClave(state.correo.trim()) },
         onCrearCuenta = onCrearCuenta,
         onAbrirDiagnostico = onAbrirDiagnostico,
+        mostrarGoogle = googleWebClientId != null,
+        onGoogle = {
+            if (googleWebClientId != null && viewModel.iniciarGoogle()) {
+                alcance.launch { viewModel.onResultadoGoogle(pedirCuentaGoogle(contexto, googleWebClientId)) }
+            }
+        },
     )
 }
 
@@ -100,6 +121,8 @@ fun LoginContenido(
     onCrearCuenta: () -> Unit,
     onAbrirDiagnostico: (() -> Unit)?,
     modifier: Modifier = Modifier,
+    mostrarGoogle: Boolean = false,
+    onGoogle: () -> Unit = {},
 ) {
     val foco = LocalFocusManager.current
     val habilitado = !state.enProceso
@@ -207,6 +230,18 @@ fun LoginContenido(
                     )
                 }
 
+                if (mostrarGoogle) {
+                    SeparadorO()
+                    BotonGoogle(
+                        onClick = {
+                            foco.clearFocus()
+                            onGoogle()
+                        },
+                        habilitado = habilitado,
+                        modifier = Modifier.testTag("login_google"),
+                    )
+                }
+
                 // Para quien llega por primera vez (MOV-0003): contorneado, sin competir con el naranja de Entrar.
                 BotonSecundario(
                     texto = stringResource(R.string.login_crear_cuenta),
@@ -234,7 +269,44 @@ fun LoginContenido(
     }
 }
 
+/** Línea con una "o" en el centro: separa entrar con correo de las otras formas de entrar. */
+@Composable
+private fun SeparadorO() {
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        HorizontalDivider(modifier = Modifier.weight(1f), color = MaterialTheme.colorScheme.outlineVariant)
+        Text(stringResource(R.string.login_o), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        HorizontalDivider(modifier = Modifier.weight(1f), color = MaterialTheme.colorScheme.outlineVariant)
+    }
+}
+
+/** "Continuar con Google" con la "G" a color, como piden las guías de marca de Google (MOV-0006). */
+@Composable
+private fun BotonGoogle(onClick: () -> Unit, habilitado: Boolean, modifier: Modifier = Modifier) {
+    OutlinedButton(
+        onClick = onClick,
+        enabled = habilitado,
+        shape = MaterialTheme.shapes.extraLarge,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.onSurface),
+        modifier = modifier
+            .fillMaxWidth()
+            .heightIn(min = 52.dp),
+    ) {
+        Icon(painterResource(R.drawable.ic_google), contentDescription = null, tint = Color.Unspecified, modifier = Modifier.size(18.dp))
+        Spacer(Modifier.width(12.dp))
+        Text(stringResource(R.string.login_google), style = MaterialTheme.typography.labelLarge)
+    }
+}
+
 private val estadoDeEjemplo = LoginState(correo = "andres.pena@correo.co", clave = "contrasena")
+
+@Preview(name = "Login con Google · oscuro", uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true, widthDp = 390, heightDp = 844)
+@Composable
+private fun LoginContenidoGooglePreview() {
+    DesafioSportsTheme {
+        LoginContenido(estadoDeEjemplo, {}, {}, {}, {}, {}, {}, null, mostrarGoogle = true)
+    }
+}
 
 @Preview(name = "Login · oscuro", uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true, widthDp = 390, heightDp = 844)
 @Preview(name = "Login · claro", showBackground = true, widthDp = 390, heightDp = 844)

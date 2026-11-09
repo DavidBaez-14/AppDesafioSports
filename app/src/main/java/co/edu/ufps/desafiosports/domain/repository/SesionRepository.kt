@@ -10,6 +10,9 @@ interface SesionRepository {
 
     suspend fun iniciarSesion(correo: String, clave: String): Result<Unit>
 
+    /** Cambia el ID token de Google por una sesión de Supabase. [nonce] va sin hash (MOV-0006). */
+    suspend fun iniciarSesionConGoogle(idToken: String, nonce: String): Result<Unit>
+
     /** Pide a Supabase el correo de recuperación. La contraseña nueva se crea en la web. */
     suspend fun recuperarClave(correo: String): Result<Unit>
 

@@ -1,0 +1,15 @@
+MOV-0006 · GREEN (9-nov-2026): ./gradlew testDebugUnitTest assembleDebug → BUILD SUCCESSFUL.
+Suite completa: 106 tests, 0 fallos, 3 omitidos (BackendRealHumoTest: solo con DESAFIO_HUMO=1).
+Nuevos: LoginConGoogleTest (7, CA-2 a CA-7) e IniciarSesionConGoogleUseCaseTest (4, CA-5 y CA-8).
+Dependencias nuevas: androidx.credentials:credentials y credentials-play-services-auth 1.5.0, googleid 1.1.1.
+
+Emulador (Pixel_8 del usuario, API 37), capturas en esta carpeta:
+02 login con "Continuar con Google" (build con un GOOGLE_WEB_CLIENT_ID de prueba, solo para ver el botón)
+03 al tocarlo se abre el selector de cuentas de Google "to continue to Desafío Sports" (CA-2: el login queda en proceso detrás)
+04 Atrás cancela: el login vuelve a estar disponible y sin aviso (CA-3)
+05 build normal sin GOOGLE_WEB_CLIENT_ID: no aparecen ni el botón ni la "o" (CA-1)
+
+No verificado (y por qué):
+- Entrar de verdad con una cuenta de Google: falta el cliente OAuth Android en Google Cloud (paquete
+  co.edu.ufps.desafiosports, SHA-1 99:BE:19:B9:93:05:0C:92:23:E1:D8:2C:7B:DE:E8:1B:7C:87:E8:16) y poner el
+  ID del cliente web en local.properties. El emulador no tiene una cuenta de Google iniciada.

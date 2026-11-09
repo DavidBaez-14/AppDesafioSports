@@ -5,6 +5,8 @@ data class Configuracion(
     val supabaseUrl: String,
     val supabaseClavePublicable: String,
     val apiBaseUrl: String,
+    /** ID del cliente web de Google (el mismo de Supabase). Opcional: sin él no se ofrece Google (MOV-0006). */
+    val googleWebClientId: String = "",
 ) {
     fun faltantes(): List<String> = buildList {
         if (supabaseUrl.isBlank()) add("SUPABASE_URL")
@@ -13,4 +15,6 @@ data class Configuracion(
     }
 
     val completa: Boolean get() = faltantes().isEmpty()
+
+    val googleDisponible: Boolean get() = googleWebClientId.isNotBlank()
 }

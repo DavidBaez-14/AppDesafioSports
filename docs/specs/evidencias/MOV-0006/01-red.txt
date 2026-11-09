@@ -1,0 +1,15 @@
+MOV-0006 · RED (9-nov-2026): ./gradlew testDebugUnitTest con los tests nuevos y la producción sin implementar.
+Compila; fallan solo los tests nuevos de MOV-0006. "CA-3 cancelar" pasa desde el inicio porque no hacer nada es lo esperado.
+
+IniciarSesionConGoogleUseCaseTest > CA-8 el nonce es aleatorio en cada intento FAILED
+IniciarSesionConGoogleUseCaseTest > CA-8 a Google va el SHA-256 del nonce en hexadecimal FAILED
+IniciarSesionConGoogleUseCaseTest > CA-5 con token llama a Supabase con el token y el nonce crudo FAILED
+IniciarSesionConGoogleUseCaseTest > CA-5 sin token no llama a Supabase FAILED
+LoginConGoogleTest > CA-2 al tocar el boton queda en proceso y un segundo toque no abre otro selector FAILED
+LoginConGoogleTest > CA-7 si Supabase rechaza el token muestra el aviso y libera el login FAILED
+LoginConGoogleTest > CA-6 cuenta bloqueada muestra el aviso y cierra la sesion FAILED
+LoginConGoogleTest > CA-4 un fallo del selector muestra el aviso FAILED
+LoginConGoogleTest > CA-5 token valido de una cuenta registrada inicia sesion con el nonce crudo y entra FAILED
+LoginConGoogleTest > CA-6 token valido de una cuenta sin registro va a completar registro FAILED
+106 tests completed, 10 failed, 3 skipped
+BUILD FAILED in 10s

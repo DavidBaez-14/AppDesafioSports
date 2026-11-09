@@ -13,3 +13,9 @@ SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
 #  - Emulador: http://10.0.2.2:8082/   (valor por defecto si no lo pones)
 #  - Teléfono por USB: corre "adb reverse tcp:8082 tcp:8082" y usa http://localhost:8082/
 API_BASE_URL=http://10.0.2.2:8082/
+
+# Opcional: "Continuar con Google" (MOV-0006). Es el ID del cliente WEB de Google Cloud, el mismo que
+# está en Supabase → Authentication → Providers → Google. No es secreto, pero va aquí y no en el código.
+# Además hace falta un cliente OAuth ANDROID con el paquete co.edu.ufps.desafiosports y el SHA-1 de tu
+# llave de debug (cada integrante el suyo). Sin este valor, el botón de Google no aparece.
+GOOGLE_WEB_CLIENT_ID=

@@ -3,6 +3,7 @@ package co.edu.ufps.desafiosports.presentacion.acceso
 import co.edu.ufps.desafiosports.domain.error.AppError
 import co.edu.ufps.desafiosports.domain.model.EstadoSesion
 import co.edu.ufps.desafiosports.domain.use_case.identidad.CerrarSesionUseCase
+import co.edu.ufps.desafiosports.domain.use_case.identidad.IniciarSesionConGoogleUseCase
 import co.edu.ufps.desafiosports.domain.use_case.identidad.IniciarSesionUseCase
 import co.edu.ufps.desafiosports.domain.use_case.identidad.ObtenerCuentaUseCase
 import co.edu.ufps.desafiosports.testutil.FakeCuentaRepository
@@ -28,6 +29,7 @@ class LoginViewModelTest {
 
     private fun crearViewModel() = LoginViewModel(
         iniciarSesionUseCase = IniciarSesionUseCase(sesion),
+        iniciarSesionConGoogleUseCase = IniciarSesionConGoogleUseCase(sesion),
         obtenerCuentaUseCase = ObtenerCuentaUseCase(cuentas),
         cerrarSesionUseCase = CerrarSesionUseCase(sesion),
     )

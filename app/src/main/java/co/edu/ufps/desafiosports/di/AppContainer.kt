@@ -16,6 +16,7 @@ import co.edu.ufps.desafiosports.domain.repository.ServidorRepository
 import co.edu.ufps.desafiosports.domain.repository.SesionRepository
 import co.edu.ufps.desafiosports.domain.use_case.identidad.CerrarSesionUseCase
 import co.edu.ufps.desafiosports.domain.use_case.identidad.CompletarRegistroUseCase
+import co.edu.ufps.desafiosports.domain.use_case.identidad.IniciarSesionConGoogleUseCase
 import co.edu.ufps.desafiosports.domain.use_case.identidad.ReenviarConfirmacionUseCase
 import co.edu.ufps.desafiosports.domain.use_case.identidad.RegistrarseUseCase
 import co.edu.ufps.desafiosports.domain.use_case.identidad.IniciarSesionUseCase
@@ -75,6 +76,7 @@ class AppContainer(val configuracion: Configuracion) {
 
     // ── Casos de uso ───────────────────────────────────────────────────────
     val iniciarSesion by lazy { IniciarSesionUseCase(sesionRepository) }
+    val iniciarSesionConGoogle by lazy { IniciarSesionConGoogleUseCase(sesionRepository) }
     val recuperarClave by lazy { RecuperarClaveUseCase(sesionRepository) }
     val registrarse by lazy { RegistrarseUseCase(sesionRepository) }
     val reenviarConfirmacion by lazy { ReenviarConfirmacionUseCase(sesionRepository) }
@@ -90,6 +92,7 @@ class AppContainer(val configuracion: Configuracion) {
             supabaseUrl = BuildConfig.SUPABASE_URL,
             supabaseClavePublicable = BuildConfig.SUPABASE_PUBLISHABLE_KEY,
             apiBaseUrl = BuildConfig.API_BASE_URL,
+            googleWebClientId = BuildConfig.GOOGLE_WEB_CLIENT_ID,
         )
     }
 }

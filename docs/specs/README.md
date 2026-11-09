@@ -12,16 +12,21 @@
 | [MOV-0002](MOV-0002-login.md) | Tema de marca, arranque e inicio de sesión con correo | hecha | F0 | David | MOV-0001 | `mov-0002-login` |
 | [MOV-0003](MOV-0003-crear-cuenta.md) | Crear cuenta, revisa tu correo y completar registro | en-revision | F0 | David | MOV-0002 | `mov-0003-crear-cuenta` |
 | [MOV-0006](MOV-0006-google.md) | Continuar con Google (Credential Manager → Supabase) | hecha | F0 | David | MOV-0003 · cliente OAuth Android | `mov-0006-google` |
+| [MOV-0004](MOV-0004-inicio-y-perfil.md) | Inicio (jugador), navegación principal y Perfil | borrador | F1 | — | MOV-0003 · backend: secciones en `/me` y `yo/equipos` | `mov-0004-inicio-y-perfil` |
+| [MOV-0005](MOV-0005-explorar-y-torneo.md) | Explorar torneos públicos y detalle del torneo | borrador | F4 | — | MOV-0004 · backend M4: visibilidad, deporte y `/api/public` | `mov-0005-explorar-y-torneo` |
+| [MOV-0007](MOV-0007-crear-torneo.md) | Crear torneo en tres pasos | borrador | F3 | — | MOV-0004 · backend 0024 y M4 | `mov-0007-crear-torneo` |
+| [MOV-0008](MOV-0008-seccion-creador.md) | Sección Creador, mis torneos y por revisar | borrador | F3 | — | MOV-0004, MOV-0005 · backend 0024 | `mov-0008-seccion-creador` |
+| [MOV-0009](MOV-0009-seccion-arbitro-y-planilla.md) | Sección Árbitro y planilla del partido | borrador | F2 | — | MOV-0004 · backend 0025 | `mov-0009-seccion-arbitro` |
+
+Cada borrador trae en su §4 lo que ya existe en el backend y lo que falta, con el JSON esperado, para que la spec del backend se escriba aparte en `CODECUP/.context/specs/`.
 
 ## Próximas (por redactar)
 
-Salen del plan de UI ([`../plan-ui-impeccable.md`](../plan-ui-impeccable.md) §5) y de la estructura de roles decidida el 8-nov: todos entran como jugador y Creador y Árbitro son secciones ([`../../PRODUCT.md`](../../PRODUCT.md), prototipo en [`../prototipo-roles/`](../prototipo-roles/index.html)). Los números son tentativos: se fijan al redactar cada una.
+Salen del plan de UI ([`../plan-ui-impeccable.md`](../plan-ui-impeccable.md) §5) y de la estructura de roles decidida el 8-nov: todos entran como jugador y Creador y Árbitro son secciones ([`../../PRODUCT.md`](../../PRODUCT.md), prototipo en [`../prototipo-roles/`](../prototipo-roles/index.html)). Los números se fijan al redactar cada una.
 
-| ID tentativo | Título | Fase | Depende de |
-|---|---|---|---|
-| MOV-0004 | Inicio (jugador), secciones Creador y Árbitro y navegación, con sus estados vacíos; cuenta bloqueada | F0 | MOV-0002 · backend M3 para los datos de las secciones |
-| MOV-0005 | Componentes base y pantallas de calibración (clasificación y planilla con datos de ejemplo) | Base | MOV-0002 |
-| MOV-0007 | Jugador: mi perfil, historial y perfil deportivo | F1 | MOV-0004 |
-| MOV-0008 | Jugador: unirme a un equipo y mis solicitudes | F1 | MOV-0004 |
-| MOV-0009 | Delegado: plantel, solicitudes de ingreso e inscripciones | F1 | MOV-0004 |
-| MOV-0010 | Comprobantes (inscripción y multa) y mis multas | F1 | MOV-0009 · backend: subida de multas por el jugador |
+| Título | Depende de |
+|---|---|
+| Inscribirme o inscribir un equipo (individual y por equipos) | MOV-0005 |
+| Delegado: plantel, solicitudes de ingreso e inscripciones | MOV-0004 |
+| Comprobantes (inscripción y multa) y mis multas | backend: subida de multas por el jugador |
+| Configuración del torneo (formato, cuota, premios, multas y árbitros) | MOV-0008 |

@@ -2,7 +2,7 @@
 id: MOV-0002
 titulo: Tema de marca, arranque e inicio de sesión con correo
 tipo: feature
-estado: en-revision
+estado: hecha
 prioridad: P1
 fase: F0
 modo: Transversal
@@ -163,3 +163,4 @@ Los tests de Compose UI necesitan dependencias de `androidTest`, que entran con 
 | 2026-11-09 | RED (26 tests nuevos fallando, `evidencias/MOV-0002/01-red.txt`) → GREEN (62 tests, 0 fallos). CA-1 suma el caso de configuración incompleta. Verificación en el emulador. Ajuste: espaciado de letras de Barlow en los textos de cuerpo y en las etiquetas pequeñas |
 | 2026-11-09 | MOV-0003/CA-7 reemplaza el caso de 404 `CUENTA_NO_REGISTRADA` de CA-5: ya no cierra la sesión, va a completar registro. La cuenta bloqueada sigue igual |
 | 2026-11-09 | Revisión final de Impeccable (disposición *fix*). Aplicado: el formulario baja hacia el pulgar cuando sobra pantalla, el ícono de "Revisa tu correo" sin naranja y el aviso de error con entrada y salida animadas. Declinado: el título de la barra en Barlow Condensed, porque el prototipo usa Barlow en las barras. Comprobado sin cambios: la semilla del sorteo y el correo conservado al volver de Recuperar |
+| 2026-11-09 | Verificada por el usuario: entra con `jugador01` y con su cuenta, recupera la contraseña con la web levantada. Integrada a `main`: pasa a `hecha` |

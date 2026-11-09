@@ -8,10 +8,10 @@
 
 | ID | Título | Estado | Fase | Responsable | Depende de | Rama |
 |---|---|---|---|---|---|---|
-| [MOV-0001](MOV-0001-estructura-base.md) | Estructura base y diagnóstico de conexión | en-revision | Base | David | backend `/api/auth/me` y `/actuator/health` | `mov-0001-estructura-base` |
-| [MOV-0002](MOV-0002-login.md) | Tema de marca, arranque e inicio de sesión con correo | en-revision | F0 | David | MOV-0001 | `mov-0002-login` |
+| [MOV-0001](MOV-0001-estructura-base.md) | Estructura base y diagnóstico de conexión | hecha | Base | David | backend `/api/auth/me` y `/actuator/health` | `mov-0001-estructura-base` |
+| [MOV-0002](MOV-0002-login.md) | Tema de marca, arranque e inicio de sesión con correo | hecha | F0 | David | MOV-0001 | `mov-0002-login` |
 | [MOV-0003](MOV-0003-crear-cuenta.md) | Crear cuenta, revisa tu correo y completar registro | en-revision | F0 | David | MOV-0002 | `mov-0003-crear-cuenta` |
-| [MOV-0006](MOV-0006-google.md) | Continuar con Google (Credential Manager → Supabase) | en-revision | F0 | David | MOV-0003 · cliente OAuth Android | `mov-0006-google` |
+| [MOV-0006](MOV-0006-google.md) | Continuar con Google (Credential Manager → Supabase) | hecha | F0 | David | MOV-0003 · cliente OAuth Android | `mov-0006-google` |
 
 ## Próximas (por redactar)
 

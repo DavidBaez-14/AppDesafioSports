@@ -2,7 +2,7 @@
 id: MOV-0001
 titulo: Estructura base del proyecto y diagnóstico de conexión
 tipo: chore
-estado: en-revision      # pasa a "hecha" cuando la rama entre a main
+estado: hecha
 prioridad: P0
 fase: Base
 modo: Transversal
@@ -127,3 +127,4 @@ Todo el repo es nuevo. Los archivos clave:
 | Fecha | Cambio |
 |---|---|
 | 2026-11-08 | Implementada y verificada: 31 tests (28 pasan y 3 de humo se saltan sin `DESAFIO_HUMO`), humo contra el backend real en verde y recorrido en el emulador. Queda `en-revision` hasta el merge a `main`. |
+| 2026-11-09 | Integrada a `main` junto con MOV-0002, MOV-0003 y MOV-0006, por pedido del usuario. Pasa a `hecha`. |

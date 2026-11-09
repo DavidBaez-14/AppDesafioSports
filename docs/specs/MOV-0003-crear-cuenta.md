@@ -127,3 +127,4 @@ Todo existe.
 |---|---|
 | 2026-11-09 | Borrador y paso a en-curso por pedido del usuario ("pasemos con login con Google, crear cuenta y todo eso") |
 | 2026-11-09 | RED (29 tests nuevos fallando, `evidencias/MOV-0003/01-red.txt`) → GREEN (95 tests, 0 fallos). Capturas 02 a 08. Falta la prueba manual del registro real con un correo del usuario (`09-green.txt`) |
+| 2026-11-09 | Integrada a `main`. Sigue `en-revision` hasta probar el registro real con un correo propio |

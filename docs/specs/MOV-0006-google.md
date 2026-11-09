@@ -2,7 +2,7 @@
 id: MOV-0006
 titulo: Continuar con Google (Credential Manager → Supabase)
 tipo: feature
-estado: en-revision
+estado: hecha
 prioridad: P1
 fase: F0
 modo: Transversal
@@ -112,3 +112,4 @@ rama: mov-0006-google
 |---|---|
 | 2026-11-09 | Borrador y paso a en-curso por pedido del usuario |
 | 2026-11-09 | RED (10 tests fallando, `evidencias/MOV-0006/01-red.txt`) → GREEN (106 tests, 0 fallos). Capturas 02 a 05: el selector de Google abre y cancelar libera el login. Falta el cliente OAuth Android para entrar de verdad (`06-green.txt`) |
+| 2026-11-09 | Verificada por el usuario con su cuenta real de Google en el emulador (después de poner el ID del cliente web). Integrada a `main`: pasa a `hecha` |

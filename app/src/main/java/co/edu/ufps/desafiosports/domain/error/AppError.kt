@@ -3,7 +3,7 @@ package co.edu.ufps.desafiosports.domain.error
 /**
  * Errores de la app, ya traducidos a algo que la interfaz entiende.
  *
- * Viajan dentro de [Result.failure], igual que en el proyecto del profesor, pero tipados:
+ * Viajan dentro de [Result.failure] y son tipados:
  * la pantalla decide qué hacer según el tipo, nunca leyendo textos.
  * Los errores del backend llegan por su `code` estable (application/problem+json) y se
  * muestran con el `mensaje` que manda el backend (ver data/remote/red/ErroresHttp).

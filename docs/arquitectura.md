@@ -2,7 +2,7 @@
 
 > **Estado:** base establecida con la spec [MOV-0001](specs/MOV-0001-estructura-base.md) (8 nov 2026).
 > **Qué es este documento:** la fuente de verdad de *cómo* se construye la app. Si el código contradice algo de aquí, se corrige uno de los dos en la misma spec, nunca se deja la diferencia.
-> **Origen:** sigue la estructura que recomienda el profesor de la materia (proyecto de clase *StreamFlix*). La diferencia es que Firebase se cambia por Supabase Auth y por BackendCodeCup. El detalle está en el §12.
+> **Base:** Clean Architecture en tres capas, MVVM e inyección manual, con Supabase Auth para la sesión y BackendCodeCup para los datos.
 
 ---
 
@@ -49,7 +49,7 @@ Además está el **Visitante**, que entra sin sesión.
 
 ### 2.1 Por qué estas versiones y no las últimas
 
-- **Base del profesor.** AGP 9.1.0, Gradle 9.3.1 y Kotlin 2.2.10 son los de StreamFlix. Así el proyecto abre en el Android Studio de la clase (2026.1 o posterior).
+- **Base.** AGP 9.1.0, Gradle 9.3.1 y Kotlin 2.2.10, para que el proyecto abra en Android Studio 2026.1 o posterior.
 - **Kotlin 2.2 solo lee librerías compiladas con Kotlin 2.3 o anterior.** Por eso:
   - supabase-kt queda en 3.2.6, porque la 3.7 o posterior pide Kotlin 2.4;
   - Ktor en 3.3.3, serialization en 1.9.0 y coroutines en 1.10.2.
@@ -70,7 +70,7 @@ Una actualización es **su propia spec** (tipo `chore`), nunca un cambio de paso
 
 ## 3. Capas y paquetes
 
-Se mantiene la estructura de tres capas que recomienda el profesor: un solo módulo `:app`, con paquetes por capa y, dentro de cada capa, por módulo del backend.
+Se usa una estructura de tres capas: un solo módulo `:app`, con paquetes por capa y, dentro de cada capa, por módulo del backend.
 
 ```
 app/src/main/java/co/edu/ufps/desafiosports/
@@ -155,13 +155,13 @@ DiagnosticoScreen ─evento─▶ DiagnosticoViewModel ─▶ IniciarSesionUseCa
 
 **Idioma:**
 - El dominio va en español (`Cuenta`, `iniciarSesion`, `EstadoSesion`).
-- Las piezas técnicas de Android van en inglés (`Screen`, `ViewModel`, `UseCase`, `Repository`), como en el proyecto del profesor.
+- Las piezas técnicas de Android van en inglés (`Screen`, `ViewModel`, `UseCase`, `Repository`).
 
 ### 5.2 Reglas de código
 
 1. **ViewModel → caso de uso → repositorio, siempre.** Vale también para las lecturas simples: cuesta poco y deja una sola forma de hacer las cosas.
-2. **Estado:** `var state by mutableStateOf(XxxState()) private set` y cambios con `state = state.copy(...)`. Es el patrón de `LoginViewModelCompose` del profesor.
-3. **El ViewModel se pide con `viewModel(factory = XxxViewModel.Factory)`.** Nunca se crea a mano en la Activity: en StreamFlix eso hacía que el estado se perdiera al girar el teléfono.
+2. **Estado:** `var state by mutableStateOf(XxxState()) private set` y cambios con `state = state.copy(...)`.
+3. **El ViewModel se pide con `viewModel(factory = XxxViewModel.Factory)`.** Nunca se crea a mano en la Activity: el estado se perdería al girar el teléfono.
 4. **La `Factory` toma las dependencias del `AppContainer`** con `this[APPLICATION_KEY] as DesafioSportsApp`.
 5. **Cada pantalla tiene dos funciones:** una con estado (`XxxScreen`) y otra sin estado (`XxxContenido`), con `@Preview` en claro y en oscuro.
 6. **Los textos van en `res/values/strings.xml`.** Los colores, la tipografía y las formas salen de `MaterialTheme`. Nunca `Color(0x…)` ni tamaños fijos dentro de una pantalla.
@@ -174,7 +174,7 @@ DiagnosticoScreen ─evento─▶ DiagnosticoViewModel ─▶ IniciarSesionUseCa
 
 ## 6. Errores
 
-Los errores viajan en `Result<T>`, como en el proyecto del profesor, pero el fallo siempre es un `AppError` tipado. La pantalla decide según el **tipo** y muestra `error.mensaje`.
+Los errores viajan en `Result<T>` y el fallo siempre es un `AppError` tipado. La pantalla decide según el **tipo** y muestra `error.mensaje`.
 
 | Origen | Señal | `AppError` | Qué hace la interfaz |
 |---|---|---|---|
@@ -286,21 +286,3 @@ DESAFIO_HUMO=1 HUMO_CLAVE=<SEED_PASSWORD del .env del backend> \
 | Room | Planilla del árbitro sin conexión | Solo si las pruebas en cancha lo piden (F2) |
 | Firebase Cloud Messaging | Notificaciones de multas | Cuando el backend tenga notificaciones. Solo FCM: la sesión sigue en Supabase |
 
----
-
-## 12. Diferencias con StreamFlix (estructura del profesor)
-
-| Se conserva | Se ajusta | Por qué |
-|---|---|---|
-| Un módulo `:app` con `domain` / `data` / `presentacion` / `ui` | — | Es la estructura recomendada |
-| Casos de uso con la validación adentro | `invocar()` pasa a `operator fun invoke()` | Idiomático en Kotlin: se llama `iniciarSesion(correo, clave)` |
-| `XxxState` + `mutableStateOf` + `copy()` | — | Patrón de `LoginViewModelCompose` |
-| Inyección manual con `viewModelFactory { initializer { } }` | Centralizada en `AppContainer` | En StreamFlix el ViewModel se creaba en `onCreate` y se perdía al girar |
-| `Result<T>` para errores | El fallo es un `AppError` tipado | Decidir por tipo y por `code`, no por texto |
-| Credential Manager + `googleid` para Google | Entrega el token a Supabase (`signInWith(IDToken)`), no a Firebase | Supabase reemplaza a Firebase Auth |
-| Firestore como fuente de datos | BackendCodeCup por REST | Las reglas viven en el backend |
-| — | `android.util.Patterns` sale del dominio | Con él, los tests fallaban fuera del teléfono |
-| — | Kotlin 100 %, sin vistas XML | StreamFlix mezclaba Java y XML (restos de clase) |
-| — | `minSdk` 26 en vez de 29 | Para que funcione en teléfonos más viejos de estudiantes |
-| — | Sin color dinámico (Material You) | Taparía los colores de la marca |
-| `google-services.json` dentro del proyecto | Claves en `local.properties`, fuera de git | No subir claves al repositorio |

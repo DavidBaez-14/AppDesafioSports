@@ -35,8 +35,7 @@ import retrofit2.create
 /**
  * Inyección manual de dependencias: el único lugar donde se conectan las capas.
  *
- * Es el patrón del profesor (StreamFlix armaba todo en MainActivity) pero centralizado:
- * vive en la Application y cada ViewModel toma de aquí lo que necesita en su Factory.
+ * Vive en la Application y cada ViewModel toma de aquí lo que necesita en su Factory.
  * Todo es `lazy`: nada se crea hasta que una pantalla lo pide.
  */
 class AppContainer(val configuracion: Configuracion) {

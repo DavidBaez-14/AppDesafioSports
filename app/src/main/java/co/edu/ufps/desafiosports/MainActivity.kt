@@ -10,8 +10,8 @@ import co.edu.ufps.desafiosports.ui.theme.DesafioSportsTheme
 /**
  * Única Activity de la app. Solo aplica el tema y monta la navegación.
  *
- * Los ViewModel NO se crean aquí (en StreamFlix se creaban a mano en onCreate y se perdían
- * al girar el teléfono). Cada pantalla los pide con viewModel(factory = XxxViewModel.Factory).
+ * Los ViewModel no se crean aquí: cada pantalla los pide con viewModel(factory = XxxViewModel.Factory),
+ * así sobreviven al girar el teléfono.
  */
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

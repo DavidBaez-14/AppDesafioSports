@@ -16,7 +16,7 @@ rama: mov-0001-estructura-base
 ## 1. Contexto
 
 La app Android de Desafío Sports arranca desde cero. Antes de diseñar pantallas hace falta una base que el equipo pueda usar con confianza:
-- la **estructura del profesor** (StreamFlix): Clean Architecture con `domain` / `data` / `presentacion`, MVVM e inyección manual;
+- la estructura: Clean Architecture con `domain` / `data` / `presentacion`, MVVM e inyección manual;
 - en lugar de Firebase, **Supabase Auth** para la sesión y **BackendCodeCup** por REST para los datos;
 - un **corte vertical que funcione de verdad**: iniciar sesión y consultar un endpoint protegido, para saber que el entorno de cada persona está bien.
 
@@ -52,7 +52,7 @@ Sin diseño: es una pantalla técnica y temporal. Usa Material 3 por defecto con
 
 ## 5. Criterios de aceptación
 
-1. **CA-1** · **Dado** el proyecto recién clonado con `local.properties` · **cuando** se corre `assembleDebug` · **entonces** compila con la base del profesor (AGP 9.1.0, Gradle 9.3.1, Kotlin 2.2.10), sin Firebase.
+1. **CA-1** · **Dado** el proyecto recién clonado con `local.properties` · **cuando** se corre `assembleDebug` · **entonces** compila con la base (AGP 9.1.0, Gradle 9.3.1, Kotlin 2.2.10), sin Firebase.
 2. **CA-2** · **Dado** el código · **cuando** se revisan los paquetes · **entonces** sigue `domain` / `data` / `presentacion` / `ui` / `di`, y `domain` no depende de Android, Retrofit ni Supabase.
 3. **CA-3** · **Dado** que faltan claves en `local.properties` · **cuando** se abre la app · **entonces** no se cierra: el diagnóstico dice qué falta y no intenta usar la sesión.
 4. **CA-4** · **Dado** el backend encendido (o apagado) · **cuando** se abre el diagnóstico · **entonces** muestra "En línea (UP)" (o el mensaje de sin conexión) y se puede reintentar.
@@ -63,7 +63,7 @@ Sin diseño: es una pantalla técnica y temporal. Usa Material 3 por defecto con
 9. **CA-9** · **Dado** un 403 `CUENTA_BLOQUEADA` en cualquier endpoint · **cuando** llega · **entonces** se cierra la sesión local. Un 403 de otro tipo no la cierra.
 10. **CA-10** · **Dado** un error del backend · **cuando** llega · **entonces** se decide por su `code` y se muestra su `mensaje`.
 11. **CA-11** · **Dado** que el servidor no responde · **cuando** se llama · **entonces** el resultado es `SinConexion` y la app no se cierra.
-12. **CA-12** · **Dado** la cuenta ya consultada · **cuando** se gira el teléfono · **entonces** el estado se conserva. Es el error de StreamFlix: allí el ViewModel se creaba en `onCreate`.
+12. **CA-12** · **Dado** la cuenta ya consultada · **cuando** se gira el teléfono · **entonces** el estado se conserva.
 13. **CA-13** · **Dado** el build `debug` · **cuando** se conecta al backend local por HTTP · **entonces** funciona hacia `10.0.2.2` y `localhost`. En `release` solo se permite HTTPS.
 
 ## 6. Fuera de alcance / qué NO debe cambiar

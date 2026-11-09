@@ -13,7 +13,7 @@ import io.github.jan.supabase.auth.status.SessionStatus
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-/** Sesión con Supabase Auth (supabase-kt). Reemplaza al AuthRepositoryImpl de Firebase de StreamFlix. */
+/** Sesión con Supabase Auth (supabase-kt). */
 class SesionRepositoryImpl(private val auth: Auth) : SesionRepository {
 
     override val sesion: Flow<EstadoSesion> = auth.sessionStatus.map { estado ->

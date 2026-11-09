@@ -7,8 +7,7 @@ import co.edu.ufps.desafiosports.domain.repository.SesionRepository
 /**
  * Inicia sesión con correo y contraseña.
  *
- * Valida antes de llamar a Supabase, como el LoginUseCase del profesor, pero sin
- * android.util.Patterns: el dominio es Kotlin puro y se prueba en la JVM.
+ * Valida antes de llamar a Supabase
  */
 class IniciarSesionUseCase(private val sesion: SesionRepository) {
 

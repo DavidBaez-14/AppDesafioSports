@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
  * Diagnóstico de conexión (MOV-0001): comprueba el backend, inicia sesión en Supabase
  * y consulta `GET /api/auth/me`. Pantalla temporal para validar el entorno.
  *
- * Patrón del profesor: estado inmutable en `mutableStateOf` con `private set`, cambios con copy()
+ * Estado inmutable en `mutableStateOf` con `private set`, cambios con copy()
  * y la pantalla solo llama funciones. Siempre ViewModel → caso de uso → repositorio.
  */
 class DiagnosticoViewModel(

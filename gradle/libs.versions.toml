@@ -1,6 +1,6 @@
 # Catálogo de versiones de Desafío Sports.
 #
-# Base del profesor (StreamFlix): AGP 9.1.0, Gradle 9.3.1 y Kotlin 2.2.10.
+# Base: AGP 9.1.0, Gradle 9.3.1 y Kotlin 2.2.10.
 # Reglas para actualizar (detalle en docs/arquitectura.md, "Versiones"):
 #  - Kotlin 2.2 solo lee librerías compiladas con Kotlin <= 2.3. Antes de subir una
 #    librería, revisa qué kotlin-stdlib declara.

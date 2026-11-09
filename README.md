@@ -7,7 +7,7 @@ App Android multideporte para los torneos universitarios de la UFPS. Empieza con
 - **Tres modos sobre una misma cuenta:** Jugador, Árbitro y Creador, más el Visitante sin sesión.
 
 > **Estado: base lista ([MOV-0001](docs/specs/MOV-0001-estructura-base.md)).**
-> - Ya está la estructura del proyecto (la que recomienda el profesor), con la red y la sesión funcionando.
+> - Ya está la estructura del proyecto, con la red y la sesión funcionando.
 > - Por ahora hay una **pantalla temporal de diagnóstico**: comprueba el backend, inicia sesión y consulta `GET /api/auth/me`.
 > - Las pantallas reales se diseñan con Impeccable: [plan de UI](docs/plan-ui-impeccable.md).
 

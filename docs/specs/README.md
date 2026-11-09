@@ -10,6 +10,7 @@
 |---|---|---|---|---|---|---|
 | [MOV-0001](MOV-0001-estructura-base.md) | Estructura base y diagnóstico de conexión | en-revision | Base | David | backend `/api/auth/me` y `/actuator/health` | `mov-0001-estructura-base` |
 | [MOV-0002](MOV-0002-login.md) | Tema de marca, arranque e inicio de sesión con correo | en-revision | F0 | David | MOV-0001 | `mov-0002-login` |
+| [MOV-0003](MOV-0003-crear-cuenta.md) | Crear cuenta, revisa tu correo y completar registro | en-revision | F0 | David | MOV-0002 | `mov-0003-crear-cuenta` |
 
 ## Próximas (por redactar)
 
@@ -17,7 +18,6 @@ Salen del plan de UI ([`../plan-ui-impeccable.md`](../plan-ui-impeccable.md) §5
 
 | ID tentativo | Título | Fase | Depende de |
 |---|---|---|---|
-| MOV-0003 | Crear cuenta: registro en 2 pasos, revisa tu correo y completar registro (sin solicitar rol) | F0 | MOV-0002 |
 | MOV-0004 | Inicio (jugador), secciones Creador y Árbitro y navegación, con sus estados vacíos; cuenta bloqueada | F0 | MOV-0002 · backend M3 para los datos de las secciones |
 | MOV-0005 | Componentes base y pantallas de calibración (clasificación y planilla con datos de ejemplo) | Base | MOV-0002 |
 | MOV-0006 | Google nativo (Credential Manager → Supabase) | F0 | Cliente OAuth Android en GCP |

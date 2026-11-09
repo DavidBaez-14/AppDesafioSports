@@ -2,9 +2,11 @@ package co.edu.ufps.desafiosports.data.repository
 
 import co.edu.ufps.desafiosports.data.remote.api.AuthApi
 import co.edu.ufps.desafiosports.data.remote.dto.MeResponseDto
+import co.edu.ufps.desafiosports.data.remote.dto.RegistroRequestDto
 import co.edu.ufps.desafiosports.data.remote.red.ErroresHttp
 import co.edu.ufps.desafiosports.data.remote.red.llamarApi
 import co.edu.ufps.desafiosports.domain.model.Cuenta
+import co.edu.ufps.desafiosports.domain.model.DatosRegistro
 import co.edu.ufps.desafiosports.domain.model.Rol
 import co.edu.ufps.desafiosports.domain.repository.CuentaRepository
 
@@ -15,6 +17,18 @@ class CuentaRepositoryImpl(
 
     override suspend fun obtenerMiCuenta(): Result<Cuenta> =
         llamarApi(errores) { api.me() }.map { it.aDominio() }
+
+    override suspend fun registrar(datos: DatosRegistro): Result<Cuenta> =
+        llamarApi(errores) {
+            api.registro(
+                RegistroRequestDto(
+                    nombres = datos.nombres,
+                    apellidos = datos.apellidos,
+                    tipoDocumento = datos.tipoDocumento?.name,
+                    numeroDocumento = datos.numeroDocumento,
+                )
+            )
+        }.map { it.aDominio() }
 }
 
 /** DTO → modelo. Los roles que la app no conoce se ignoran. */

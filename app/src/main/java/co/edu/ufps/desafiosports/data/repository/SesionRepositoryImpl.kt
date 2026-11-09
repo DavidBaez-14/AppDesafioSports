@@ -2,8 +2,10 @@ package co.edu.ufps.desafiosports.data.repository
 
 import co.edu.ufps.desafiosports.data.auth.llamarSupabase
 import co.edu.ufps.desafiosports.domain.model.EstadoSesion
+import co.edu.ufps.desafiosports.domain.model.ResultadoRegistro
 import co.edu.ufps.desafiosports.domain.repository.SesionRepository
 import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.auth.OtpType
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.status.SessionStatus
 import kotlinx.coroutines.flow.Flow
@@ -32,6 +34,19 @@ class SesionRepositoryImpl(private val auth: Auth) : SesionRepository {
     // abre la web, donde se crea la contraseña nueva.
     override suspend fun recuperarClave(correo: String): Result<Unit> = llamarSupabase {
         auth.resetPasswordForEmail(correo)
+    }
+
+    // Con "Confirm email" activo, Supabase no abre sesión y responde igual exista o no la cuenta.
+    override suspend fun registrarse(correo: String, clave: String): Result<ResultadoRegistro> = llamarSupabase {
+        auth.signUpWith(Email) {
+            email = correo
+            password = clave
+        }
+        if (auth.currentSessionOrNull() != null) ResultadoRegistro.SESION_ACTIVA else ResultadoRegistro.CONFIRMAR_CORREO
+    }
+
+    override suspend fun reenviarConfirmacion(correo: String): Result<Unit> = llamarSupabase {
+        auth.resendEmail(OtpType.Email.SIGNUP, correo)
     }
 
     override suspend fun cerrarSesion(): Result<Unit> = llamarSupabase {

@@ -14,4 +14,6 @@ data class LoginState(
     val error: String? = null,
     /** Evento: entró bien y la pantalla debe navegar al inicio. Se apaga con onIngresoAtendido(). */
     val ingresado: Boolean = false,
+    /** Evento: la cuenta está confirmada pero sin registro completo (MOV-0003 · CA-7). */
+    val debeCompletarRegistro: Boolean = false,
 )

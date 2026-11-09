@@ -22,6 +22,18 @@ data object Login
 @Serializable
 data class RecuperarClave(val correo: String = "")
 
+/** Crear cuenta (MOV-0003 · A-3). */
+@Serializable
+data object Registro
+
+/** Revisa tu correo tras crear la cuenta (MOV-0003 · N-1). */
+@Serializable
+data class RevisaTuCorreo(val correo: String)
+
+/** Completar registro: sesión de Supabase abierta, sin cuenta en el backend (MOV-0003 · N-2). */
+@Serializable
+data object CompletarRegistro
+
 /** Diagnóstico de conexión (MOV-0001). Hoy también es el inicio provisional. */
 @Serializable
 data object Diagnostico

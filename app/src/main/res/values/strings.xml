@@ -23,6 +23,38 @@
     <string name="recuperar_volver">Volver a entrar</string>
     <string name="accion_atras">Atrás</string>
 
+    <!-- Crear cuenta, revisa tu correo y completar registro (MOV-0003). -->
+    <string name="login_crear_cuenta">Crear cuenta</string>
+    <string name="registro_titulo">Crear cuenta</string>
+    <string name="registro_explicacion">Con tu correo y una contraseña. Te enviamos un enlace para confirmar que el correo es tuyo.</string>
+    <string name="registro_ayuda_clave">Mínimo 8 caracteres</string>
+    <string name="registro_crear">Crear cuenta</string>
+    <string name="registro_creando">Creando…</string>
+    <string name="revisa_titulo">Revisa tu correo</string>
+    <string name="revisa_detalle">Te enviamos un enlace a %1$s. Ábrelo para confirmar tu cuenta y vuelve aquí a entrar.</string>
+    <string name="revisa_nota">Si ya tenías una cuenta con ese correo, entra con ella o recupera tu contraseña.</string>
+    <string name="revisa_ir_a_entrar">Ir a entrar</string>
+    <string name="revisa_reenviar">Reenviar correo</string>
+    <string name="revisa_reenviando">Reenviando…</string>
+    <string name="revisa_reenviado">Te lo enviamos de nuevo. Revisa también la carpeta de spam.</string>
+    <string name="completar_titulo">Completa tu registro</string>
+    <string name="completar_explicacion">Así te verán en los torneos. Se piden una sola vez.</string>
+    <string name="completar_nombres">Nombres</string>
+    <string name="completar_apellidos">Apellidos</string>
+    <string name="completar_documento_titulo">Documento (opcional)</string>
+    <string name="completar_documento_explicacion">Sirve para unir tu historial si un delegado ya te había agregado a un equipo.</string>
+    <string name="completar_tipo">Tipo de documento</string>
+    <string name="completar_tipo_ninguno">Sin documento</string>
+    <string name="completar_numero">Número</string>
+    <string name="completar_terminar">Terminar registro</string>
+    <string name="completar_terminando">Guardando…</string>
+    <string name="completar_salir">Salir</string>
+    <string name="tipo_documento_cc">Cédula de ciudadanía</string>
+    <string name="tipo_documento_ti">Tarjeta de identidad</string>
+    <string name="tipo_documento_ce">Cédula de extranjería</string>
+    <string name="tipo_documento_ppt">Permiso por protección temporal</string>
+    <string name="tipo_documento_pasaporte">Pasaporte</string>
+
     <!-- Diagnóstico de conexión (MOV-0001). Pantalla temporal, sin diseño. -->
     <string name="diagnostico_titulo">Diagnóstico de conexión</string>
     <string name="diagnostico_aviso">Pantalla temporal para comprobar el entorno. Las pantallas reales se diseñan con Impeccable.</string>

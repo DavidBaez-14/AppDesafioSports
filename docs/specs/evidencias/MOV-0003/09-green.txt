@@ -1,0 +1,15 @@
+MOV-0003 · GREEN (9-nov-2026): ./gradlew testDebugUnitTest assembleDebug → BUILD SUCCESSFUL.
+Suite completa: 95 tests, 0 fallos, 3 omitidos (BackendRealHumoTest: solo con DESAFIO_HUMO=1).
+Nuevos de MOV-0003: RegistrarseUseCaseTest (3), CompletarRegistroUseCaseTest (8), RegistroViewModelTest (8),
+RevisaTuCorreoViewModelTest (3), CompletarRegistroViewModelTest (7), CuentaRepositoryImplTest (+3, MockWebServer)
+y LoginViewModelTest (+2, CA-7; reemplaza el caso de 404 de MOV-0002/CA-5).
+
+Emulador (Pixel_8 del usuario, API 37), capturas en esta carpeta:
+02 login con "Crear cuenta" (claro) · 03 login (oscuro) · 04 Crear cuenta (oscuro) · 05 Crear cuenta (claro)
+06 Crear cuenta con letra al 130 % · 07 error de validación en el campo (CA-2) · 08 Atrás vuelve al login (CA-1)
+
+No verificado en el emulador (y por qué):
+- Crear una cuenta real, "Revisa tu correo" y Completar registro: crear la cuenta envía un correo de confirmación
+  y no se envían a dominios falsos (rebotes, cupo de Brevo). Cubierto por los tests de ViewModel, dominio y red y
+  por las previews. Prueba manual pendiente con un correo del usuario que no tenga cuenta, con la web levantada
+  (npm run dev) para abrir el enlace de confirmación.

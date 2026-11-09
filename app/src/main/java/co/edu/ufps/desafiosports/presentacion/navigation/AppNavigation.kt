@@ -10,8 +10,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import co.edu.ufps.desafiosports.BuildConfig
 import co.edu.ufps.desafiosports.presentacion.acceso.ArranqueScreen
+import co.edu.ufps.desafiosports.presentacion.acceso.CompletarRegistroScreen
 import co.edu.ufps.desafiosports.presentacion.acceso.LoginScreen
 import co.edu.ufps.desafiosports.presentacion.acceso.RecuperarClaveScreen
+import co.edu.ufps.desafiosports.presentacion.acceso.RegistroScreen
+import co.edu.ufps.desafiosports.presentacion.acceso.RevisaTuCorreoScreen
 import co.edu.ufps.desafiosports.presentacion.diagnostico.DiagnosticoScreen
 
 /**
@@ -61,6 +64,12 @@ fun AppNavigation(
                     }
                 },
                 onRecuperarClave = { correo -> navController.navigate(RecuperarClave(correo)) },
+                onCrearCuenta = { navController.navigate(Registro) },
+                onCompletarRegistro = {
+                    navController.navigate(CompletarRegistro) {
+                        popUpTo<Login> { inclusive = true }
+                    }
+                },
                 onAbrirDiagnostico = if (BuildConfig.DEBUG) {
                     { navController.navigate(Diagnostico) }
                 } else {
@@ -70,6 +79,34 @@ fun AppNavigation(
         }
         composable<RecuperarClave> {
             RecuperarClaveScreen(onVolver = { navController.popBackStack() })
+        }
+        composable<Registro> {
+            RegistroScreen(
+                onVolver = { navController.popBackStack() },
+                // Revisa tu correo reemplaza a Crear cuenta: Atrás o "Ir a entrar" vuelven al login.
+                onRevisarCorreo = { correo ->
+                    navController.navigate(RevisaTuCorreo(correo)) {
+                        popUpTo<Registro> { inclusive = true }
+                    }
+                },
+                onCompletarRegistro = {
+                    navController.navigate(CompletarRegistro) {
+                        popUpTo(navController.graph.id) { inclusive = true }
+                    }
+                },
+            )
+        }
+        composable<RevisaTuCorreo> {
+            RevisaTuCorreoScreen(onIrAEntrar = { navController.popBackStack() })
+        }
+        composable<CompletarRegistro> {
+            CompletarRegistroScreen(
+                onRegistrado = {
+                    navController.navigate(Diagnostico) {
+                        popUpTo(navController.graph.id) { inclusive = true }
+                    }
+                },
+            )
         }
         composable<Diagnostico> { DiagnosticoScreen() }
     }

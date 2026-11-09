@@ -1,0 +1,34 @@
+MOV-0003 · RED (9-nov-2026): ./gradlew testDebugUnitTest con los tests nuevos y la producción sin implementar.
+Compila; fallan solo los tests nuevos de MOV-0003, por aserción. Los de MOV-0001 y MOV-0002 siguen en verde.
+
+CuentaRepositoryImplTest > MOV-0003 CA-9 registro envia POST con los datos y devuelve la cuenta FAILED
+CuentaRepositoryImplTest > MOV-0003 CA-10 documento registrado llega como error de negocio con el mensaje del backend FAILED
+CuentaRepositoryImplTest > MOV-0003 CA-9 registro sin documento no envia tipo ni numero FAILED
+CompletarRegistroUseCaseTest > CA-8 tipo de documento sin numero falla en el campo documento FAILED
+CompletarRegistroUseCaseTest > CA-9 sin documento se envia sin tipo ni numero FAILED
+CompletarRegistroUseCaseTest > CA-9 datos validos se envian sin espacios sobrantes FAILED
+CompletarRegistroUseCaseTest > CA-8 numero con caracteres no validos falla en el campo documento FAILED
+CompletarRegistroUseCaseTest > CA-9 si la cuenta ya estaba registrada devuelve la cuenta igual FAILED
+CompletarRegistroUseCaseTest > CA-8 nombres vacios fallan en el campo nombres sin llamar al backend FAILED
+CompletarRegistroUseCaseTest > CA-8 numero sin tipo de documento falla en el campo documento FAILED
+CompletarRegistroUseCaseTest > CA-8 apellidos vacios fallan en el campo apellidos FAILED
+RegistrarseUseCaseTest > CA-2 datos validos crean la cuenta con el correo sin espacios FAILED
+RegistrarseUseCaseTest > CA-2 correo mal escrito falla en el campo correo sin llamar a Supabase FAILED
+RegistrarseUseCaseTest > CA-2 contrasena corta falla en el campo contrasena sin llamar a Supabase FAILED
+CompletarRegistroViewModelTest > CA-11 salir cierra la sesion FAILED
+CompletarRegistroViewModelTest > CA-8 documento a medias muestra el error bajo documento FAILED
+CompletarRegistroViewModelTest > CA-9 datos validos registran y avisan que hay que ir al inicio FAILED
+CompletarRegistroViewModelTest > CA-10 documento ya registrado muestra el mensaje del backend y se queda FAILED
+CompletarRegistroViewModelTest > CA-8 nombres vacios muestran el error bajo nombres sin llamar al backend FAILED
+LoginViewModelTest > MOV-0003 CA-7 cuenta sin registro completo va a completar registro sin cerrar la sesion FAILED
+RegistroViewModelTest > CA-4 si Supabase deja la sesion abierta va a completar registro FAILED
+RegistroViewModelTest > CA-5 mientras espera un segundo toque no repite la llamada FAILED
+RegistroViewModelTest > CA-5 contrasena debil va bajo el campo contrasena FAILED
+RegistroViewModelTest > CA-5 correo ya registrado muestra el aviso y se queda FAILED
+RegistroViewModelTest > CA-2 correo mal escrito muestra el error bajo el correo sin llamar a Supabase FAILED
+RegistroViewModelTest > CA-2 contrasena corta muestra el error bajo la contrasena FAILED
+RegistroViewModelTest > CA-3 con confirmacion de correo va a revisa tu correo FAILED
+RevisaTuCorreoViewModelTest > CA-6 con el limite de envios muestra el aviso y no lo confirma FAILED
+RevisaTuCorreoViewModelTest > CA-6 reenviar pide otro envio y lo confirma FAILED
+95 tests completed, 29 failed, 3 skipped
+BUILD FAILED in 15s

@@ -5,6 +5,7 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,6 +19,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -77,6 +79,26 @@ internal fun AvisoErrorAnimado(mensaje: String?, modifier: Modifier = Modifier) 
         modifier = modifier,
     ) {
         AvisoError(mensaje ?: ultimo, Modifier.padding(bottom = 12.dp))
+    }
+}
+
+/**
+ * Botón secundario de ancho completo (MOV-0003): contorneado, sin naranja, para que la acción
+ * principal de la pantalla siga siendo la única en color de marca.
+ */
+@Composable
+internal fun BotonSecundario(texto: String, onClick: () -> Unit, modifier: Modifier = Modifier, habilitado: Boolean = true) {
+    OutlinedButton(
+        onClick = onClick,
+        enabled = habilitado,
+        shape = MaterialTheme.shapes.extraLarge,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.onSurface),
+        modifier = modifier
+            .fillMaxWidth()
+            .heightIn(min = 52.dp),
+    ) {
+        Text(texto, style = MaterialTheme.typography.labelLarge)
     }
 }
 

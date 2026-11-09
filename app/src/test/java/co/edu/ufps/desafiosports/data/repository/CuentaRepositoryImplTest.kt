@@ -4,7 +4,9 @@ import co.edu.ufps.desafiosports.data.remote.api.AuthApi
 import co.edu.ufps.desafiosports.data.remote.red.ClienteHttp
 import co.edu.ufps.desafiosports.data.remote.red.ErroresHttp
 import co.edu.ufps.desafiosports.domain.error.AppError
+import co.edu.ufps.desafiosports.domain.model.DatosRegistro
 import co.edu.ufps.desafiosports.domain.model.Rol
+import co.edu.ufps.desafiosports.domain.model.TipoDocumento
 import kotlinx.coroutines.test.runTest
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
@@ -31,6 +33,53 @@ class CuentaRepositoryImplTest {
     @After
     fun tearDown() {
         runCatching { servidor.shutdown() }
+    }
+
+    @Test
+    fun `MOV-0003 CA-9 registro envia POST con los datos y devuelve la cuenta`() = runTest {
+        servidor.enqueue(
+            MockResponse().setResponseCode(201)
+                .setHeader("Content-Type", "application/json")
+                .setBody("""{"cuentaId":"c9","nombres":"Andrés","apellidos":"Peña","nombre":"Andrés Peña","correo":"nueva@cuenta.co","estado":"ACTIVA","roles":["JUGADOR"],"rolesPendientes":[]}""")
+        )
+
+        val cuenta = repositorio.registrar(DatosRegistro("Andrés", "Peña", TipoDocumento.CC, "1090123456")).getOrThrow()
+
+        val pedido = servidor.takeRequest()
+        assertEquals("POST", pedido.method)
+        assertEquals("/api/auth/registro", pedido.path)
+        assertEquals(
+            """{"nombres":"Andrés","apellidos":"Peña","tipoDocumento":"CC","numeroDocumento":"1090123456"}""",
+            pedido.body.readUtf8(),
+        )
+        assertEquals("Andrés Peña", cuenta.nombre)
+        assertEquals(setOf(Rol.JUGADOR), cuenta.roles)
+    }
+
+    @Test
+    fun `MOV-0003 CA-9 registro sin documento no envia tipo ni numero`() = runTest {
+        servidor.enqueue(
+            MockResponse().setResponseCode(201).setHeader("Content-Type", "application/json")
+                .setBody("""{"cuentaId":"c9","nombre":"Andrés Peña","estado":"ACTIVA","roles":["JUGADOR"],"rolesPendientes":[]}""")
+        )
+
+        repositorio.registrar(DatosRegistro("Andrés", "Peña")).getOrThrow()
+
+        assertEquals("""{"nombres":"Andrés","apellidos":"Peña"}""", servidor.takeRequest().body.readUtf8())
+    }
+
+    @Test
+    fun `MOV-0003 CA-10 documento registrado llega como error de negocio con el mensaje del backend`() = runTest {
+        servidor.enqueue(
+            MockResponse().setResponseCode(409).setHeader("Content-Type", "application/problem+json")
+                .setBody("""{"code":"DOCUMENTO_REGISTRADO","mensaje":"Ya existe una cuenta con este documento.","status":409}""")
+        )
+
+        val error = repositorio.registrar(DatosRegistro("Andrés", "Peña", TipoDocumento.CC, "1")).exceptionOrNull()
+
+        assertTrue(error is AppError.Negocio)
+        assertEquals("DOCUMENTO_REGISTRADO", (error as AppError.Negocio).codigo)
+        assertEquals("Ya existe una cuenta con este documento.", error.mensaje)
     }
 
     @Test

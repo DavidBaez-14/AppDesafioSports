@@ -114,17 +114,30 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun `CA-5 cuenta sin registro completo cierra la sesion y muestra el mensaje del backend`() {
+    fun `MOV-0003 CA-7 cuenta sin registro completo va a completar registro sin cerrar la sesion`() {
         cuentas.resultado = Result.failure(AppError.CuentaNoRegistrada("Completa tu registro para continuar."))
         val vm = crearViewModel()
         vm.escribir()
 
         vm.entrar()
 
-        assertEquals("Completa tu registro para continuar.", vm.state.error)
+        assertTrue(vm.state.debeCompletarRegistro)
         assertFalse(vm.state.ingresado)
-        assertEquals(1, sesion.cierres)
-        assertEquals(EstadoSesion.Inactiva, sesion.estado.value)
+        assertNull(vm.state.error)
+        assertEquals(0, sesion.cierres)
+        assertEquals(EstadoSesion.Activa(CORREO), sesion.estado.value)
+    }
+
+    @Test
+    fun `MOV-0003 CA-7 al atender el aviso de completar registro el evento se apaga`() {
+        cuentas.resultado = Result.failure(AppError.CuentaNoRegistrada("Completa tu registro."))
+        val vm = crearViewModel()
+        vm.escribir()
+        vm.entrar()
+
+        vm.onCompletarRegistroAtendido()
+
+        assertFalse(vm.state.debeCompletarRegistro)
     }
 
     @Test

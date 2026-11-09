@@ -58,7 +58,12 @@ class LoginViewModel(
 
             val cuenta = obtenerCuentaUseCase()
             val errorCuenta = cuenta.exceptionOrNull()
-            if (errorCuenta is AppError.CuentaNoRegistrada || errorCuenta is AppError.CuentaBloqueada) {
+            // Correo confirmado pero sin registro completo: la sesión sigue y toca completar registro (MOV-0003 · CA-7).
+            if (errorCuenta is AppError.CuentaNoRegistrada) {
+                state = state.copy(enProceso = false, clave = "", claveVisible = false, debeCompletarRegistro = true)
+                return@launch
+            }
+            if (errorCuenta is AppError.CuentaBloqueada) {
                 cerrarSesionUseCase()
                 state = state.copy(enProceso = false, clave = "", error = errorCuenta.mensajeParaMostrar())
                 return@launch
@@ -73,13 +78,17 @@ class LoginViewModel(
         state = state.copy(ingresado = false)
     }
 
+    fun onCompletarRegistroAtendido() {
+        state = state.copy(debeCompletarRegistro = false)
+    }
+
     private fun conError(error: Throwable): LoginState {
         val base = state.copy(enProceso = false)
         return if (error is AppError.Validacion) {
             when (error.campo) {
                 CampoValidado.CORREO -> base.copy(errorCorreo = error.mensaje)
                 CampoValidado.CLAVE -> base.copy(errorClave = error.mensaje)
-                null -> base.copy(error = error.mensaje)
+                else -> base.copy(error = error.mensaje)
             }
         } else {
             base.copy(error = error.mensajeParaMostrar())

@@ -59,6 +59,8 @@ import co.edu.ufps.desafiosports.ui.theme.Logotipo
 fun LoginScreen(
     onIngresado: () -> Unit,
     onRecuperarClave: (correo: String) -> Unit,
+    onCrearCuenta: () -> Unit,
+    onCompletarRegistro: () -> Unit,
     onAbrirDiagnostico: (() -> Unit)?,
     viewModel: LoginViewModel = viewModel(factory = LoginViewModel.Factory),
 ) {
@@ -69,6 +71,12 @@ fun LoginScreen(
             onIngresado()
         }
     }
+    LaunchedEffect(state.debeCompletarRegistro) {
+        if (state.debeCompletarRegistro) {
+            viewModel.onCompletarRegistroAtendido()
+            onCompletarRegistro()
+        }
+    }
     LoginContenido(
         state = state,
         onCorreoChange = viewModel::onCorreoChange,
@@ -76,6 +84,7 @@ fun LoginScreen(
         onAlternarClave = viewModel::onAlternarClave,
         onEntrar = viewModel::entrar,
         onRecuperarClave = { onRecuperarClave(state.correo.trim()) },
+        onCrearCuenta = onCrearCuenta,
         onAbrirDiagnostico = onAbrirDiagnostico,
     )
 }
@@ -88,6 +97,7 @@ fun LoginContenido(
     onAlternarClave: () -> Unit,
     onEntrar: () -> Unit,
     onRecuperarClave: () -> Unit,
+    onCrearCuenta: () -> Unit,
     onAbrirDiagnostico: (() -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
@@ -197,6 +207,14 @@ fun LoginContenido(
                     )
                 }
 
+                // Para quien llega por primera vez (MOV-0003): contorneado, sin competir con el naranja de Entrar.
+                BotonSecundario(
+                    texto = stringResource(R.string.login_crear_cuenta),
+                    onClick = onCrearCuenta,
+                    habilitado = habilitado,
+                    modifier = Modifier.testTag("login_crear_cuenta"),
+                )
+
                 TextButton(
                     onClick = onRecuperarClave,
                     enabled = habilitado,
@@ -223,7 +241,7 @@ private val estadoDeEjemplo = LoginState(correo = "andres.pena@correo.co", clave
 @Composable
 private fun LoginContenidoPreview() {
     DesafioSportsTheme {
-        LoginContenido(estadoDeEjemplo, {}, {}, {}, {}, {}, null)
+        LoginContenido(estadoDeEjemplo, {}, {}, {}, {}, {}, {}, null)
     }
 }
 
@@ -231,7 +249,7 @@ private fun LoginContenidoPreview() {
 @Composable
 private fun LoginContenidoErrorPreview() {
     DesafioSportsTheme {
-        LoginContenido(estadoDeEjemplo.copy(error = "Correo o contraseña incorrectos."), {}, {}, {}, {}, {}, null)
+        LoginContenido(estadoDeEjemplo.copy(error = "Correo o contraseña incorrectos."), {}, {}, {}, {}, {}, {}, null)
     }
 }
 
@@ -239,6 +257,6 @@ private fun LoginContenidoErrorPreview() {
 @Composable
 private fun LoginContenidoEntrandoPreview() {
     DesafioSportsTheme {
-        LoginContenido(estadoDeEjemplo.copy(enProceso = true), {}, {}, {}, {}, {}, null)
+        LoginContenido(estadoDeEjemplo.copy(enProceso = true), {}, {}, {}, {}, {}, {}, null)
     }
 }

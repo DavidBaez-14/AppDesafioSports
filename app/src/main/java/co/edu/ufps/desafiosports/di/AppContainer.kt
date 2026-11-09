@@ -15,6 +15,9 @@ import co.edu.ufps.desafiosports.domain.repository.CuentaRepository
 import co.edu.ufps.desafiosports.domain.repository.ServidorRepository
 import co.edu.ufps.desafiosports.domain.repository.SesionRepository
 import co.edu.ufps.desafiosports.domain.use_case.identidad.CerrarSesionUseCase
+import co.edu.ufps.desafiosports.domain.use_case.identidad.CompletarRegistroUseCase
+import co.edu.ufps.desafiosports.domain.use_case.identidad.ReenviarConfirmacionUseCase
+import co.edu.ufps.desafiosports.domain.use_case.identidad.RegistrarseUseCase
 import co.edu.ufps.desafiosports.domain.use_case.identidad.IniciarSesionUseCase
 import co.edu.ufps.desafiosports.domain.use_case.identidad.ObservarSesionUseCase
 import co.edu.ufps.desafiosports.domain.use_case.identidad.ObtenerCuentaUseCase
@@ -73,6 +76,9 @@ class AppContainer(val configuracion: Configuracion) {
     // ── Casos de uso ───────────────────────────────────────────────────────
     val iniciarSesion by lazy { IniciarSesionUseCase(sesionRepository) }
     val recuperarClave by lazy { RecuperarClaveUseCase(sesionRepository) }
+    val registrarse by lazy { RegistrarseUseCase(sesionRepository) }
+    val reenviarConfirmacion by lazy { ReenviarConfirmacionUseCase(sesionRepository) }
+    val completarRegistro by lazy { CompletarRegistroUseCase(cuentaRepository) }
     val cerrarSesion by lazy { CerrarSesionUseCase(sesionRepository) }
     val observarSesion by lazy { ObservarSesionUseCase(sesionRepository) }
     val obtenerCuenta by lazy { ObtenerCuentaUseCase(cuentaRepository) }

@@ -2,8 +2,10 @@ package co.edu.ufps.desafiosports.testutil
 
 import co.edu.ufps.desafiosports.data.remote.red.ProveedorToken
 import co.edu.ufps.desafiosports.domain.model.Cuenta
+import co.edu.ufps.desafiosports.domain.model.DatosRegistro
 import co.edu.ufps.desafiosports.domain.model.EstadoServidor
 import co.edu.ufps.desafiosports.domain.model.EstadoSesion
+import co.edu.ufps.desafiosports.domain.model.ResultadoRegistro
 import co.edu.ufps.desafiosports.domain.model.Rol
 import co.edu.ufps.desafiosports.domain.repository.CuentaRepository
 import co.edu.ufps.desafiosports.domain.repository.ServidorRepository
@@ -49,6 +51,26 @@ class FakeSesionRepository : SesionRepository {
         return resultadoRecuperacion
     }
 
+    var resultadoRegistro: Result<ResultadoRegistro> = Result.success(ResultadoRegistro.CONFIRMAR_CORREO)
+    val llamadasRegistro = mutableListOf<Pair<String, String>>()
+    var resultadoReenvio: Result<Unit> = Result.success(Unit)
+    val llamadasReenvio = mutableListOf<String>()
+
+    /** Si no es null, registrarse espera a que se complete (doble toque). */
+    var bloqueoRegistro: CompletableDeferred<Unit>? = null
+
+    override suspend fun registrarse(correo: String, clave: String): Result<ResultadoRegistro> {
+        llamadasRegistro += correo to clave
+        bloqueoRegistro?.await()
+        if (resultadoRegistro.getOrNull() == ResultadoRegistro.SESION_ACTIVA) estado.value = EstadoSesion.Activa(correo)
+        return resultadoRegistro
+    }
+
+    override suspend fun reenviarConfirmacion(correo: String): Result<Unit> {
+        llamadasReenvio += correo
+        return resultadoReenvio
+    }
+
     override suspend fun cerrarSesion(): Result<Unit> {
         cierres++
         estado.value = EstadoSesion.Inactiva
@@ -63,6 +85,14 @@ class FakeCuentaRepository(var resultado: Result<Cuenta> = Result.success(cuenta
     override suspend fun obtenerMiCuenta(): Result<Cuenta> {
         llamadas++
         return resultado
+    }
+
+    var resultadoRegistro: Result<Cuenta> = Result.success(cuentaDePrueba())
+    val registros = mutableListOf<DatosRegistro>()
+
+    override suspend fun registrar(datos: DatosRegistro): Result<Cuenta> {
+        registros += datos
+        return resultadoRegistro
     }
 }
 

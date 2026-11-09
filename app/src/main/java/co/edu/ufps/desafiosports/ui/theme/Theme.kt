@@ -29,7 +29,8 @@ private val EsquemaOscuro = darkColorScheme(
     onSurface = OscuroTinta,
     surfaceVariant = OscuroContenedorAlto,
     onSurfaceVariant = OscuroTintaSecundaria,
-    surfaceTint = OscuroContenedorMaximo,
+    // Elevación tonal hacia el azul del borde en los dos temas, nunca hacia el naranja.
+    surfaceTint = Borde,
     inverseSurface = OscuroTinta,
     inverseOnSurface = OscuroContenedor,
     error = OscuroError,

@@ -1,0 +1,142 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-09T00:00:00-05:00",
+  "title": "Design System: Desafío Sports",
+  "extensions": {
+    "colorMeta": {
+      "naranja": { "role": "primary", "displayName": "Naranja Desafío", "canonical": "#FF5500", "tonalRamp": ["#2B0C00", "#4A1700", "#7A2600", "#C23C00", "#FF5500", "#FF8A4D", "#FFDBC9", "#FFF1EA"] },
+      "claro-naranja": { "role": "primary", "displayName": "Naranja Desafío (claro)", "canonical": "#C23C00", "tonalRamp": ["#2B0C00", "#5C1A00", "#7A2600", "#C23C00", "#FF5500", "#FF8A4D", "#FFE4CC", "#FFF1EA"] },
+      "naranja-contenedor": { "role": "primary", "displayName": "Brasa", "canonical": "#4A1700" },
+      "azul": { "role": "tertiary", "displayName": "Azul Marcador", "canonical": "#93C5FD", "tonalRamp": ["#0D2350", "#1E3A8A", "#1D4ED8", "#3B82F6", "#60A5FA", "#93C5FD", "#DBEAFE", "#EFF6FF"] },
+      "claro-azul": { "role": "tertiary", "displayName": "Azul Marcador (claro)", "canonical": "#1D4ED8" },
+      "fondo": { "role": "neutral", "displayName": "Noche de Cancha", "canonical": "#04070F", "tonalRamp": ["#020409", "#04070F", "#090E1C", "#0D1429", "#151F3F", "#1E2D5A", "#A9B1CC", "#EEF0F7"] },
+      "claro-fondo": { "role": "neutral", "displayName": "Noche de Cancha (claro)", "canonical": "#F4F5F9", "tonalRamp": ["#0D1429", "#4A5578", "#6878A8", "#DFE3EC", "#E5E8F0", "#EBEEF5", "#F4F5F9", "#FFFFFF"] },
+      "contenedor-bajo": { "role": "neutral", "displayName": "Escalones de Grada", "canonical": "#090E1C" },
+      "tinta": { "role": "neutral", "displayName": "Tinta Reflector", "canonical": "#EEF0F7" },
+      "tinta-secundaria": { "role": "neutral", "displayName": "Tinta de Grada", "canonical": "#A9B1CC" },
+      "borde": { "role": "neutral", "displayName": "Línea de Cal", "canonical": "#6878A8" },
+      "error": { "role": "error", "displayName": "Tarjeta Roja", "canonical": "#F87171", "tonalRamp": ["#3B1114", "#7F1D1D", "#B91C1C", "#DC2626", "#EF4444", "#F87171", "#FECACA", "#FEE2E2"] }
+    },
+    "typographyMeta": {
+      "logotipo": { "displayName": "Logotipo", "purpose": "Solo el logotipo tipográfico provisional (Barlow Condensed ExtraBold Itálica, mayúsculas)." },
+      "display": { "displayName": "Display", "purpose": "Mapeado para cifras de marcador; sin uso todavía." },
+      "headline": { "displayName": "Headline", "purpose": "Titulares de pantalla y de sección, en mayúsculas (Barlow Condensed Bold)." },
+      "title": { "displayName": "Title", "purpose": "Título de la barra superior y de bloques (Barlow SemiBold)." },
+      "body": { "displayName": "Body", "purpose": "Texto corrido; espaciado de letras reducido respecto a M3." },
+      "label": { "displayName": "Label", "purpose": "Botones, botones de texto y etiquetas (Barlow SemiBold)." }
+    },
+    "shadows": [],
+    "motion": [
+      { "name": "aviso-entra", "value": "fadeIn + expandVertically(desde arriba), duraciones por defecto de Compose", "purpose": "Entrada del aviso de error; el único movimiento de las pantallas de acceso. Instantáneo con 'Quitar animaciones'." },
+      { "name": "aviso-sale", "value": "fadeOut + shrinkVertically(hacia arriba)", "purpose": "Salida del aviso de error, conservando el último texto." }
+    ],
+    "breakpoints": [
+      { "name": "columna-maxima", "value": "480dp" }
+    ],
+    "plataforma": {
+      "comunes": ["paleta de los dos temas", "Barlow Condensed + Barlow y la escala de tamaños", "radios 4/8/12/16/24", "ritmo de espaciado 4-40", "Regla del Naranja Único", "Regla Plana"],
+      "android": ["roles de ColorScheme de M3", "nombres de Typography y Shapes de M3", "unidades sp/dp", "OutlinedTextField, TopAppBar, TextButton", "íconos como vectores XML (Material Symbols Rounded)", "color dinámico desactivado"]
+    }
+  },
+  "components": [
+    {
+      "name": "Botón principal (oscuro)",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Acción principal de la pantalla, a todo el ancho; el único naranja.",
+      "html": "<button class=\"ds-btn-primary\">Entrar</button>",
+      "css": ".ds-btn-primary { background: #FF5500; color: #04070F; font-family: Barlow, sans-serif; font-weight: 600; font-size: 14px; line-height: 20px; letter-spacing: 0.1px; min-height: 52px; width: 100%; border: none; border-radius: 24px; cursor: pointer; transition: filter 0.15s; } .ds-btn-primary:hover { filter: brightness(1.08); } .ds-btn-primary:active { filter: brightness(0.92); } .ds-btn-primary:focus-visible { outline: 2px solid #EEF0F7; outline-offset: 2px; }"
+    },
+    {
+      "name": "Botón principal (claro)",
+      "kind": "button",
+      "refersTo": "button-primary-claro",
+      "description": "El mismo botón en el tema claro: naranja oscurecido con texto blanco (5,3:1).",
+      "html": "<div class=\"ds-claro\"><button class=\"ds-btn-primary-claro\">Entrar</button></div>",
+      "css": ".ds-claro { background: #F4F5F9; padding: 16px; } .ds-btn-primary-claro { background: #C23C00; color: #FFFFFF; font-family: Barlow, sans-serif; font-weight: 600; font-size: 14px; line-height: 20px; letter-spacing: 0.1px; min-height: 52px; width: 100%; border: none; border-radius: 24px; cursor: pointer; transition: filter 0.15s; } .ds-btn-primary-claro:hover { filter: brightness(1.08); } .ds-btn-primary-claro:focus-visible { outline: 2px solid #0D1429; outline-offset: 2px; }"
+    },
+    {
+      "name": "Botón principal en proceso",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Mientras trabaja conserva el naranja, muestra el progreso y el texto en gerundio.",
+      "html": "<button class=\"ds-btn-busy\" disabled><span class=\"ds-spin\"></span>Entrando…</button>",
+      "css": ".ds-btn-busy { display: flex; align-items: center; justify-content: center; gap: 10px; background: #FF5500; color: #04070F; font-family: Barlow, sans-serif; font-weight: 600; font-size: 14px; min-height: 52px; width: 100%; border: none; border-radius: 24px; } .ds-spin { width: 14px; height: 14px; border: 2px solid #04070F; border-right-color: transparent; border-radius: 50%; animation: ds-rot 0.8s linear infinite; } @keyframes ds-rot { to { transform: rotate(360deg); } } @media (prefers-reduced-motion: reduce) { .ds-spin { animation: none; } }"
+    },
+    {
+      "name": "Botón de texto",
+      "kind": "button",
+      "refersTo": "button-text",
+      "description": "Acción secundaria en tinta, nunca en naranja.",
+      "html": "<button class=\"ds-btn-text\">¿Olvidaste tu contraseña?</button>",
+      "css": ".ds-btn-text { background: transparent; color: #EEF0F7; font-family: Barlow, sans-serif; font-weight: 600; font-size: 14px; letter-spacing: 0.1px; min-height: 48px; padding: 0 12px; border: none; border-radius: 24px; cursor: pointer; transition: background 0.15s; } .ds-btn-text:hover { background: rgba(238,240,247,0.08); } .ds-btn-text:focus-visible { outline: 2px solid #EEF0F7; outline-offset: 2px; }"
+    },
+    {
+      "name": "Campo de texto con contorno",
+      "kind": "input",
+      "refersTo": "input-outlined",
+      "description": "OutlinedTextField de M3: contorno Línea de Cal, radio 8, etiqueta flotante.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field-label\">Correo</span><input class=\"ds-field-input\" value=\"jugador01@prueba.local\"></label>",
+      "css": ".ds-field { position: relative; display: block; width: 100%; background: #04070F; padding-top: 8px; } .ds-field-label { position: absolute; top: 0; left: 12px; padding: 0 4px; background: #04070F; color: #A9B1CC; font-family: Barlow, sans-serif; font-size: 12px; line-height: 16px; } .ds-field-input { width: 100%; height: 56px; padding: 0 16px; background: transparent; color: #EEF0F7; font-family: Barlow, sans-serif; font-size: 16px; letter-spacing: 0.15px; border: 1px solid #6878A8; border-radius: 8px; outline: none; transition: border-color 0.15s; } .ds-field-input:hover { border-color: #EEF0F7; } .ds-field-input:focus-visible { border: 2px solid #FF5500; } .ds-field-input[aria-invalid=true] { border-color: #F87171; }"
+    },
+    {
+      "name": "Aviso de error",
+      "kind": "custom",
+      "refersTo": "aviso-error",
+      "description": "Contenedor de error sobre el botón principal; región viva, se despliega al aparecer.",
+      "html": "<div class=\"ds-aviso\" role=\"status\"><svg viewBox=\"0 0 24 24\" width=\"20\" height=\"20\" aria-hidden=\"true\"><path fill=\"currentColor\" d=\"M12 17q.43 0 .71-.29T13 16q0-.42-.29-.71T12 15q-.42 0-.71.29T11 16q0 .43.29.71T12 17m0-4q.43 0 .71-.29T13 12V8q0-.42-.29-.71T12 7q-.42 0-.71.29T11 8v4q0 .43.29.71T12 13m0 9q-2.07 0-3.9-.79t-3.17-2.14q-1.35-1.35-2.14-3.17T2 12q0-2.07.79-3.9t2.14-3.17Q6.27 3.58 8.1 2.79T12 2q2.07 0 3.9.79t3.17 2.14q1.35 1.35 2.14 3.17T22 12q0 2.07-.79 3.9t-2.14 3.17q-1.35 1.35-3.17 2.14T12 22\"/></svg><span>Correo o contraseña incorrectos.</span></div>",
+      "css": ".ds-aviso { display: flex; align-items: flex-start; gap: 12px; padding: 12px 14px; background: #3B1114; color: #FECACA; font-family: Barlow, sans-serif; font-size: 14px; line-height: 20px; letter-spacing: 0.1px; border-radius: 12px; animation: ds-desplegar 0.25s ease-out; } @keyframes ds-desplegar { from { opacity: 0; clip-path: inset(0 0 100% 0); } to { opacity: 1; clip-path: inset(0 0 0 0); } } @media (prefers-reduced-motion: reduce) { .ds-aviso { animation: none; } }"
+    },
+    {
+      "name": "Barra superior",
+      "kind": "nav",
+      "refersTo": "top-app-bar",
+      "description": "TopAppBar del color del fondo, flecha atrás Rounded y título en Barlow SemiBold 22.",
+      "html": "<header class=\"ds-topbar\"><button class=\"ds-topbar-back\" aria-label=\"Atrás\"><svg viewBox=\"0 0 24 24\" width=\"24\" height=\"24\"><path fill=\"currentColor\" d=\"m7.83 13 4.9 4.9q.3.3.29.7t-.31.7q-.3.28-.7.29t-.7-.29l-6.6-6.6q-.15-.15-.21-.33T4.43 12t.07-.37.21-.33l6.6-6.6q.28-.28.69-.28t.71.28q.3.3.3.71t-.3.71L7.83 11H19q.43 0 .71.29T20 12t-.29.71T19 13z\"/></svg></button><h1 class=\"ds-topbar-title\">Recuperar contraseña</h1></header>",
+      "css": ".ds-topbar { display: flex; align-items: center; gap: 4px; height: 64px; padding: 0 4px; background: #04070F; color: #EEF0F7; } .ds-topbar-back { width: 48px; height: 48px; display: grid; place-items: center; background: transparent; color: inherit; border: none; border-radius: 24px; cursor: pointer; } .ds-topbar-back:hover { background: rgba(238,240,247,0.08); } .ds-topbar-back:focus-visible { outline: 2px solid #EEF0F7; } .ds-topbar-title { margin: 0; font-family: Barlow, sans-serif; font-weight: 600; font-size: 22px; line-height: 28px; }"
+    },
+    {
+      "name": "Logotipo",
+      "kind": "custom",
+      "refersTo": "logotipo",
+      "description": "Logotipo tipográfico provisional: DESAFÍO en tinta sobre SPORTS en naranja.",
+      "html": "<div class=\"ds-logo\" role=\"heading\" aria-label=\"Desafío Sports\">DESAFÍO<br><span>SPORTS</span></div>",
+      "css": ".ds-logo { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-style: italic; font-size: 46px; line-height: 0.95; letter-spacing: 0.01em; color: #EEF0F7; text-transform: uppercase; } .ds-logo span { color: #FF5500; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "La cancha de noche",
+    "overview": "Desafío Sports se ve como una cancha iluminada de noche: un fondo azul marino casi negro que se aparta, tinta blanca azulada que se lee de pie y con prisa, y un solo foco naranja sobre lo que hay que hacer ahora. El oscuro es el tema principal; el claro es un gris azulado con tinta azul marino que conserva la misma jerarquía, con el naranja oscurecido para que el texto blanco del botón pase AA.\n\nLa energía de marca vive en la tipografía, no en la decoración: Barlow Condensed para los titulares y el logotipo, Barlow para todo lo que se lee y se toca. Las superficies son planas; la profundidad sale de escalones tonales en azul marino, no de sombras. El único movimiento registrado es el aviso de error que se despliega. La densidad es la de un formulario cómodo para el pulgar: columna única, márgenes de 24, separación de 12 y la acción principal abajo.\n\nEste primer build cubre solo el tema y el acceso (arranque, login, recuperar contraseña). Lo que el sistema todavía no tiene se marca como pendiente en Components; no se inventa aquí.",
+    "keyCharacteristics": [
+      "Fondo azul marino casi negro con superficies escalonadas en la misma familia.",
+      "Un naranja reservado para la acción principal y para \"lo de ahora\".",
+      "Barlow Condensed (titulares, logotipo) + Barlow (texto, botones, campos), fuentes empaquetadas.",
+      "Plano: sin sombras, la profundidad es tonal.",
+      "Las pantallas leen roles de color, nunca valores sueltos."
+    ],
+    "rules": [
+      { "name": "The Naranja Único Rule", "body": "El naranja marca la acción principal de la pantalla y lo que está pasando ahora; nada más. Los botones secundarios van en tinta (el \"¿Olvidaste tu contraseña?\" es `tinta`, no naranja) y los íconos decorativos en tinta secundaria (el sobre de \"Revisa tu correo\"). Prueba: si hay dos cosas naranjas en pantalla y una no es la acción principal ni \"lo de ahora\", sobra una.", "section": "colors" },
+      { "name": "The Roles, No Hex Rule", "body": "Las pantallas leen `MaterialTheme.colorScheme`; los valores viven solo en `ui/theme`. En el build no hay un solo color literal fuera del tema. En la web, el equivalente es leer variables, nunca hex sueltos.", "section": "colors" },
+      { "name": "The Sin Material You Rule", "body": "El color dinámico está apagado: taparía la marca.", "section": "colors" },
+      { "name": "The Doble Barlow Rule", "body": "Condensada para display, headline y el logotipo; Barlow para title, body y label. La ExtraBold Itálica es del logotipo y de nadie más.", "section": "typography" },
+      { "name": "The Espaciado Ajustado Rule", "body": "El espaciado de letras de M3 está pensado para Roboto; en Barlow se reduce sin llegar a cero (body 0,15 / 0,1 / 0,2; labelMedium y labelSmall 0,3). No se vuelve al valor de M3.", "section": "typography" },
+      { "name": "The Plana Rule", "body": "Nada proyecta sombra. Si algo tiene que separarse del fondo, sube un escalón de contenedor.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do usar el naranja solo para la acción principal y para \"lo de ahora\" (Naranja Único).",
+      "Do leer roles de `MaterialTheme.colorScheme` (en la web, variables), nunca hex.",
+      "Do dar profundidad con los escalones de contenedor, no con sombras.",
+      "Do usar Barlow Condensed para titulares y Barlow para todo lo que se lee y se toca, con la escala en `sp`.",
+      "Do mantener el botón principal en naranja mientras trabaja, con indicador y texto en gerundio.",
+      "Do verificar cada pantalla en oscuro, en claro y con la letra al 130 %."
+    ],
+    "donts": [
+      "Don't usar el blanco sobre `#FF5500` para texto: en oscuro el botón lleva tinta `fondo`; en claro el naranja baja a `#C23C00`.",
+      "Don't pintar en naranja botones secundarios, íconos decorativos o enlaces.",
+      "Don't activar el color dinámico (Material You).",
+      "Don't usar la ExtraBold Itálica fuera del logotipo.",
+      "Don't devolver el espaciado de letras de M3 al texto en Barlow.",
+      "Don't mostrar botones muertos para funciones que todavía no existen (Google, crear cuenta, explorar sin cuenta llegan con su spec)."
+    ]
+  }
+}

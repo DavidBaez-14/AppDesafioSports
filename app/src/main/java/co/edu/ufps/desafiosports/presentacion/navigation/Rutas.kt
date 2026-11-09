@@ -5,8 +5,23 @@ import kotlinx.serialization.Serializable
 /**
  * Rutas tipadas de Navigation Compose. Una por pantalla.
  *
- * Hoy solo existe el diagnóstico (MOV-0001). La spec de acceso (F0) agrega arranque, login,
- * registro… y un grafo por modo (Jugador, Árbitro, Creador) con su barra inferior.
+ * MOV-0002 agrega el acceso: arranque, login y recuperar contraseña. Inicio, con las
+ * secciones Creador y Árbitro (PRODUCT.md), llega con su propia spec; mientras tanto el
+ * diagnóstico de MOV-0001 hace de inicio provisional.
  */
+
+/** Primera pantalla: muestra el logotipo mientras se lee la sesión guardada (A-1). */
+@Serializable
+data object Arranque
+
+/** Login con correo (A-2). */
+@Serializable
+data object Login
+
+/** Recuperar contraseña (N-3). Trae el correo escrito en el login, si lo hay. */
+@Serializable
+data class RecuperarClave(val correo: String = "")
+
+/** Diagnóstico de conexión (MOV-0001). Hoy también es el inicio provisional. */
 @Serializable
 data object Diagnostico

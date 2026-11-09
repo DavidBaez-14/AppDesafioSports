@@ -14,6 +14,9 @@ internal fun Throwable.aAppError(): AppError = when (this) {
     is AuthRestException -> when (errorCode) {
         AuthErrorCode.InvalidCredentials -> AppError.CredencialesInvalidas()
         AuthErrorCode.EmailNotConfirmed -> AppError.CorreoNoConfirmado()
+        // Recuperar contraseña muchas veces seguidas (MOV-0002 · CA-9). Supabase lo describe en inglés.
+        AuthErrorCode.OverEmailSendRateLimit, AuthErrorCode.OverRequestRateLimit ->
+            AppError.Negocio(errorCode?.value ?: error, "Ya pediste varios correos. Espera unos minutos y vuelve a intentarlo.")
         else -> AppError.Negocio(errorCode?.value ?: error, errorDescription)
     }
     is RestException -> AppError.Negocio(error, description ?: error)

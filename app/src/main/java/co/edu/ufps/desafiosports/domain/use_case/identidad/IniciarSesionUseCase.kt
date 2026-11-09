@@ -1,6 +1,7 @@
 package co.edu.ufps.desafiosports.domain.use_case.identidad
 
 import co.edu.ufps.desafiosports.domain.error.AppError
+import co.edu.ufps.desafiosports.domain.error.CampoValidado
 import co.edu.ufps.desafiosports.domain.repository.SesionRepository
 
 /**
@@ -15,10 +16,12 @@ class IniciarSesionUseCase(private val sesion: SesionRepository) {
         val correoLimpio = correo.trim()
         return when {
             !esCorreoValido(correoLimpio) ->
-                Result.failure(AppError.Validacion("Escribe un correo válido."))
+                Result.failure(AppError.Validacion("Escribe un correo válido.", CampoValidado.CORREO))
 
             clave.length < LONGITUD_MINIMA_CLAVE ->
-                Result.failure(AppError.Validacion("La contraseña debe tener al menos $LONGITUD_MINIMA_CLAVE caracteres."))
+                Result.failure(
+                    AppError.Validacion("La contraseña debe tener al menos $LONGITUD_MINIMA_CLAVE caracteres.", CampoValidado.CLAVE)
+                )
 
             else -> sesion.iniciarSesion(correoLimpio, clave)
         }

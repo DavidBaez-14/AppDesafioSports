@@ -1,6 +1,7 @@
 package co.edu.ufps.desafiosports.domain.use_case.identidad
 
 import co.edu.ufps.desafiosports.domain.error.AppError
+import co.edu.ufps.desafiosports.domain.error.CampoValidado
 import co.edu.ufps.desafiosports.testutil.FakeSesionRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -44,6 +45,20 @@ class IniciarSesionUseCaseTest {
         val resultado = iniciarSesion("jugador01@prueba.local", "12345678")
 
         assertTrue(resultado.exceptionOrNull() is AppError.CredencialesInvalidas)
+    }
+
+    @Test
+    fun `MOV-0002 CA-2 el error de correo se marca para el campo correo`() = runTest {
+        val error = iniciarSesion("jugador01-prueba.local", "clave-segura").exceptionOrNull()
+
+        assertEquals(CampoValidado.CORREO, (error as AppError.Validacion).campo)
+    }
+
+    @Test
+    fun `MOV-0002 CA-2 el error de contrasena se marca para el campo contrasena`() = runTest {
+        val error = iniciarSesion("jugador01@prueba.local", "1234567").exceptionOrNull()
+
+        assertEquals(CampoValidado.CLAVE, (error as AppError.Validacion).campo)
     }
 
     @Test

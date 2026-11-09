@@ -18,6 +18,7 @@ import co.edu.ufps.desafiosports.domain.use_case.identidad.CerrarSesionUseCase
 import co.edu.ufps.desafiosports.domain.use_case.identidad.IniciarSesionUseCase
 import co.edu.ufps.desafiosports.domain.use_case.identidad.ObservarSesionUseCase
 import co.edu.ufps.desafiosports.domain.use_case.identidad.ObtenerCuentaUseCase
+import co.edu.ufps.desafiosports.domain.use_case.identidad.RecuperarClaveUseCase
 import co.edu.ufps.desafiosports.domain.use_case.sistema.ComprobarServidorUseCase
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.Auth
@@ -71,6 +72,7 @@ class AppContainer(val configuracion: Configuracion) {
 
     // ── Casos de uso ───────────────────────────────────────────────────────
     val iniciarSesion by lazy { IniciarSesionUseCase(sesionRepository) }
+    val recuperarClave by lazy { RecuperarClaveUseCase(sesionRepository) }
     val cerrarSesion by lazy { CerrarSesionUseCase(sesionRepository) }
     val observarSesion by lazy { ObservarSesionUseCase(sesionRepository) }
     val obtenerCuenta by lazy { ObtenerCuentaUseCase(cuentaRepository) }

@@ -1,0 +1,31 @@
+MOV-0002 · RED (8-nov-2026): ./gradlew testDebugUnitTest con los tests nuevos y la producción sin implementar.
+Compila; fallan solo los tests nuevos, por aserción. Los de MOV-0001 siguen en verde.
+
+IniciarSesionUseCaseTest > MOV-0002 CA-2 el error de correo se marca para el campo correo FAILED
+IniciarSesionUseCaseTest > MOV-0002 CA-2 el error de contrasena se marca para el campo contrasena FAILED
+RecuperarClaveUseCaseTest > CA-9 correo mal escrito falla en el campo correo sin llamar a Supabase FAILED
+RecuperarClaveUseCaseTest > CA-9 correo valido pide el enlace con el correo sin espacios FAILED
+RecuperarClaveUseCaseTest > CA-9 el limite de envios de Supabase llega intacto a la pantalla FAILED
+LoginViewModelTest > CA-5 cuenta sin registro completo cierra la sesion y muestra el mensaje del backend FAILED
+LoginViewModelTest > CA-6 sin conexion muestra el aviso y se puede reintentar FAILED
+LoginViewModelTest > CA-2 contrasena corta muestra el error bajo la contrasena sin llamar a Supabase FAILED
+LoginViewModelTest > CA-2 correo mal escrito muestra el error bajo el correo sin llamar a Supabase FAILED
+LoginViewModelTest > CA-8 correo sin confirmar muestra el mensaje de confirmar el correo FAILED
+LoginViewModelTest > CA-4 credenciales validas y cuenta registrada entran y borran la contrasena FAILED
+LoginViewModelTest > CA-5 si el backend no responde despues de Supabase entra igual FAILED
+LoginViewModelTest > CA-3 credenciales rechazadas muestran el aviso y conservan el correo FAILED
+LoginViewModelTest > CA-7 mientras espera la respuesta un segundo toque no repite la llamada FAILED
+LoginViewModelTest > CA-5 cuenta bloqueada cierra la sesion y muestra el mensaje del backend FAILED
+RecuperarClaveViewModelTest > CA-9 correo valido pide el enlace y muestra revisa tu correo FAILED
+RecuperarClaveViewModelTest > CA-9 correo mal escrito muestra el error en el campo sin llamar a Supabase FAILED
+RecuperarClaveViewModelTest > CA-9 al superar el limite de envios muestra el aviso en espanol FAILED
+RecuperarClaveViewModelTest > CA-9 sin conexion muestra el aviso y no marca como enviado FAILED
+RaizViewModelTest > CA-1 el destino inicial no cambia cuando despues se inicia sesion FAILED
+RaizViewModelTest > CA-1 con la configuracion incompleta va al diagnostico FAILED
+RaizViewModelTest > CA-1 decide en cuanto termina de leer la sesion FAILED
+RaizViewModelTest > CA-10 al cerrar una sesion activa avisa que hay que volver al login FAILED
+RaizViewModelTest > CA-1 con una sesion que no se pudo renovar va al inicio igual FAILED
+RaizViewModelTest > CA-1 sin sesion va al login FAILED
+RaizViewModelTest > CA-1 con sesion va al inicio FAILED
+62 tests completed, 26 failed, 3 skipped
+BUILD FAILED in 26s

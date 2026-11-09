@@ -2,6 +2,27 @@
 <resources>
     <string name="app_name">Desafío Sports</string>
 
+    <!-- Acceso: logotipo, login y recuperar contraseña (MOV-0002). -->
+    <string name="logotipo_linea_1">Desafío</string>
+    <string name="logotipo_linea_2">Sports</string>
+    <string name="arranque_cargando">Cargando tu sesión</string>
+    <string name="login_bienvenida">Crea tu torneo en minutos. Encuentra dónde jugar. Lleva tu historial.</string>
+    <string name="login_correo">Correo</string>
+    <string name="login_clave">Contraseña</string>
+    <string name="login_mostrar_clave">Mostrar contraseña</string>
+    <string name="login_ocultar_clave">Ocultar contraseña</string>
+    <string name="login_entrar">Entrar</string>
+    <string name="login_entrando">Entrando…</string>
+    <string name="login_olvide_clave">¿Olvidaste tu contraseña?</string>
+    <string name="recuperar_titulo">Recuperar contraseña</string>
+    <string name="recuperar_explicacion">Escribe el correo de tu cuenta y te enviamos un enlace para crear una contraseña nueva.</string>
+    <string name="recuperar_enviar">Enviar enlace</string>
+    <string name="recuperar_enviando">Enviando…</string>
+    <string name="recuperar_enviado_titulo">Revisa tu correo</string>
+    <string name="recuperar_enviado_detalle">Si %1$s tiene una cuenta, te llegará un enlace para crear una contraseña nueva. Ábrelo, cámbiala y vuelve a entrar aquí.</string>
+    <string name="recuperar_volver">Volver a entrar</string>
+    <string name="accion_atras">Atrás</string>
+
     <!-- Diagnóstico de conexión (MOV-0001). Pantalla temporal, sin diseño. -->
     <string name="diagnostico_titulo">Diagnóstico de conexión</string>
     <string name="diagnostico_aviso">Pantalla temporal para comprobar el entorno. Las pantallas reales se diseñan con Impeccable.</string>

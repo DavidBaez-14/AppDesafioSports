@@ -1,0 +1,26 @@
+MOV-0002 · GREEN (9-nov-2026): ./gradlew testDebugUnitTest assembleDebug → BUILD SUCCESSFUL.
+Suite completa: 62 tests, 0 fallos, 3 omitidos (BackendRealHumoTest: solo corre con DESAFIO_HUMO=1).
+
+data.remote.red.ErroresHttpTest                       tests=5  fallos=0
+data.remote.red.RedSesionTest                         tests=8  fallos=0
+data.repository.CuentaRepositoryImplTest              tests=3  fallos=0
+domain.use_case.identidad.IniciarSesionUseCaseTest    tests=7  fallos=0   (2 nuevos: MOV-0002 CA-2)
+domain.use_case.identidad.RecuperarClaveUseCaseTest   tests=3  fallos=0   (nuevo: CA-9)
+humo.BackendRealHumoTest                              tests=3  omitidos=3
+presentacion.acceso.LoginViewModelTest                tests=12 fallos=0   (nuevo: CA-2 a CA-8)
+presentacion.acceso.RecuperarClaveViewModelTest       tests=5  fallos=0   (nuevo: CA-9)
+presentacion.diagnostico.DiagnosticoViewModelTest     tests=7  fallos=0
+presentacion.navigation.RaizViewModelTest             tests=9  fallos=0   (nuevo: CA-1 y CA-10)
+
+Emulador (Pixel_8, API 37, 1080x2400), capturas en esta carpeta:
+02 login oscuro · 03 login claro · 04 letra al 130 % · 05 error de validación (CA-2)
+06 credenciales rechazadas por Supabase (CA-3) · 07 entra con jugador01 → inicio provisional (CA-4)
+08 cerrar sesión vuelve al login (CA-10) · 09 recuperar con el correo traído del login (CA-9)
+10 Atrás del sistema vuelve al login · 11 modo avión: aviso de sin conexión (CA-6)
+
+No verificado en el emulador (y por qué):
+- "Revisa tu correo": no se envió el enlace. Las cuentas del seed usan dominios falsos y los rebotes
+  perjudican el envío de correos del proyecto de Supabase. Cubierto por RecuperarClaveViewModelTest y
+  las previews; queda la prueba manual con una cuenta real.
+- CA-5 (cuenta sin registro o bloqueada) y la comprobación con /api/auth/me: el backend no estaba
+  corriendo en :8082. Cubierto por LoginViewModelTest.

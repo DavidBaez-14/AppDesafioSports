@@ -8,6 +8,7 @@ import co.edu.ufps.desafiosports.domain.model.Rol
 import co.edu.ufps.desafiosports.domain.repository.CuentaRepository
 import co.edu.ufps.desafiosports.domain.repository.ServidorRepository
 import co.edu.ufps.desafiosports.domain.repository.SesionRepository
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -18,6 +19,15 @@ class FakeSesionRepository : SesionRepository {
     val estado = MutableStateFlow<EstadoSesion>(EstadoSesion.Inactiva)
     var resultadoInicio: Result<Unit> = Result.success(Unit)
     val llamadasInicio = mutableListOf<Pair<String, String>>()
+
+    /** Si no es null, iniciarSesion espera a que se complete: sirve para probar el doble toque. */
+    var bloqueoInicio: CompletableDeferred<Unit>? = null
+
+    var resultadoRecuperacion: Result<Unit> = Result.success(Unit)
+    val llamadasRecuperacion = mutableListOf<String>()
+
+    var cierres = 0
+        private set
     var fueObservada = false
         private set
 
@@ -29,11 +39,18 @@ class FakeSesionRepository : SesionRepository {
 
     override suspend fun iniciarSesion(correo: String, clave: String): Result<Unit> {
         llamadasInicio += correo to clave
+        bloqueoInicio?.await()
         if (resultadoInicio.isSuccess) estado.value = EstadoSesion.Activa(correo)
         return resultadoInicio
     }
 
+    override suspend fun recuperarClave(correo: String): Result<Unit> {
+        llamadasRecuperacion += correo
+        return resultadoRecuperacion
+    }
+
     override suspend fun cerrarSesion(): Result<Unit> {
+        cierres++
         estado.value = EstadoSesion.Inactiva
         return Result.success(Unit)
     }

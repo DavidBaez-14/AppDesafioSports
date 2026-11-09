@@ -10,8 +10,11 @@ package co.edu.ufps.desafiosports.domain.error
  */
 sealed class AppError(val mensaje: String, causa: Throwable? = null) : Exception(mensaje, causa) {
 
-    /** Validación local, antes de llamar a la red (correo mal escrito, contraseña corta…). */
-    class Validacion(mensaje: String) : AppError(mensaje)
+    /**
+     * Validación local, antes de llamar a la red (correo mal escrito, contraseña corta…).
+     * [campo] dice bajo qué campo mostrarla; sin campo, va como aviso general (MOV-0002).
+     */
+    class Validacion(mensaje: String, val campo: CampoValidado? = null) : AppError(mensaje)
 
     /** No se pudo hablar con el servidor: sin red, servidor apagado o tiempo agotado. */
     class SinConexion(causa: Throwable? = null) :

@@ -28,6 +28,12 @@ class SesionRepositoryImpl(private val auth: Auth) : SesionRepository {
         }
     }
 
+    // Sin redirectUrl, igual que la web: el enlace del correo (plantilla en español de Supabase)
+    // abre la web, donde se crea la contraseña nueva.
+    override suspend fun recuperarClave(correo: String): Result<Unit> = llamarSupabase {
+        auth.resetPasswordForEmail(correo)
+    }
+
     override suspend fun cerrarSesion(): Result<Unit> = llamarSupabase {
         // Si falla la llamada a Supabase (por ejemplo, sin red), igual se borra la sesión local.
         runCatching { auth.signOut() }.onFailure { auth.clearSession() }

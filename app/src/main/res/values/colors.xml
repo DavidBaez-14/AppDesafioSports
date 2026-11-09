@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Solo para la ventana y el ícono. Los colores de la UI están en ui/theme/Color.kt. -->
-    <color name="fondo_ventana">#FF04070F</color>
+    <!-- Fondo del tema claro: evita un destello oscuro al abrir con el teléfono en claro (MOV-0002). -->
+    <color name="fondo_ventana">#FFF4F5F9</color>
     <color name="icono_fondo">#FF090E1C</color>
     <color name="icono_marca">#FFFF5500</color>
 </resources>

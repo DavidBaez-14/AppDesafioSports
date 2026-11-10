@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -33,6 +34,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -160,30 +162,43 @@ fun ChipEstado(texto: String, modifier: Modifier = Modifier, tono: Tono = Tono.N
 }
 
 /**
- * Columna de fecha al inicio de una fila: el día arriba y la hora en grande.
- * Con [ahora] va en naranja (es lo que pasa hoy).
+ * Columna de fecha al inicio de una fila: el día arriba, la hora en grande ("4:00") y debajo
+ * "a. m." o "p. m.". Con [ahora] va en naranja (es lo que pasa hoy). TalkBack la lee de corrido.
  */
 @Composable
-fun BloqueFecha(dia: String, hora: String?, modifier: Modifier = Modifier, ahora: Boolean = false) {
+fun BloqueFecha(
+    dia: String,
+    hora: String?,
+    modifier: Modifier = Modifier,
+    periodo: String? = null,
+    ahora: Boolean = false,
+) {
     val color = if (ahora) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+    val secundario = if (ahora) color else MaterialTheme.colorScheme.onSurfaceVariant
+    val lectura = listOfNotNull(dia, hora, periodo).joinToString(" ")
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.width(64.dp),
+        modifier = modifier
+            .width(72.dp)
+            .clearAndSetSemantics { contentDescription = lectura },
     ) {
         Text(
             text = dia.uppercase(),
             style = MaterialTheme.typography.labelSmall,
-            color = if (ahora) color else MaterialTheme.colorScheme.onSurfaceVariant,
-            maxLines = 1,
+            color = secundario,
+            textAlign = TextAlign.Center,
+            maxLines = 2,
         )
         if (hora != null) {
             Text(
                 text = hora,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.headlineSmall.copy(fontFeatureSettings = "tnum"),
                 color = color,
-                textAlign = TextAlign.Center,
-                maxLines = 2,
+                maxLines = 1,
             )
+        }
+        if (periodo != null) {
+            Text(periodo, style = MaterialTheme.typography.labelSmall, color = secundario, maxLines = 1)
         }
     }
 }
@@ -261,6 +276,48 @@ fun BotonContorno(texto: String, onClick: () -> Unit, modifier: Modifier = Modif
         modifier = modifier.heightIn(min = 48.dp),
     ) {
         Text(texto, style = MaterialTheme.typography.labelLarge)
+    }
+}
+
+/**
+ * Botón principal que también puede estar **deshabilitado** (el paso aún no está completo).
+ * Mientras trabaja conserva el naranja con el indicador, como pide DESIGN.md; deshabilitado se
+ * apaga, para que se note que falta algo.
+ */
+@Composable
+fun BotonPrimario(
+    texto: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    habilitado: Boolean = true,
+    enProceso: Boolean = false,
+    textoEnProceso: String = texto,
+) {
+    val colores = if (enProceso) {
+        ButtonDefaults.buttonColors(
+            disabledContainerColor = MaterialTheme.colorScheme.primary,
+            disabledContentColor = MaterialTheme.colorScheme.onPrimary,
+        )
+    } else {
+        ButtonDefaults.buttonColors()
+    }
+    Button(
+        onClick = onClick,
+        enabled = habilitado && !enProceso,
+        colors = colores,
+        shape = MaterialTheme.shapes.extraLarge,
+        modifier = modifier.heightIn(min = 52.dp),
+    ) {
+        if (enProceso) {
+            CircularProgressIndicator(
+                color = MaterialTheme.colorScheme.onPrimary,
+                strokeWidth = 2.dp,
+                modifier = Modifier.size(18.dp),
+            )
+            Text(textoEnProceso, style = MaterialTheme.typography.labelLarge, modifier = Modifier.padding(start = 10.dp))
+        } else {
+            Text(texto, style = MaterialTheme.typography.labelLarge)
+        }
     }
 }
 

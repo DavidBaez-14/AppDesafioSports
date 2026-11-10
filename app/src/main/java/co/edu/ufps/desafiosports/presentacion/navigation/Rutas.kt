@@ -47,3 +47,15 @@ data object SeccionArbitro
 /** Planilla de un partido (MOV-0009). */
 @Serializable
 data class Planilla(val partidoId: String)
+
+/** Sección Creador: los torneos que administra la persona (MOV-0008). */
+@Serializable
+data object SeccionCreador
+
+/** Crear torneo en tres pasos (MOV-0007). */
+@Serializable
+data object CrearTorneo
+
+/** Inscripciones de un torneo que administra: aprobar y rechazar (MOV-0008). */
+@Serializable
+data class InscripcionesTorneo(val torneoId: String, val nombre: String = "")

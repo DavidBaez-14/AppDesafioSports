@@ -19,6 +19,9 @@ import androidx.compose.ui.res.stringResource
 import co.edu.ufps.desafiosports.R
 import co.edu.ufps.desafiosports.presentacion.arbitro.PlanillaScreen
 import co.edu.ufps.desafiosports.presentacion.arbitro.SeccionArbitroScreen
+import co.edu.ufps.desafiosports.presentacion.creador.CrearTorneoScreen
+import co.edu.ufps.desafiosports.presentacion.creador.InscripcionesScreen
+import co.edu.ufps.desafiosports.presentacion.creador.SeccionCreadorScreen
 import co.edu.ufps.desafiosports.presentacion.diagnostico.AccesoProvisional
 import co.edu.ufps.desafiosports.presentacion.diagnostico.DiagnosticoScreen
 
@@ -121,8 +124,38 @@ fun AppNavigation(
                     AccesoProvisional(stringResource(R.string.arbitro_titulo), "acceso_arbitro") {
                         navController.navigate(SeccionArbitro)
                     },
+                    AccesoProvisional(stringResource(R.string.creador_titulo), "acceso_creador") {
+                        navController.navigate(SeccionCreador)
+                    },
+                    AccesoProvisional(stringResource(R.string.creador_crear_torneo), "acceso_crear_torneo") {
+                        navController.navigate(CrearTorneo)
+                    },
                 ),
             )
+        }
+        composable<SeccionCreador> {
+            SeccionCreadorScreen(
+                onVolver = { navController.popBackStack() },
+                onCrearTorneo = { navController.navigate(CrearTorneo) },
+                onAbrirTorneo = { torneo -> navController.navigate(InscripcionesTorneo(torneo.id, torneo.nombre)) },
+            )
+        }
+        composable<CrearTorneo> {
+            CrearTorneoScreen(
+                onSalir = { navController.popBackStack() },
+                // "Ver mis torneos" reemplaza el formulario: Atrás desde la sección no vuelve a él.
+                // Si se entró desde la sección, se regresa a ella en vez de abrir otra encima.
+                onVerMisTorneos = {
+                    if (!navController.popBackStack<SeccionCreador>(inclusive = false)) {
+                        navController.navigate(SeccionCreador) {
+                            popUpTo<CrearTorneo> { inclusive = true }
+                        }
+                    }
+                },
+            )
+        }
+        composable<InscripcionesTorneo> {
+            InscripcionesScreen(onVolver = { navController.popBackStack() })
         }
         composable<SeccionArbitro> {
             SeccionArbitroScreen(

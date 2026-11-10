@@ -4,7 +4,16 @@ import co.edu.ufps.desafiosports.BuildConfig
 import co.edu.ufps.desafiosports.data.auth.ProveedorTokenSupabase
 import co.edu.ufps.desafiosports.data.remote.api.ArbitrajeApi
 import co.edu.ufps.desafiosports.data.remote.api.AuthApi
+import co.edu.ufps.desafiosports.data.remote.api.CreadorApi
 import co.edu.ufps.desafiosports.data.repository.ArbitrajeRepositoryImpl
+import co.edu.ufps.desafiosports.data.repository.CreadorRepositoryImpl
+import co.edu.ufps.desafiosports.domain.repository.CreadorRepository
+import co.edu.ufps.desafiosports.domain.use_case.competicion.AprobarInscripcionUseCase
+import co.edu.ufps.desafiosports.domain.use_case.competicion.CrearTorneoUseCase
+import co.edu.ufps.desafiosports.domain.use_case.competicion.ObtenerDeportesUseCase
+import co.edu.ufps.desafiosports.domain.use_case.competicion.ObtenerInscripcionesUseCase
+import co.edu.ufps.desafiosports.domain.use_case.competicion.ObtenerMisTorneosUseCase
+import co.edu.ufps.desafiosports.domain.use_case.competicion.RechazarInscripcionUseCase
 import co.edu.ufps.desafiosports.domain.repository.ArbitrajeRepository
 import co.edu.ufps.desafiosports.domain.use_case.competicion.AlinearEquipoUseCase
 import co.edu.ufps.desafiosports.domain.use_case.competicion.AlinearJugadorUseCase
@@ -77,6 +86,7 @@ class AppContainer(val configuracion: Configuracion) {
     private val authApi: AuthApi by lazy { retrofit.create() }
     private val sistemaApi: SistemaApi by lazy { retrofit.create() }
     private val arbitrajeApi: ArbitrajeApi by lazy { retrofit.create() }
+    private val creadorApi: CreadorApi by lazy { retrofit.create() }
 
     // ── Repositorios ───────────────────────────────────────────────────────
     val sesionRepository: SesionRepository by lazy { SesionRepositoryImpl(supabase.auth) }
@@ -107,6 +117,15 @@ class AppContainer(val configuracion: Configuracion) {
     val quitarDeAlineacion by lazy { QuitarDeAlineacionUseCase(arbitrajeRepository) }
     val alinearEquipo by lazy { AlinearEquipoUseCase(arbitrajeRepository) }
     val cerrarPartido by lazy { CerrarPartidoUseCase(arbitrajeRepository) }
+
+    // Crear torneo y sección Creador (MOV-0007 y MOV-0008)
+    val creadorRepository: CreadorRepository by lazy { CreadorRepositoryImpl(creadorApi, erroresHttp) }
+    val obtenerDeportes by lazy { ObtenerDeportesUseCase(creadorRepository) }
+    val crearTorneo by lazy { CrearTorneoUseCase(creadorRepository) }
+    val obtenerMisTorneos by lazy { ObtenerMisTorneosUseCase(creadorRepository) }
+    val obtenerInscripciones by lazy { ObtenerInscripcionesUseCase(creadorRepository) }
+    val aprobarInscripcion by lazy { AprobarInscripcionUseCase(creadorRepository) }
+    val rechazarInscripcion by lazy { RechazarInscripcionUseCase(creadorRepository) }
 
     companion object {
         /** Lee la configuración que Gradle copió de local.properties a BuildConfig. */

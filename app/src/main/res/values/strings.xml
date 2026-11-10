@@ -172,4 +172,118 @@
     <string name="planilla_aviso_quitado">Evento quitado.</string>
     <string name="planilla_aviso_cerrado">Partido cerrado.</string>
     <string name="planilla_aviso_sin_actualizar">Se guardó, pero no pudimos actualizar la planilla. Desliza hacia abajo para verla al día.</string>
+
+    <!-- Torneos: textos que comparten las secciones (MOV-0007 y MOV-0008). -->
+    <string name="accion_aceptar">Aceptar</string>
+    <string name="torneo_borrador">Borrador</string>
+    <string name="torneo_inscripciones_abiertas">Inscripciones abiertas</string>
+    <string name="torneo_en_curso">En curso</string>
+    <string name="torneo_finalizado">Finalizado</string>
+    <string name="visibilidad_publico">Público</string>
+    <string name="visibilidad_publico_detalle">Aparece en Explorar: cualquiera lo encuentra por deporte o por nombre.</string>
+    <string name="visibilidad_no_listado">Solo con enlace</string>
+    <string name="visibilidad_no_listado_detalle">No aparece en Explorar. Entra quien tenga el enlace.</string>
+    <string name="visibilidad_privado">Privado</string>
+    <string name="visibilidad_privado_detalle">Solo lo ven los participantes que tú invites.</string>
+    <string name="formato_liga">Liga</string>
+    <string name="formato_liga_detalle">Todos contra todos. Gana quien sume más puntos.</string>
+    <string name="formato_eliminacion">Eliminación directa</string>
+    <string name="formato_eliminacion_detalle">El que pierde sale. Hasta 16 cupos.</string>
+    <string name="formato_grupos">Grupos y eliminatorias</string>
+    <string name="formato_grupos_detalle">Primero grupos; los mejores pasan a las llaves. Desde 4 cupos.</string>
+
+    <!-- Crear torneo (MOV-0007). -->
+    <string name="crear_titulo">Crear torneo</string>
+    <string name="crear_paso">Paso %1$d de %2$d</string>
+    <string name="crear_salir_sin_crear">Salir sin crear</string>
+    <string name="crear_siguiente">Siguiente</string>
+    <string name="crear_crear">Crear torneo</string>
+    <string name="crear_creando">Creando…</string>
+    <string name="crear_salir_titulo">¿Salir sin crear el torneo?</string>
+    <string name="crear_salir_detalle">Se pierde lo que llevas escrito.</string>
+    <string name="crear_salir">Salir</string>
+    <string name="crear_seguir">Seguir creando</string>
+    <string name="crear_p1_titulo">¿Qué deporte?</string>
+    <string name="crear_p1_detalle">De esto depende cómo se inscriben, el marcador y la tabla.</string>
+    <string name="crear_p1_sin_deportes">Todavía no hay deportes disponibles para crear torneos.</string>
+    <string name="crear_por_equipos">Por equipos</string>
+    <string name="crear_individual">Individual</string>
+    <string name="crear_p2_titulo">Nombre y formato</string>
+    <string name="crear_nombre">Nombre del torneo</string>
+    <string name="crear_nombre_ayuda">Así lo van a buscar. Ej.: Relámpago de %1$s</string>
+    <string name="crear_nombre_corto">Escribe al menos 3 letras.</string>
+    <string name="crear_formato">Formato</string>
+    <string name="crear_cupos">Cupos</string>
+    <string name="crear_cupos_equipos_rango">equipos como máximo · de %1$d a %2$d</string>
+    <string name="crear_cupos_jugadores_rango">jugadores como máximo · de %1$d a %2$d</string>
+    <plurals name="crear_cupos_equipos">
+        <item quantity="one">%1$d equipo como máximo</item>
+        <item quantity="other">%1$d equipos como máximo</item>
+    </plurals>
+    <plurals name="crear_cupos_jugadores">
+        <item quantity="one">%1$d jugador como máximo</item>
+        <item quantity="other">%1$d jugadores como máximo</item>
+    </plurals>
+    <string name="crear_cupos_menos">Menos cupos</string>
+    <string name="crear_cupos_mas">Más cupos</string>
+    <string name="crear_empieza">Empieza</string>
+    <string name="crear_elegir_fecha">Elegir fecha</string>
+    <string name="crear_p3_titulo">¿Quién lo puede ver?</string>
+    <string name="crear_p3_detalle">Lo puedes cambiar después.</string>
+    <string name="crear_cobrar">Cobrar inscripción</string>
+    <string name="crear_cobrar_detalle">Cada inscrito sube su comprobante y tú lo apruebas.</string>
+    <string name="crear_valor">Valor de la inscripción</string>
+    <string name="crear_valor_ayuda">En pesos, sin puntos ni comas.</string>
+    <string name="crear_valor_lectura">%1$s por inscripción</string>
+    <string name="crear_despues">Premios, multas, árbitros y reglas se configuran después, desde el torneo.</string>
+    <string name="crear_compartir_texto">Inscríbete en %1$s en Desafío Sports: %2$s</string>
+    <string name="creado_titulo">Tu torneo está listo</string>
+    <string name="creado_publico">Ya aparece en Explorar. Cualquiera lo encuentra buscando su nombre.</string>
+    <string name="creado_no_listado">Comparte el enlace: solo entra quien lo tenga.</string>
+    <string name="creado_privado">Es privado: invita a los participantes desde el torneo.</string>
+    <string name="creado_generico">Ya puedes recibir inscripciones.</string>
+    <string name="creado_compartir">Compartir enlace</string>
+    <string name="creado_ver_mis_torneos">Ver mis torneos</string>
+
+    <!-- Sección Creador (MOV-0008). -->
+    <string name="creador_titulo">Creador</string>
+    <string name="creador_crear_torneo">Crear torneo</string>
+    <string name="creador_por_revisar">Por revisar</string>
+    <string name="creador_mis_torneos">Mis torneos</string>
+    <string name="creador_vacio_titulo">Crea tu primer torneo</string>
+    <string name="creador_vacio_detalle">En tres pasos: el deporte, el nombre y el formato, y quién lo puede ver.</string>
+    <string name="creador_inscritos_de_cupos">%1$d de %2$d cupos</string>
+    <plurals name="creador_inscritos">
+        <item quantity="one">%1$d inscrito</item>
+        <item quantity="other">%1$d inscritos</item>
+    </plurals>
+    <plurals name="creador_inscripciones_pendientes">
+        <item quantity="one">%1$d inscripción por aprobar</item>
+        <item quantity="other">%1$d inscripciones por aprobar</item>
+    </plurals>
+    <plurals name="creador_comprobantes_pendientes">
+        <item quantity="one">%1$d comprobante por revisar</item>
+        <item quantity="other">%1$d comprobantes por revisar</item>
+    </plurals>
+
+    <!-- Inscripciones de un torneo (MOV-0008). -->
+    <string name="inscripciones_titulo">Inscripciones</string>
+    <string name="inscripciones_por_aprobar">Por aprobar</string>
+    <string name="inscripciones_aprobadas">Aprobadas</string>
+    <string name="inscripciones_rechazadas">Rechazadas</string>
+    <string name="inscripciones_delegado">Delegado: %1$s</string>
+    <string name="inscripciones_motivo">Motivo: %1$s</string>
+    <string name="inscripciones_aprobar">Aprobar</string>
+    <string name="inscripciones_rechazar">Rechazar</string>
+    <string name="inscripciones_rechazar_titulo">¿Rechazar a %1$s?</string>
+    <string name="inscripciones_motivo_etiqueta">Motivo</string>
+    <string name="inscripciones_motivo_ayuda">Lo verá quien se inscribió.</string>
+    <string name="inscripciones_vacio_titulo">Aún no hay inscripciones</string>
+    <string name="inscripciones_vacio_detalle">Comparte el enlace del torneo para que se inscriban.</string>
+    <string name="inscripciones_aviso_aprobada">Inscripción de %1$s aprobada.</string>
+    <string name="inscripciones_aviso_rechazada">Inscripción de %1$s rechazada.</string>
+    <string name="inscripciones_aviso_sin_actualizar">Se guardó, pero no pudimos actualizar la lista. Desliza hacia abajo para verla al día.</string>
+    <string name="inscripcion_aprobada">Aprobada</string>
+    <string name="inscripcion_rechazada">Rechazada</string>
+    <string name="inscripcion_expulsado">Expulsado</string>
 </resources>

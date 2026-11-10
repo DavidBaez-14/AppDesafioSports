@@ -5,6 +5,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 
 // Tema de marca (MOV-0002). Sin color dinámico (Material You): taparía los colores de la marca.
 // El oscuro es el principal; la app sigue al tema del teléfono.
@@ -93,10 +94,12 @@ fun DesafioSportsTheme(
     oscuro: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit,
 ) {
-    MaterialTheme(
-        colorScheme = if (oscuro) EsquemaOscuro else EsquemaClaro,
-        typography = Tipografia,
-        shapes = Formas,
-        content = content,
-    )
+    CompositionLocalProvider(LocalColoresExtra provides if (oscuro) ColoresExtraOscuro else ColoresExtraClaro) {
+        MaterialTheme(
+            colorScheme = if (oscuro) EsquemaOscuro else EsquemaClaro,
+            typography = Tipografia,
+            shapes = Formas,
+            content = content,
+        )
+    }
 }

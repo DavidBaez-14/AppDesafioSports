@@ -8,6 +8,9 @@ build/
 
 # Configuración local: rutas del SDK y claves. NUNCA se sube.
 local.properties
+# Copias por entorno (local.properties.dev, .prod…). La plantilla sí se versiona.
+local.properties.*
+!local.properties.ejemplo
 
 # Android Studio / IntelliJ
 *.iml

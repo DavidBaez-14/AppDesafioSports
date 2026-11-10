@@ -66,6 +66,8 @@ import co.edu.ufps.desafiosports.ui.theme.DesafioSportsTheme
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
+import co.edu.ufps.desafiosports.presentacion.comun.Avatar
+import co.edu.ufps.desafiosports.presentacion.comun.inicialDe
 
 /** Inscripciones de un torneo que administro: aprobar y rechazar (MOV-0008). */
 @Composable
@@ -197,6 +199,7 @@ fun InscripcionesContenido(
                         bloque(R.string.inscripciones_aprobadas, inscripciones.aprobadas) { inscripcion ->
                             Fila(
                                 titulo = inscripcion.equipo,
+                                inicio = { Avatar(inicialDe(inscripcion.equipo)) },
                                 detalle = inscripcion.delegado?.let { stringResource(R.string.inscripciones_delegado, it) },
                                 fin = { ChipEstado(stringResource(R.string.inscripcion_aprobada), tono = Tono.EXITO) },
                                 modifier = Modifier.testTag("inscripcion_aprobada"),
@@ -206,6 +209,7 @@ fun InscripcionesContenido(
                             val expulsado = inscripcion.estado == EstadoInscripcion.EXPULSADO
                             Fila(
                                 titulo = inscripcion.equipo,
+                                inicio = { Avatar(inicialDe(inscripcion.equipo)) },
                                 detalle = inscripcion.motivoRechazo?.let { stringResource(R.string.inscripciones_motivo, it) }
                                     ?: inscripcion.delegado?.let { stringResource(R.string.inscripciones_delegado, it) },
                                 fin = {
@@ -265,7 +269,7 @@ private fun LazyListScope.bloque(
     if (inscripciones.isEmpty()) return
     item(key = "titulo_$titulo") { EncabezadoBloque(stringResource(titulo)) }
     itemsIndexed(inscripciones, key = { _, inscripcion -> "${titulo}_${inscripcion.id}" }) { indice, inscripcion ->
-        if (indice > 0) HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, modifier = Modifier.padding(start = 16.dp))
+        if (indice > 0) HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, modifier = Modifier.padding(start = 72.dp, end = 16.dp))
         fila(inscripcion)
     }
 }
@@ -285,13 +289,13 @@ private fun FilaPorAprobar(
         inscripcion.monto?.takeIf { it.signum() > 0 }?.let { Formatos.pesos(it) },
     ).joinToString(" · ")
     Column(Modifier.testTag("inscripcion_pendiente")) {
-        Fila(titulo = inscripcion.equipo, detalle = detalle.ifBlank { null })
+        Fila(titulo = inscripcion.equipo, detalle = detalle.ifBlank { null }, inicio = { Avatar(inicialDe(inscripcion.equipo)) })
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 16.dp, end = 16.dp, bottom = 12.dp),
+                .padding(start = 72.dp, end = 16.dp, bottom = 14.dp),
         ) {
             if (ocupada) {
                 CircularProgressIndicator(

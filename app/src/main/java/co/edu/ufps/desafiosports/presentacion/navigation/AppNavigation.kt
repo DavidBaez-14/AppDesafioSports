@@ -24,11 +24,12 @@ import co.edu.ufps.desafiosports.presentacion.creador.InscripcionesScreen
 import co.edu.ufps.desafiosports.presentacion.creador.SeccionCreadorScreen
 import co.edu.ufps.desafiosports.presentacion.diagnostico.AccesoProvisional
 import co.edu.ufps.desafiosports.presentacion.diagnostico.DiagnosticoScreen
+import co.edu.ufps.desafiosports.presentacion.inicio.InicioScreen
 
 /**
  * Grafo de la app (MOV-0002).
  *
- * Arranque → Login o inicio provisional (diagnóstico). Cerrar sesión desde cualquier lado
+ * Arranque → Login o Inicio (MOV-0010). Cerrar sesión desde cualquier lado
  * vuelve al login y borra la pila, así Atrás no regresa a una pantalla de sesión cerrada.
  */
 @Composable
@@ -56,7 +57,9 @@ fun AppNavigation(
                 onDestino = { destino ->
                     val ruta: Any = when (destino) {
                         DestinoRaiz.LOGIN -> Login
-                        DestinoRaiz.INICIO, DestinoRaiz.DIAGNOSTICO -> Diagnostico
+                        DestinoRaiz.INICIO -> Inicio
+                        // Sin configuración completa no hay sesión posible: el diagnóstico dice qué falta.
+                        DestinoRaiz.DIAGNOSTICO -> Diagnostico
                     }
                     navController.navigate(ruta) {
                         popUpTo<Arranque> { inclusive = true }
@@ -67,7 +70,7 @@ fun AppNavigation(
         composable<Login> {
             LoginScreen(
                 onIngresado = {
-                    navController.navigate(Diagnostico) {
+                    navController.navigate(Inicio) {
                         popUpTo<Login> { inclusive = true }
                     }
                 },
@@ -111,14 +114,28 @@ fun AppNavigation(
         composable<CompletarRegistro> {
             CompletarRegistroScreen(
                 onRegistrado = {
-                    navController.navigate(Diagnostico) {
+                    navController.navigate(Inicio) {
                         popUpTo(navController.graph.id) { inclusive = true }
                     }
                 },
             )
         }
+        composable<Inicio> {
+            InicioScreen(
+                onAbrirArbitro = { navController.navigate(SeccionArbitro) },
+                onAbrirPlanilla = { partidoId -> navController.navigate(Planilla(partidoId)) },
+                onAbrirCreador = { navController.navigate(SeccionCreador) },
+                onAbrirTorneo = { torneo -> navController.navigate(InscripcionesTorneo(torneo.id, torneo.nombre)) },
+                onCrearTorneo = { navController.navigate(CrearTorneo) },
+                onAbrirDiagnostico = if (BuildConfig.DEBUG) {
+                    { navController.navigate(Diagnostico) }
+                } else {
+                    null
+                },
+            )
+        }
         composable<Diagnostico> {
-            // Acceso provisional a las secciones mientras llega Inicio (MOV-0004).
+            // Accesos directos a las secciones, útiles para probar sin pasar por Inicio.
             DiagnosticoScreen(
                 accesos = listOf(
                     AccesoProvisional(stringResource(R.string.arbitro_titulo), "acceso_arbitro") {

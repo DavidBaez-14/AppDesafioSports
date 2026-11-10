@@ -131,6 +131,46 @@
     <string name="arbitro_jugados">Jugados</string>
     <string name="arbitro_vacio_titulo">Aún no tienes partidos asignados</string>
     <string name="arbitro_vacio_detalle">Cuando un organizador te invite como árbitro y te asigne partidos, aparecen aquí.</string>
+    <!-- Diseño de las secciones (MOV-0010). -->
+    <string name="arbitro_abrir_planilla">Abrir planilla</string>
+    <string name="arbitro_seguir_planilla">Seguir con la planilla</string>
+    <string name="planilla_anotar">Anotar</string>
+    <string name="planilla_evento_lectura">%1$d. %2$s de %3$s, %4$s</string>
+
+    <!-- Inicio provisional (MOV-0010). El Inicio completo llega con MOV-0004. -->
+    <string name="inicio_saludo">Hola, %1$s</string>
+    <string name="inicio_saludo_generico">Hola</string>
+    <string name="inicio_tus_secciones">Tus secciones</string>
+    <string name="inicio_cuenta">Tu cuenta</string>
+    <string name="inicio_cerrar_sesion">Cerrar sesión</string>
+    <string name="inicio_cerrando_sesion">Cerrando sesión…</string>
+    <string name="inicio_diagnostico">Diagnóstico de conexión</string>
+    <string name="inicio_ver_seccion">Abrir %1$s</string>
+    <string name="inicio_arbitro_proximo">Tu próximo partido</string>
+    <string name="inicio_arbitro_nada">No tienes partidos por arbitrar. Los jugados siguen en la sección.</string>
+    <plurals name="inicio_arbitro_por_jugar">
+        <item quantity="one">%d partido por arbitrar</item>
+        <item quantity="other">%d partidos por arbitrar</item>
+    </plurals>
+    <string name="inicio_creador_vacio">Arma tu primer torneo: el deporte, el nombre y quién lo puede ver.</string>
+    <string name="inicio_creador_al_dia">Nada espera tu revisión.</string>
+    <plurals name="inicio_creador_torneos">
+        <item quantity="one">%d torneo</item>
+        <item quantity="other">%d torneos</item>
+    </plurals>
+    <plurals name="inicio_creador_por_revisar">
+        <item quantity="one">%d por revisar</item>
+        <item quantity="other">%d por revisar</item>
+    </plurals>
+    <string name="inicio_creador_espera">%1$s te espera</string>
+    <string name="creador_inscritos_etiqueta">inscritos</string>
+    <string name="creado_ficha_deporte">Deporte</string>
+    <string name="creado_ficha_formato">Formato</string>
+    <string name="creado_ficha_cupos">Cupos</string>
+    <string name="creado_ficha_empieza">Empieza</string>
+    <string name="creado_ficha_inscripcion">Inscripción</string>
+    <string name="creado_ficha_visibilidad">Quién lo ve</string>
+    <string name="creado_ficha_gratis">Sin costo</string>
 
     <!-- Planilla del partido (MOV-0009). -->
     <string name="planilla_titulo">Planilla</string>

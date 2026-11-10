@@ -171,7 +171,7 @@ components:
 
 # Design System: Desafío Sports
 
-<!-- Registrado el 9-nov-2026 a partir del primer build en Compose (MOV-0002: tema de marca y pantallas de acceso). Fuente de verdad: app/src/main/java/co/edu/ufps/desafiosports/ui/theme/. El prototipo HTML docs/prototipo-roles/ fue la exploración de origen; donde difiere, manda Compose. -->
+<!-- Registrado el 9-nov-2026 a partir del primer build en Compose (MOV-0002: tema de marca y pantallas de acceso). Ampliado el 10-nov-2026 con las secciones Árbitro y Creador y el Inicio provisional (MOV-0010). Fuente de verdad: app/src/main/java/co/edu/ufps/desafiosports/ui/theme/. El prototipo HTML docs/prototipo-roles/ fue la exploración de origen; donde difiere, manda Compose. -->
 
 ## Overview
 
@@ -181,7 +181,9 @@ Desafío Sports se ve como una cancha iluminada de noche: un fondo azul marino c
 
 La energía de marca vive en la tipografía, no en la decoración: Barlow Condensed para los titulares y el logotipo, Barlow para todo lo que se lee y se toca. Las superficies son planas; la profundidad sale de escalones tonales en azul marino, no de sombras. El único movimiento registrado es el aviso de error que se despliega. La densidad es la de un formulario cómodo para el pulgar: columna única, márgenes de 24, separación de 12 y la acción principal abajo.
 
-Este primer build cubre solo el tema y el acceso (arranque, login, recuperar contraseña). Lo que el sistema todavía no tiene se marca como pendiente en Components; no se inventa aquí.
+El build cubre el acceso (arranque, login, crear cuenta), el Inicio provisional y las secciones Árbitro (partidos y planilla) y Creador (mis torneos, crear torneo, inscripciones). Lo que el sistema todavía no tiene se marca como pendiente en Components; no se inventa aquí.
+
+En las pantallas de trabajo la energía de marca vive en las **cifras**: la hora del partido de hoy, el marcador, los cupos ocupados. Van en Barlow Condensed con dígitos de ancho fijo, como en un tablero.
 
 **Key Characteristics:**
 - Fondo azul marino casi negro con superficies escalonadas en la misma familia.
@@ -198,13 +200,13 @@ Azul marino casi negro con tinta fría y un naranja de cancha; el claro invierte
 
 ### Primary
 - **Naranja Desafío** (`naranja`, oscuro / `claro-naranja`, claro): el color de la acción principal (Entrar, Enviar enlace, Volver a entrar) y del "SPORTS" del logotipo. En oscuro lleva tinta `fondo` encima; en claro, `blanco` (5,3:1). Es la familia `#FF5500` del Code Cup Design System, restricción de marca.
-- **Brasa** (`naranja-contenedor` / `claro-naranja-contenedor`, con `sobre-naranja-contenedor`): rol `primaryContainer` de M3. Definido en el esquema; sin uso en las pantallas de acceso.
+- **Brasa** (`naranja-contenedor` / `claro-naranja-contenedor`, con `sobre-naranja-contenedor`): rol `primaryContainer` de M3. Es el fondo del chip "de ahora" (Planilla, En juego, N por revisar): la versión discreta del naranja para lo que pasa hoy sin competir con la acción principal.
 
 ### Secondary
 - No hay un segundo acento. El rol `secondary` de M3 apunta a la tinta secundaria y `secondaryContainer` a `contenedor-maximo`: es neutro a propósito.
 
 ### Tertiary
-- **Azul Marcador** (`azul` / `claro-azul`, con sus contenedores): rol `tertiary` de M3. Definido en el esquema, todavía sin uso en pantalla; su rol (información, enlaces o estados) queda pendiente de la primera pantalla que lo necesite.
+- **Azul Marcador** (`azul` / `claro-azul`, con sus contenedores): rol `tertiary` de M3. Información neutra de estado: el chip "Inscripciones abiertas" de un torneo. No se usa para acciones ni para enlaces.
 
 ### Neutral
 - **Noche de Cancha** (`fondo` / `claro-fondo`): fondo y `surface` de toda pantalla, también la barra superior. La ventana de Android arranca en este mismo color en cada tema (sin destello).
@@ -213,6 +215,10 @@ Azul marino casi negro con tinta fría y un naranja de cancha; el claro invierte
 - **Tinta de Grada** (`tinta-secundaria` / `claro-tinta-secundaria`): textos de apoyo (bienvenida, explicaciones), etiquetas de campo, íconos decorativos.
 - **Línea de Cal** (`borde`): contorno de los campos, igual en los dos temas; pasa 3:1 sobre ambos fondos.
 - **Tarjeta Roja** (`error`, `error-contenedor`, `sobre-error-contenedor` y sus `claro-*`): errores de campo y el aviso de error.
+
+### Semánticos (colores extra)
+- **Éxito, Advertencia** (`ColoresExtra`, con sus contenedores): partido cerrado, torneo en curso, cupos llenos (éxito); aplazado, borrador (advertencia). Se leen con `MaterialTheme.coloresExtra`, nunca como valores sueltos.
+- **Tarjetas** (amarilla, azul, roja): el objeto real del deporte; conservan su color en los dos temas y siempre van con su nombre en texto al lado.
 
 ### Named Rules
 **The Naranja Único Rule.** El naranja marca la acción principal de la pantalla y lo que está pasando ahora; nada más. Los botones secundarios van en tinta (el "¿Olvidaste tu contraseña?" es `tinta`, no naranja) y los íconos decorativos en tinta secundaria (el sobre de "Revisa tu correo"). Prueba: si hay dos cosas naranjas en pantalla y una no es la acción principal ni "lo de ahora", sobra una.
@@ -254,6 +260,8 @@ Ritmo observado: 4, 8, 12, 16, 24, 32, 40. Los objetivos táctiles miden al meno
 
 Plano. Ninguna superficie del build lleva sombra ni elevación tonal; la profundidad se expresa con los escalones de contenedor en azul marino (y en gris azulado en claro), y los contenedores con significado (el aviso de error) usan su propio rol de color.
 
+**Paneles** (tablero del partido, secciones de Inicio, partido destacado, ficha del torneo): en oscuro suben a `contenedor-bajo`; en claro van en blanco (`claro-contenedor-minimo`), porque el escalón bajo del claro casi no se distingue del fondo. Lo resuelve `colorDePanel()` en un solo lugar. Las opciones elegibles (deporte, formato, visibilidad) van un escalón más arriba (`contenedor`) y la elegida sube a `contenedor-alto` con contorno de 2 en tinta.
+
 ### Named Rules
 **The Plana Rule.** Nada proyecta sombra. Si algo tiene que separarse del fondo, sube un escalón de contenedor.
 
@@ -283,13 +291,41 @@ Firmes y anchos, hechos para el pulgar.
 
 ### Navigation
 - **Barra superior (TopAppBar):** fondo igual al de la pantalla (no se separa), título en title (Barlow SemiBold 22), flecha atrás Rounded a la izquierda. El Atrás del sistema siempre funciona.
-- **Pendiente:** barra de navegación inferior (Inicio · Explorar · Perfil) y FAB "Crear torneo": están en el contrato de dirección, no en el build.
+- **Barra superior de Inicio:** el logotipo en una línea ("DESAFÍO SPORTS", 26) a la izquierda y el avatar de la cuenta a la derecha, que abre el menú (cerrar sesión; en debug, el diagnóstico).
+- **FAB "Crear torneo"** (Inicio y Creador): extendido, naranja, sin elevación (Regla Plana). Es la acción principal de esas pantallas.
+- **Pendiente:** barra de navegación inferior (Inicio · Explorar · Perfil), con MOV-0004. No se muestra mientras sus destinos no existan.
 
 ### Logotipo (signature)
 Tipográfico y provisional: "DESAFÍO" sobre "SPORTS", Barlow Condensed ExtraBold Itálica en mayúsculas, "SPORTS" en el color primario. Centrado en el arranque, alineado a la izquierda en el login. El logo definitivo lo reemplaza en un solo lugar.
 
+### Tablero del partido (signature)
+Panel con el torneo y la fase arriba (bodySmall), las dos cifras en `displayLarge` con dígitos de ancho fijo y el nombre de cada equipo debajo, en Barlow Condensed mayúscula. Al centro, una raya en `outline`. Debajo, el chip del estado; "En juego" es el único naranja del tablero. TalkBack lo lee de corrido ("Halcones FC 2, Tiburones FC 1").
+
+### Línea de eventos de dos lados (signature)
+Los eventos en orden, sin minuto: lo del local a la izquierda (alineado hacia el centro) y lo del visitante a la derecha, con el número de orden en un círculo sobre una línea vertical de 2 en `outlineVariant`, cortada antes del primero y después del último. Cada evento: jugador (titleSmall), tipo debajo (bodySmall) y su marca (tarjeta de color o ícono). El botón de quitar queda en el borde exterior de su lado. Sobre la línea, los nombres de los equipos en labelMedium. No lleva marcador parcial: qué suma punto depende del deporte.
+
+### Partidos
+- **Partido destacado:** el de hoy que falta por cerrar, en un panel: la hora en `displaySmall` naranja (es lo de ahora), los equipos en headlineSmall mayúscula, el contexto y el botón principal "Abrir planilla".
+- **Fila de fixture:** la columna de fecha (día arriba, hora en headlineSmall, periodo abajo; en naranja solo si es hoy) y los dos equipos uno sobre otro, con su cifra al final de cada renglón cuando hay marcador. Quien perdió va en tinta secundaria.
+
+### Secciones de Inicio
+Panel con una cabecera tocable (ícono en círculo, nombre de la sección en headlineSmall mayúscula, resumen, flecha) y debajo lo que necesita a la persona: el próximo partido (abre la planilla en un toque) o el torneo que espera revisión. Si la carga falla, el error y "Reintentar" quedan dentro del panel; la otra sección sigue.
+
+### Tarjeta de opción
+Selección única como tarjeta de 72 de alto mínimo: a la izquierda un dibujo de 48 × 40 (el esquema del formato o el ícono de la visibilidad), título y explicación, y la marca de elegida a la derecha. Los esquemas de formato están dibujados: liga = cinco puntos unidos todos con todos; eliminación = llaves de 4 a 1; grupos y eliminatorias = dos grupos que alimentan una llave.
+
+### Chips de estado
+Etiqueta de 24 de alto, radio `sm` (4), labelMedium, con ícono opcional de 14. El texto dice el estado; el color solo lo refuerza: neutro, información (azul), éxito, advertencia, error y "de ahora" (brasa).
+
+### Cifras y llenado
+- **Cupos:** "12/16" en headlineSmall con dígitos fijos ("/16" en tinta secundaria) y una barra de llenado de 4 de alto debajo: pista en `contenedor-maximo`, relleno en tinta, en éxito cuando se llena. Sin cupos, la cifra va con "inscritos".
+- **Avatar:** círculo en `contenedor-maximo` con las iniciales en Barlow Condensed, mientras no haya fotos. Decorativo para TalkBack.
+
+### Ficha del torneo
+Al crear un torneo: panel con el ícono del deporte y el nombre en headlineSmall mayúscula, un divisor y las filas etiqueta (tinta secundaria) / valor (titleSmall a la derecha).
+
 ### Pendiente (no existe todavía)
-Tarjetas, chips de estado con color semántico, tablas de posiciones, cifras de marcador en display, barra inferior y FAB. Se registran cuando haya un build que los muestre.
+Tablas de posiciones, llaves con resultados, Explorar, Perfil y la barra inferior. Se registran cuando haya un build que los muestre.
 
 ## Do's and Don'ts
 
@@ -300,6 +336,8 @@ Tarjetas, chips de estado con color semántico, tablas de posiciones, cifras de 
 - **Do** usar Barlow Condensed para titulares y Barlow para todo lo que se lee y se toca, con la escala en `sp`.
 - **Do** mantener el botón principal en naranja mientras trabaja, con indicador y texto en gerundio.
 - **Do** verificar cada pantalla en oscuro, en claro y con la letra al 130 %.
+- **Do** poner las cifras (hora, marcador, cupos) en Barlow Condensed con dígitos de ancho fijo (`tnum`).
+- **Do** usar `colorDePanel()` para los paneles: en claro el escalón bajo se pierde contra el fondo.
 
 ### Don't:
 - **Don't** usar el blanco sobre `#FF5500` para texto: en oscuro el botón lleva tinta `fondo`; en claro el naranja baja a `#C23C00`.

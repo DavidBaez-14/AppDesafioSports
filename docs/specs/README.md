@@ -17,6 +17,7 @@
 | [MOV-0007](MOV-0007-crear-torneo.md) | Crear torneo en tres pasos | borrador | F3 | — | MOV-0004 · backend 0024 y M4 | `mov-0007-crear-torneo` |
 | [MOV-0008](MOV-0008-seccion-creador.md) | Sección Creador, mis torneos y por revisar | borrador | F3 | — | MOV-0004, MOV-0005 · backend 0024 | `mov-0008-seccion-creador` |
 | [MOV-0009](MOV-0009-seccion-arbitro-y-planilla.md) | Sección Árbitro y planilla del partido | borrador | F2 | — | MOV-0004 · backend 0025 | `mov-0009-seccion-arbitro` |
+| [MOV-0010](MOV-0010-diseno-secciones.md) | Diseño de las secciones Árbitro y Creador, e Inicio provisional | en-revision | F2 | David | MOV-0007, MOV-0008, MOV-0009 | `mov-0010-diseno-secciones` |
 
 Cada borrador trae en su §4 lo que ya existe en el backend y lo que falta, con el JSON esperado, para que la spec del backend se escriba aparte en `CODECUP/.context/specs/`.
 

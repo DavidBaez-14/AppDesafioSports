@@ -65,11 +65,10 @@ import co.edu.ufps.desafiosports.domain.model.PartidoArbitro
 import co.edu.ufps.desafiosports.domain.model.Planilla
 import co.edu.ufps.desafiosports.presentacion.acceso.BotonPrincipal
 import co.edu.ufps.desafiosports.presentacion.comun.Cargando
-import co.edu.ufps.desafiosports.presentacion.comun.ChipEstado
 import co.edu.ufps.desafiosports.presentacion.comun.EstadoError
 import co.edu.ufps.desafiosports.presentacion.comun.Fila
 import co.edu.ufps.desafiosports.presentacion.comun.FlechaFila
-import co.edu.ufps.desafiosports.presentacion.comun.Tono
+import co.edu.ufps.desafiosports.presentacion.comun.IconoEnCirculo
 import co.edu.ufps.desafiosports.ui.deporte.MarcaDeEvento
 import co.edu.ufps.desafiosports.ui.deporte.nombreDeEvento
 import co.edu.ufps.desafiosports.ui.theme.DesafioSportsTheme
@@ -278,7 +277,23 @@ private fun CuerpoPlanilla(state: PlanillaState, planilla: Planilla, acciones: A
             .fillMaxSize()
             .testTag("planilla_lista"),
     ) {
-        item(key = "encabezado") { Encabezado(planilla) }
+        item(key = "encabezado") { Tablero(planilla, Modifier.padding(start = 16.dp, end = 16.dp, top = 4.dp)) }
+
+        if (state.editable) {
+            item(key = "registro") {
+                Column(Modifier.padding(start = 16.dp, end = 16.dp, top = 20.dp)) {
+                    Text(
+                        text = stringResource(R.string.planilla_anotar).uppercase(),
+                        style = MaterialTheme.typography.headlineSmall,
+                        modifier = Modifier
+                            .padding(bottom = 10.dp)
+                            .semantics { heading() },
+                    )
+                    SelectorDeEquipo(planilla, state.lado, acciones.onLado)
+                    TecladoDeEventos(planilla.tiposEvento, habilitado = !state.enAccion, onTipo = acciones.onTipoEvento)
+                }
+            }
+        }
 
         if (planilla.partido.cruceDefinido) {
             item(key = "alineacion") {
@@ -289,36 +304,32 @@ private fun CuerpoPlanilla(state: PlanillaState, planilla: Planilla, acciones: A
                         planilla.local.alineados, planilla.local.nombre,
                         planilla.visitante.alineados, planilla.visitante.nombre,
                     ),
-                    inicio = {
-                        Box(Modifier.size(40.dp), contentAlignment = Alignment.Center) {
-                            Icon(painterResource(R.drawable.ic_groups), contentDescription = null)
-                        }
-                    },
+                    inicio = { IconoEnCirculo(R.drawable.ic_groups) },
                     fin = { FlechaFila() },
                     onClick = acciones.onAbrirAlineacion,
-                    modifier = Modifier.testTag("planilla_alineacion"),
+                    modifier = Modifier
+                        .padding(top = 12.dp)
+                        .testTag("planilla_alineacion"),
                 )
             }
         }
 
-        if (state.editable) {
-            item(key = "registro") {
-                Column(Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp)) {
-                    SelectorDeEquipo(planilla, state.lado, acciones.onLado)
-                    TecladoDeEventos(planilla.tiposEvento, habilitado = !state.enAccion, onTipo = acciones.onTipoEvento)
-                }
+        item(key = "titulo_eventos") {
+            Row(
+                verticalAlignment = Alignment.Bottom,
+                modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 8.dp),
+            ) {
+                Text(
+                    text = stringResource(R.string.planilla_eventos).uppercase(),
+                    style = MaterialTheme.typography.headlineSmall,
+                    modifier = Modifier
+                        .weight(1f)
+                        .semantics { heading() },
+                )
             }
         }
-
-        item(key = "titulo_eventos") {
-            Text(
-                text = stringResource(R.string.planilla_eventos).uppercase(),
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier
-                    .padding(start = 16.dp, end = 16.dp, top = 20.dp, bottom = 4.dp)
-                    .semantics { heading() },
-            )
+        if (planilla.eventos.isNotEmpty()) {
+            item(key = "lados") { RotulosDeLados(planilla) }
         }
         if (planilla.eventos.isEmpty()) {
             item(key = "sin_eventos") {
@@ -335,10 +346,12 @@ private fun CuerpoPlanilla(state: PlanillaState, planilla: Planilla, acciones: A
             }
         } else {
             itemsIndexed(planilla.eventos, key = { _, evento -> evento.id }) { indice, evento ->
-                if (indice > 0) HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, modifier = Modifier.padding(start = 16.dp))
-                FilaEvento(
+                EventoEnLinea(
                     numero = indice + 1,
                     evento = evento,
+                    lado = ladoDelEvento(evento, planilla),
+                    primero = indice == 0,
+                    ultimo = indice == planilla.eventos.lastIndex,
                     sePuedeQuitar = state.editable,
                     habilitado = !state.enAccion,
                     onQuitar = { acciones.onPedirQuitar(evento) },
@@ -349,80 +362,34 @@ private fun CuerpoPlanilla(state: PlanillaState, planilla: Planilla, acciones: A
     }
 }
 
-/** Torneo, fase y lugar; los dos equipos; el marcador en grande y el estado del partido. */
+/** Los nombres de los dos equipos sobre la línea: de qué lado va cada uno. */
 @Composable
-private fun Encabezado(planilla: Planilla) {
-    val partido = planilla.partido
-    val marcador = planilla.marcador
-    val local = partido.local?.nombre ?: stringResource(R.string.partido_equipo_por_definir)
-    val visitante = partido.visitante?.nombre ?: stringResource(R.string.partido_equipo_por_definir)
-    val contexto = listOfNotNull(partido.torneo, partido.fase, partido.lugar).filter { it.isNotBlank() }.joinToString(" · ")
-    val lectura = stringResource(R.string.planilla_marcador_lectura, local, marcador.local, visitante, marcador.visitante)
-
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
+private fun RotulosDeLados(planilla: Planilla) {
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = 4.dp)
+            .clearAndSetSemantics { },
     ) {
-        if (contexto.isNotBlank()) {
-            Text(
-                text = contexto,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-            )
-        }
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .padding(top = 12.dp)
-                .clearAndSetSemantics { contentDescription = lectura }
-                .testTag("planilla_marcador"),
-        ) {
-            Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(32.dp)) {
-                NombreEquipo(local, Modifier.weight(1f))
-                NombreEquipo(visitante, Modifier.weight(1f))
-            }
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Cifra(marcador.local, Modifier.weight(1f))
-                Text("–", style = MaterialTheme.typography.displaySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Cifra(marcador.visitante, Modifier.weight(1f))
-            }
-        }
-        when (partido.estado) {
-            EstadoPartido.PROGRAMADO -> ChipEstado(stringResource(R.string.partido_programado), icono = R.drawable.ic_schedule)
-            EstadoPartido.EN_CURSO -> ChipEstado(stringResource(R.string.partido_en_juego), tono = Tono.AHORA, icono = R.drawable.ic_radio_button_checked)
-            EstadoPartido.FINALIZADO -> ChipEstado(stringResource(R.string.planilla_cerrado), tono = Tono.EXITO, icono = R.drawable.ic_task_alt)
-            EstadoPartido.WO -> ChipEstado(stringResource(R.string.partido_wo))
-            EstadoPartido.APLAZADO -> ChipEstado(stringResource(R.string.partido_aplazado), tono = Tono.ADVERTENCIA)
-            EstadoPartido.DESCONOCIDO -> Unit
-        }
+        Text(
+            text = planilla.local.nombre,
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.End,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f).padding(end = 8.dp),
+        )
+        Spacer(Modifier.width(44.dp))
+        Text(
+            text = planilla.visitante.nombre,
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f).padding(start = 8.dp),
+        )
     }
-}
-
-@Composable
-private fun NombreEquipo(nombre: String, modifier: Modifier = Modifier) {
-    Text(
-        text = nombre,
-        style = MaterialTheme.typography.titleMedium,
-        textAlign = TextAlign.Center,
-        maxLines = 2,
-        overflow = TextOverflow.Ellipsis,
-        modifier = modifier,
-    )
-}
-
-/** Cifra del marcador: Barlow Condensed en display, con dígitos de ancho fijo para que no baile. */
-@Composable
-private fun Cifra(valor: Int, modifier: Modifier = Modifier) {
-    Text(
-        text = valor.toString(),
-        style = MaterialTheme.typography.displayLarge.copy(fontFeatureSettings = "tnum"),
-        textAlign = TextAlign.Center,
-        maxLines = 1,
-        modifier = modifier,
-    )
 }
 
 /** Los tipos de evento del deporte, de a cuatro por fila. Los manda el backend. */
@@ -436,11 +403,11 @@ private fun TecladoDeEventos(tipos: List<String>, habilitado: Boolean, onTipo: (
                         onClick = { onTipo(tipo) },
                         enabled = habilitado,
                         shape = MaterialTheme.shapes.large,
-                        color = MaterialTheme.colorScheme.surfaceContainer,
+                        color = MaterialTheme.colorScheme.surfaceContainerHigh,
                         contentColor = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier
                             .weight(1f)
-                            .heightIn(min = 76.dp)
+                            .heightIn(min = 84.dp)
                             .testTag("evento_${tipo.lowercase()}"),
                     ) {
                         Column(
@@ -451,7 +418,7 @@ private fun TecladoDeEventos(tipos: List<String>, habilitado: Boolean, onTipo: (
                             MarcaDeEvento(tipo)
                             Text(
                                 text = nombreDeEvento(tipo),
-                                style = MaterialTheme.typography.labelMedium,
+                                style = MaterialTheme.typography.labelLarge,
                                 textAlign = TextAlign.Center,
                                 maxLines = 2,
                                 overflow = TextOverflow.Ellipsis,
@@ -464,39 +431,6 @@ private fun TecladoDeEventos(tipos: List<String>, habilitado: Boolean, onTipo: (
             }
         }
     }
-}
-
-@Composable
-private fun FilaEvento(numero: Int, evento: EventoPartido, sePuedeQuitar: Boolean, habilitado: Boolean, onQuitar: () -> Unit) {
-    Fila(
-        titulo = stringResource(R.string.planilla_evento_fila, nombreDeEvento(evento.tipo), evento.jugadorNombre),
-        detalle = evento.equipoNombre.ifBlank { null },
-        inicio = {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                Surface(
-                    shape = MaterialTheme.shapes.extraLarge,
-                    color = MaterialTheme.colorScheme.surfaceContainerHigh,
-                    contentColor = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.size(28.dp),
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Text(numero.toString(), style = MaterialTheme.typography.labelLarge, maxLines = 1)
-                    }
-                }
-                MarcaDeEvento(evento.tipo)
-            }
-        },
-        fin = if (sePuedeQuitar) {
-            {
-                IconButton(onClick = onQuitar, enabled = habilitado, modifier = Modifier.testTag("evento_quitar")) {
-                    Icon(painterResource(R.drawable.ic_close), contentDescription = stringResource(R.string.planilla_quitar_evento, numero))
-                }
-            }
-        } else {
-            null
-        },
-        modifier = Modifier.testTag("evento_fila"),
-    )
 }
 
 /** Barra fija con la acción principal de la planilla. */

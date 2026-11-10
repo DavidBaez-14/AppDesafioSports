@@ -29,6 +29,8 @@ import co.edu.ufps.desafiosports.R
 fun Logotipo(
     modifier: Modifier = Modifier,
     tamano: TextUnit = 46.sp,
+    /** En una sola línea ("DESAFÍO SPORTS"), para la barra superior de Inicio (MOV-0010). */
+    enUnaLinea: Boolean = false,
 ) {
     val nombre = stringResource(R.string.app_name)
     val linea1 = stringResource(R.string.logotipo_linea_1).uppercase()
@@ -36,7 +38,7 @@ fun Logotipo(
     Text(
         text = buildAnnotatedString {
             append(linea1)
-            append('\n')
+            append(if (enUnaLinea) ' ' else '\n')
             withStyle(SpanStyle(color = MaterialTheme.colorScheme.primary)) { append(linea2) }
         },
         style = TextStyle(

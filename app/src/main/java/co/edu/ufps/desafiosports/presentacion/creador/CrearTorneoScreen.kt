@@ -76,6 +76,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import co.edu.ufps.desafiosports.R
+import co.edu.ufps.desafiosports.presentacion.comun.colorDePanel
 import co.edu.ufps.desafiosports.domain.model.BorradorTorneo
 import co.edu.ufps.desafiosports.domain.model.Deporte
 import co.edu.ufps.desafiosports.domain.model.FormatoTorneo
@@ -96,6 +97,18 @@ import co.edu.ufps.desafiosports.ui.theme.coloresExtra
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.FilledTonalIconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.style.TextOverflow
+import co.edu.ufps.desafiosports.presentacion.comun.IconoEnCirculo
 
 /** Lo que "Crear torneo" le pide al ViewModel. */
 data class AccionesCrearTorneo(
@@ -166,7 +179,7 @@ private fun compartirTorneo(contexto: Context, torneo: TorneoCreado) {
 fun CrearTorneoContenido(state: CrearTorneoState, acciones: AccionesCrearTorneo, modifier: Modifier = Modifier) {
     val creado = state.creado
     if (creado != null) {
-        TorneoListo(creado, acciones, modifier)
+        TorneoListo(creado, state.borrador, state.hoy, acciones, modifier)
         return
     }
 
@@ -327,34 +340,115 @@ private fun Subtitulo(texto: String) {
     )
 }
 
-/** Opción de una lista de selección única: toda la fila es el control. */
+/**
+ * Opción de una lista de selección única, como tarjeta (MOV-0010): toda la tarjeta es el control.
+ * La elegida sube un escalón de contenedor y lleva contorno en tinta y la marca de elegida, igual
+ * que las tarjetas de deporte del paso 1.
+ */
 @Composable
-private fun OpcionRadio(
+private fun OpcionTarjeta(
     titulo: String,
     detalle: String,
     elegida: Boolean,
     onElegir: () -> Unit,
     modifier: Modifier = Modifier,
-    @DrawableRes icono: Int? = null,
+    habilitada: Boolean = true,
+    inicio: @Composable (color: Color) -> Unit,
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    val tinta = if (elegida) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant
+    Surface(
+        selected = elegida,
+        onClick = onElegir,
+        enabled = habilitada,
+        shape = MaterialTheme.shapes.large,
+        color = if (elegida) MaterialTheme.colorScheme.surfaceContainerHigh else MaterialTheme.colorScheme.surfaceContainer,
+        contentColor = MaterialTheme.colorScheme.onSurface,
+        border = if (elegida) BorderStroke(2.dp, MaterialTheme.colorScheme.onSurface) else null,
         modifier = modifier
             .fillMaxWidth()
-            .heightIn(min = 64.dp)
-            .selectable(selected = elegida, role = Role.RadioButton, onClick = onElegir)
-            .padding(vertical = 8.dp),
+            .heightIn(min = 72.dp)
+            .semantics { role = Role.RadioButton },
     ) {
-        RadioButton(selected = elegida, onClick = null)
-        Column(Modifier.weight(1f)) {
-            Text(titulo, style = MaterialTheme.typography.titleMedium)
-            Text(detalle, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
-        if (icono != null) {
-            Icon(painterResource(icono), contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(14.dp),
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
+        ) {
+            Box(Modifier.size(width = 48.dp, height = 40.dp), contentAlignment = Alignment.Center) { inicio(tinta) }
+            Column(Modifier.weight(1f)) {
+                Text(titulo, style = MaterialTheme.typography.titleMedium)
+                Text(detalle, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            Box(Modifier.size(20.dp)) {
+                if (elegida) Icon(painterResource(R.drawable.ic_check), contentDescription = null, modifier = Modifier.size(20.dp))
+            }
         }
     }
+}
+
+/**
+ * El esquema de cada formato, dibujado: liga = todos contra todos (cada punto unido con todos),
+ * eliminación = llaves que se cierran en un campeón, grupos = dos grupos que alimentan las llaves.
+ * Es decorativo: el nombre y la explicación van al lado en texto.
+ */
+@Composable
+private fun EsquemaFormato(formato: FormatoTorneo, color: Color, modifier: Modifier = Modifier) {
+    Canvas(modifier.size(width = 48.dp, height = 40.dp)) {
+        val grosor = 2.dp.toPx()
+        val punto = 3.dp.toPx()
+        val w = size.width
+        val h = size.height
+        when (formato) {
+            FormatoTorneo.LIGA -> {
+                val r = minOf(w, h) / 2 - punto
+                val centro = Offset(w / 2, h / 2)
+                val puntos = (0 until 5).map { i ->
+                    val angulo = Math.toRadians(-90.0 + i * 72.0)
+                    Offset(centro.x + r * kotlin.math.cos(angulo).toFloat(), centro.y + r * kotlin.math.sin(angulo).toFloat())
+                }
+                for (i in puntos.indices) {
+                    for (j in i + 1 until puntos.size) drawLine(color.copy(alpha = 0.55f), puntos[i], puntos[j], grosor * 0.6f)
+                }
+                puntos.forEach { drawCircle(color, punto, it) }
+            }
+            FormatoTorneo.ELIMINACION_DIRECTA -> llaves(color, grosor, x0 = 2.dp.toPx(), ancho = w - 6.dp.toPx(), alto = h)
+            FormatoTorneo.GRUPOS_ELIMINATORIAS -> {
+                val lado = h * 0.36f
+                val izquierda = 1.dp.toPx()
+                val arriba = h * 0.08f
+                val abajo = h * 0.56f
+                val radio = CornerRadius(3.dp.toPx())
+                drawRoundRect(color, Offset(izquierda, arriba), Size(lado, lado), radio, style = Stroke(grosor))
+                drawRoundRect(color, Offset(izquierda, abajo), Size(lado, lado), radio, style = Stroke(grosor))
+                val xLlave = izquierda + lado + 8.dp.toPx()
+                drawLine(color, Offset(izquierda + lado, arriba + lado / 2), Offset(xLlave, arriba + lado / 2), grosor)
+                drawLine(color, Offset(izquierda + lado, abajo + lado / 2), Offset(xLlave, abajo + lado / 2), grosor)
+                drawLine(color, Offset(xLlave, arriba + lado / 2), Offset(xLlave, abajo + lado / 2), grosor)
+                drawLine(color, Offset(xLlave, h / 2), Offset(w - 4.dp.toPx(), h / 2), grosor)
+                drawCircle(color, punto, Offset(w - 4.dp.toPx(), h / 2))
+            }
+        }
+    }
+}
+
+/** Llaves de 4 a 2 a 1, de izquierda a derecha, con el campeón en un punto. */
+private fun DrawScope.llaves(color: Color, grosor: Float, x0: Float, ancho: Float, alto: Float) {
+    val filas = listOf(0.1f, 0.36f, 0.64f, 0.9f).map { it * alto }
+    val x1 = x0 + ancho * 0.36f
+    val x2 = x0 + ancho * 0.7f
+    val x3 = x0 + ancho
+    for ((uno, dos) in listOf(filas[0] to filas[1], filas[2] to filas[3])) {
+        drawLine(color, Offset(x0, uno), Offset(x1, uno), grosor)
+        drawLine(color, Offset(x0, dos), Offset(x1, dos), grosor)
+        drawLine(color, Offset(x1, uno), Offset(x1, dos), grosor)
+    }
+    val m1 = (filas[0] + filas[1]) / 2
+    val m2 = (filas[2] + filas[3]) / 2
+    drawLine(color, Offset(x1, m1), Offset(x2, m1), grosor)
+    drawLine(color, Offset(x1, m2), Offset(x2, m2), grosor)
+    drawLine(color, Offset(x2, m1), Offset(x2, m2), grosor)
+    drawLine(color, Offset(x2, alto / 2), Offset(x3, alto / 2), grosor)
+    drawCircle(color, 3.dp.toPx(), Offset(x3, alto / 2))
 }
 
 // ── Paso 1 · deporte ────────────────────────────────────────────────────────
@@ -450,20 +544,21 @@ private fun PasoNombreYFormato(state: CrearTorneoState, acciones: AccionesCrearT
     )
 
     Subtitulo(stringResource(R.string.crear_formato))
-    Column(Modifier.selectableGroup()) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.selectableGroup()) {
         FormatoTorneo.entries.forEach { formato ->
             val (titulo, detalle) = when (formato) {
                 FormatoTorneo.LIGA -> R.string.formato_liga to R.string.formato_liga_detalle
                 FormatoTorneo.ELIMINACION_DIRECTA -> R.string.formato_eliminacion to R.string.formato_eliminacion_detalle
                 FormatoTorneo.GRUPOS_ELIMINATORIAS -> R.string.formato_grupos to R.string.formato_grupos_detalle
             }
-            OpcionRadio(
+            OpcionTarjeta(
                 titulo = stringResource(titulo),
                 detalle = stringResource(detalle),
                 elegida = borrador.formato == formato,
                 onElegir = { acciones.onFormato(formato) },
+                habilitada = !state.creando,
                 modifier = Modifier.testTag("formato_${formato.name.lowercase()}"),
-            )
+            ) { color -> EsquemaFormato(formato, color) }
         }
     }
 
@@ -492,15 +587,26 @@ private fun PasoNombreYFormato(state: CrearTorneoState, acciones: AccionesCrearT
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
-        IconButton(
+        val coloresPaso = IconButtonDefaults.filledTonalIconButtonColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+        )
+        FilledTonalIconButton(
             onClick = { acciones.onCupos(-1) },
             enabled = borrador.cupos > borrador.cuposMinimos && !state.creando,
-            modifier = Modifier.testTag("crear_cupos_menos"),
+            colors = coloresPaso,
+            modifier = Modifier
+                .size(48.dp)
+                .testTag("crear_cupos_menos"),
         ) { Icon(painterResource(R.drawable.ic_remove), contentDescription = stringResource(R.string.crear_cupos_menos)) }
-        IconButton(
+        Spacer(Modifier.width(8.dp))
+        FilledTonalIconButton(
             onClick = { acciones.onCupos(1) },
             enabled = borrador.cupos < borrador.cuposMaximos && !state.creando,
-            modifier = Modifier.testTag("crear_cupos_mas"),
+            colors = coloresPaso,
+            modifier = Modifier
+                .size(48.dp)
+                .testTag("crear_cupos_mas"),
         ) { Icon(painterResource(R.drawable.ic_add), contentDescription = stringResource(R.string.crear_cupos_mas)) }
     }
 
@@ -575,20 +681,22 @@ private fun Long.aFecha(): LocalDate = Instant.ofEpochMilli(this).atZone(ZoneOff
 private fun PasoVisibilidad(state: CrearTorneoState, acciones: AccionesCrearTorneo) {
     val borrador = state.borrador
     Pregunta(stringResource(R.string.crear_p3_titulo), stringResource(R.string.crear_p3_detalle))
-    Column(Modifier.selectableGroup()) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.selectableGroup()) {
         Visibilidad.entries.forEach { visibilidad ->
-            OpcionRadio(
+            OpcionTarjeta(
                 titulo = stringResource(visibilidad.titulo()),
                 detalle = stringResource(visibilidad.detalle()),
-                icono = visibilidad.icono(),
                 elegida = borrador.visibilidad == visibilidad,
                 onElegir = { acciones.onVisibilidad(visibilidad) },
+                habilitada = !state.creando,
                 modifier = Modifier.testTag("visibilidad_${visibilidad.name.lowercase()}"),
-            )
+            ) { color ->
+                Icon(painterResource(visibilidad.icono()), contentDescription = null, tint = color, modifier = Modifier.size(28.dp))
+            }
         }
     }
 
-    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, modifier = Modifier.padding(vertical = 8.dp))
+    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, modifier = Modifier.padding(top = 16.dp, bottom = 8.dp))
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -671,7 +779,13 @@ internal fun Visibilidad.icono(): Int = when (this) {
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-private fun TorneoListo(torneo: TorneoCreado, acciones: AccionesCrearTorneo, modifier: Modifier = Modifier) {
+private fun TorneoListo(
+    torneo: TorneoCreado,
+    borrador: BorradorTorneo,
+    hoy: LocalDate,
+    acciones: AccionesCrearTorneo,
+    modifier: Modifier = Modifier,
+) {
     val mensaje = when (torneo.visibilidad) {
         Visibilidad.PUBLICO -> stringResource(R.string.creado_publico)
         Visibilidad.NO_LISTADO -> stringResource(R.string.creado_no_listado)
@@ -711,14 +825,13 @@ private fun TorneoListo(torneo: TorneoCreado, acciones: AccionesCrearTorneo, mod
                         contentDescription = lectura
                     },
                 )
-                Text(torneo.nombre, style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Center)
                 Text(
                     text = mensaje,
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
                 )
-                Spacer(Modifier.size(8.dp))
+                FichaDelTorneo(torneo, borrador, hoy, Modifier.padding(vertical = 12.dp))
                 if (torneo.enlace.isNotBlank()) {
                     BotonPrincipal(
                         texto = stringResource(R.string.creado_compartir),
@@ -733,6 +846,68 @@ private fun TorneoListo(torneo: TorneoCreado, acciones: AccionesCrearTorneo, mod
                     onClick = acciones.onVerMisTorneos,
                     modifier = Modifier.testTag("creado_mis_torneos"),
                 )
+            }
+        }
+    }
+}
+
+/**
+ * La ficha del torneo recién creado (MOV-0010): el nombre en la condensada y lo que se eligió en
+ * los tres pasos, para confirmarlo de un vistazo antes de compartir.
+ */
+@Composable
+private fun FichaDelTorneo(torneo: TorneoCreado, borrador: BorradorTorneo, hoy: LocalDate, modifier: Modifier = Modifier) {
+    val formato = when (borrador.formato) {
+        FormatoTorneo.LIGA -> stringResource(R.string.formato_liga)
+        FormatoTorneo.ELIMINACION_DIRECTA -> stringResource(R.string.formato_eliminacion)
+        FormatoTorneo.GRUPOS_ELIMINATORIAS -> stringResource(R.string.formato_grupos)
+        null -> null
+    }
+    val individual = borrador.deporte?.tipo == TipoCompetencia.INDIVIDUAL
+    val cupos = pluralStringResource(
+        if (individual) R.plurals.crear_cupos_jugadores else R.plurals.crear_cupos_equipos, borrador.cupos, borrador.cupos,
+    )
+    val visibilidad = (torneo.visibilidad ?: borrador.visibilidad)?.let { stringResource(it.titulo()) }
+    val valor = borrador.valorInscripcion?.takeIf { borrador.cobraInscripcion && it > 0 }
+    val filas = listOfNotNull(
+        borrador.deporte?.let { stringResource(R.string.creado_ficha_deporte) to it.nombre },
+        formato?.let { stringResource(R.string.creado_ficha_formato) to it },
+        stringResource(R.string.creado_ficha_cupos) to cupos,
+        borrador.fechaInicio?.let { stringResource(R.string.creado_ficha_empieza) to Formatos.fecha(it, hoy) },
+        visibilidad?.let { stringResource(R.string.creado_ficha_visibilidad) to it },
+        stringResource(R.string.creado_ficha_inscripcion) to (valor?.let { Formatos.pesos(it) } ?: stringResource(R.string.creado_ficha_gratis)),
+    )
+    Surface(
+        color = colorDePanel(),
+        shape = MaterialTheme.shapes.large,
+        modifier = modifier
+            .fillMaxWidth()
+            .testTag("creado_ficha"),
+    ) {
+        Column(Modifier.padding(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                IconoEnCirculo(iconoDeDeporte(torneo.deporte.ifBlank { borrador.deporte?.codigo.orEmpty() }))
+                Text(
+                    text = torneo.nombre.uppercase(),
+                    style = MaterialTheme.typography.headlineSmall,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f),
+                )
+            }
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, modifier = Modifier.padding(vertical = 12.dp))
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                filas.forEach { (etiqueta, texto) ->
+                    Row(Modifier.semantics(mergeDescendants = true) { }) {
+                        Text(
+                            text = etiqueta,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.weight(1f),
+                        )
+                        Text(texto, style = MaterialTheme.typography.titleSmall, textAlign = TextAlign.End)
+                    }
+                }
             }
         }
     }

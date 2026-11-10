@@ -2,6 +2,14 @@ package co.edu.ufps.desafiosports.presentacion.comun
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,6 +38,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -333,4 +342,76 @@ fun Cargando(modifier: Modifier = Modifier) {
                 .semantics { contentDescription = descripcion },
         )
     }
+}
+
+// ── MOV-0010 ────────────────────────────────────────────────────────────────
+
+/**
+ * Qué tan lleno está un torneo, de 0 a 1 (MOV-0010 · CA-8). Null si no tiene cupos (sin límite).
+ * Nunca pasa de lleno aunque el backend cuente más inscritos que cupos.
+ */
+fun llenadoDeCupos(inscritos: Int, cupos: Int?): Float? {
+    if (cupos == null || cupos <= 0) return null
+    return (inscritos.toFloat() / cupos).coerceIn(0f, 1f)
+}
+
+/** La primera letra de un nombre, para el círculo de una persona o un equipo. */
+fun inicialDe(nombre: String): String =
+    nombre.trim().firstOrNull { it.isLetterOrDigit() }?.uppercaseChar()?.toString() ?: "?"
+
+/** Círculo con iniciales: la persona o el equipo, mientras no haya fotos. Decorativo para TalkBack. */
+@Composable
+fun Avatar(iniciales: String, modifier: Modifier = Modifier, tamano: Dp = 40.dp) {
+    Surface(
+        shape = CircleShape,
+        color = MaterialTheme.colorScheme.surfaceContainerHighest,
+        contentColor = MaterialTheme.colorScheme.onSurface,
+        modifier = modifier
+            .size(tamano)
+            .clearAndSetSemantics { },
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            Text(
+                text = iniciales,
+                // Las iniciales son de la condensada, como el marcador: se leen como una camiseta.
+                style = MaterialTheme.typography.headlineSmall.copy(fontSize = (tamano.value * 0.42f).sp, lineHeight = (tamano.value * 0.5f).sp),
+                maxLines = 1,
+            )
+        }
+    }
+}
+
+/**
+ * Barra fina de llenado (cupos ocupados). La pista es un escalón de contenedor y el relleno va en
+ * tinta; lleno pasa a éxito. Sin naranja: no es la acción principal.
+ */
+@Composable
+fun BarraDeLlenado(fraccion: Float, modifier: Modifier = Modifier) {
+    val esquema = MaterialTheme.colorScheme
+    val relleno = if (fraccion >= 1f) MaterialTheme.coloresExtra.exito else esquema.onSurface
+    val forma = RoundedCornerShape(2.dp)
+    Box(
+        modifier = modifier
+            .height(4.dp)
+            .clip(forma)
+            .background(esquema.surfaceContainerHighest),
+    ) {
+        Box(
+            Modifier
+                .fillMaxHeight()
+                .fillMaxWidth(fraccion.coerceIn(0f, 1f))
+                .background(relleno, forma),
+        )
+    }
+}
+
+/**
+ * El escalón de los paneles (tablero, secciones de Inicio, ficha del torneo). En oscuro sube un
+ * escalón sobre el fondo; en claro, el escalón de abajo es casi del color del fondo y el panel se
+ * pierde, así que usa el blanco (contenedor mínimo). Sigue siendo plano: sin sombra.
+ */
+@Composable
+fun colorDePanel(): Color {
+    val esquema = MaterialTheme.colorScheme
+    return if (esquema.background.luminance() > 0.5f) esquema.surfaceContainerLowest else esquema.surfaceContainerLow
 }

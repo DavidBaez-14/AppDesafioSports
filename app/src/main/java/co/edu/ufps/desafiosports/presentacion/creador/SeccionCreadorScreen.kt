@@ -53,6 +53,24 @@ import co.edu.ufps.desafiosports.presentacion.comun.FlechaFila
 import co.edu.ufps.desafiosports.presentacion.comun.IconoEnCirculo
 import co.edu.ufps.desafiosports.ui.deporte.iconoDeDeporte
 import co.edu.ufps.desafiosports.ui.theme.DesafioSportsTheme
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
+import co.edu.ufps.desafiosports.presentacion.comun.BarraDeLlenado
+import co.edu.ufps.desafiosports.presentacion.comun.Tono
+import co.edu.ufps.desafiosports.presentacion.comun.llenadoDeCupos
 
 /** Sección Creador (MOV-0008): mis torneos y lo que espera mi revisión. */
 @Composable
@@ -186,7 +204,7 @@ fun SeccionCreadorContenido(
 
 @Composable
 private fun Separador() {
-    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, modifier = Modifier.padding(start = 16.dp))
+    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, modifier = Modifier.padding(start = 70.dp, end = 16.dp))
 }
 
 @Composable
@@ -210,32 +228,83 @@ private fun FilaPorRevisar(torneo: TorneoDeCreador, onAbrir: (TorneoDeCreador) -
     )
 }
 
+/**
+ * Un torneo de "Mis torneos": el deporte, el nombre, el estado con su color y cómo lo ven los
+ * demás; a la derecha, los cupos ocupados en cifras de marcador con su barra de llenado (CA-8).
+ */
 @Composable
 private fun FilaTorneo(torneo: TorneoDeCreador, onAbrir: (TorneoDeCreador) -> Unit) {
-    val estado = when (torneo.estado) {
-        EstadoTorneo.BORRADOR -> stringResource(R.string.torneo_borrador)
-        EstadoTorneo.PUBLICADO -> stringResource(R.string.torneo_inscripciones_abiertas)
-        EstadoTorneo.EN_CURSO -> stringResource(R.string.torneo_en_curso)
-        EstadoTorneo.FINALIZADO -> stringResource(R.string.torneo_finalizado)
-        EstadoTorneo.DESCONOCIDO -> null
+    val (estado, tono) = when (torneo.estado) {
+        EstadoTorneo.BORRADOR -> stringResource(R.string.torneo_borrador) to Tono.ADVERTENCIA
+        EstadoTorneo.PUBLICADO -> stringResource(R.string.torneo_inscripciones_abiertas) to Tono.INFO
+        EstadoTorneo.EN_CURSO -> stringResource(R.string.torneo_en_curso) to Tono.EXITO
+        EstadoTorneo.FINALIZADO -> stringResource(R.string.torneo_finalizado) to Tono.NEUTRO
+        EstadoTorneo.DESCONOCIDO -> null to Tono.NEUTRO
     }
     val cupos = torneo.cupos
-    val inscritos = if (cupos != null) {
+    val lecturaCupos = if (cupos != null) {
         stringResource(R.string.creador_inscritos_de_cupos, torneo.inscritos, cupos)
     } else {
         pluralStringResource(R.plurals.creador_inscritos, torneo.inscritos, torneo.inscritos)
     }
-    Fila(
-        titulo = torneo.nombre,
-        detalle = listOfNotNull(estado, inscritos).joinToString(" · "),
-        inicio = { IconoEnCirculo(iconoDeDeporte(torneo.deporte)) },
-        fin = {
-            val visibilidad = torneo.visibilidad
-            if (visibilidad != null) ChipEstado(stringResource(visibilidad.titulo()), icono = visibilidad.icono()) else FlechaFila()
-        },
-        onClick = { onAbrir(torneo) },
-        modifier = Modifier.testTag("creador_torneo"),
-    )
+    val visibilidad = torneo.visibilidad
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(14.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 88.dp)
+            .clickable(role = Role.Button) { onAbrir(torneo) }
+            .semantics(mergeDescendants = true) { }
+            .padding(horizontal = 16.dp, vertical = 14.dp)
+            .testTag("creador_torneo"),
+    ) {
+        IconoEnCirculo(iconoDeDeporte(torneo.deporte))
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.weight(1f)) {
+            Text(torneo.nombre, style = MaterialTheme.typography.titleMedium, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                if (estado != null) ChipEstado(estado, tono = tono)
+                if (visibilidad != null) {
+                    Icon(
+                        painterResource(visibilidad.icono()),
+                        contentDescription = stringResource(visibilidad.titulo()),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(18.dp),
+                    )
+                }
+            }
+        }
+        Column(
+            horizontalAlignment = Alignment.End,
+            modifier = Modifier
+                .width(64.dp)
+                .clearAndSetSemantics { contentDescription = lecturaCupos },
+        ) {
+            Text(
+                text = buildAnnotatedString {
+                    append(torneo.inscritos.toString())
+                    if (cupos != null) {
+                        withStyle(SpanStyle(color = MaterialTheme.colorScheme.onSurfaceVariant)) { append("/$cupos") }
+                    }
+                },
+                style = MaterialTheme.typography.headlineSmall.copy(fontFeatureSettings = "tnum"),
+                maxLines = 1,
+            )
+            val llenado = llenadoDeCupos(torneo.inscritos, cupos)
+            if (llenado != null) {
+                BarraDeLlenado(llenado, Modifier.fillMaxWidth().padding(top = 4.dp))
+            } else {
+                Text(
+                    text = stringResource(R.string.creador_inscritos_etiqueta),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+    }
 }
 
 // ── Vistas previas ──────────────────────────────────────────────────────────

@@ -1,9 +1,16 @@
 package co.edu.ufps.desafiosports.presentacion.arbitro
 
 import android.content.res.Configuration
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,6 +26,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -32,34 +40,39 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.viewmodel.compose.viewModel
 import co.edu.ufps.desafiosports.R
+import co.edu.ufps.desafiosports.presentacion.comun.colorDePanel
 import co.edu.ufps.desafiosports.domain.model.EquipoEnPartido
 import co.edu.ufps.desafiosports.domain.model.EstadoPartido
 import co.edu.ufps.desafiosports.domain.model.Marcador
 import co.edu.ufps.desafiosports.domain.model.PartidoArbitro
 import co.edu.ufps.desafiosports.domain.model.PartidosDeArbitro
 import co.edu.ufps.desafiosports.presentacion.comun.BloqueFecha
+import co.edu.ufps.desafiosports.presentacion.comun.BotonPrimario
 import co.edu.ufps.desafiosports.presentacion.comun.Cargando
 import co.edu.ufps.desafiosports.presentacion.comun.ChipEstado
 import co.edu.ufps.desafiosports.presentacion.comun.EncabezadoBloque
 import co.edu.ufps.desafiosports.presentacion.comun.ErrorDePantalla
 import co.edu.ufps.desafiosports.presentacion.comun.EstadoError
 import co.edu.ufps.desafiosports.presentacion.comun.EstadoVacio
-import co.edu.ufps.desafiosports.presentacion.comun.Fila
 import co.edu.ufps.desafiosports.presentacion.comun.FlechaFila
 import co.edu.ufps.desafiosports.presentacion.comun.Tono
 import co.edu.ufps.desafiosports.ui.formato.Formatos
 import co.edu.ufps.desafiosports.ui.theme.DesafioSportsTheme
+import co.edu.ufps.desafiosports.ui.theme.coloresExtra
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-/** Sección Árbitro (MOV-0009): los partidos que arbitra quien inició sesión. */
+/** Sección Árbitro (MOV-0009; diseño MOV-0010): los partidos que arbitra quien inició sesión. */
 @Composable
 fun SeccionArbitroScreen(
     onVolver: () -> Unit,
@@ -150,11 +163,26 @@ fun SeccionArbitroContenido(
                     }
                 } else {
                     LazyColumn(
+                        contentPadding = PaddingValues(bottom = 24.dp),
                         modifier = Modifier
                             .fillMaxSize()
                             .testTag("arbitro_lista"),
                     ) {
-                        bloque(R.string.arbitro_hoy, partidos.hoy, hoy, onAbrirPartido)
+                        // El partido de hoy que falta por cerrar va arriba y grande: es "lo de ahora".
+                        val destacado = partidos.hoy.firstOrNull { !it.estado.cerrado && it.cruceDefinido }
+                        if (partidos.hoy.isNotEmpty()) {
+                            item(key = "titulo_hoy", contentType = "titulo") { EncabezadoBloque(stringResource(R.string.arbitro_hoy)) }
+                            if (destacado != null) {
+                                item(key = "destacado_${destacado.id}", contentType = "destacado") {
+                                    PartidoDestacado(
+                                        partido = destacado,
+                                        onAbrirPartido = onAbrirPartido,
+                                        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 4.dp),
+                                    )
+                                }
+                            }
+                        }
+                        bloque(null, partidos.hoy.filter { it.id != destacado?.id }, hoy, onAbrirPartido)
                         bloque(R.string.arbitro_proximos, partidos.proximos, hoy, onAbrirPartido)
                         bloque(R.string.arbitro_jugados, partidos.jugados, hoy, onAbrirPartido)
                     }
@@ -165,68 +193,220 @@ fun SeccionArbitroContenido(
 }
 
 private fun LazyListScope.bloque(
-    titulo: Int,
+    titulo: Int?,
     partidos: List<PartidoArbitro>,
     hoy: LocalDate,
     onAbrirPartido: (String) -> Unit,
 ) {
     if (partidos.isEmpty()) return
-    item(key = "titulo_$titulo", contentType = "titulo") { EncabezadoBloque(stringResource(titulo)) }
+    if (titulo != null) item(key = "titulo_$titulo", contentType = "titulo") { EncabezadoBloque(stringResource(titulo)) }
     itemsIndexed(partidos, key = { _, partido -> partido.id }, contentType = { _, _ -> "partido" }) { indice, partido ->
-        if (indice > 0) HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, modifier = Modifier.padding(start = 16.dp))
+        if (indice > 0) {
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, modifier = Modifier.padding(start = 88.dp, end = 16.dp))
+        }
         FilaPartido(partido, hoy, onAbrirPartido)
     }
 }
 
+/**
+ * El partido de hoy que falta por cerrar: la hora en cifras de marcador y en naranja (es lo de
+ * ahora), los equipos en la condensada y el botón que abre la planilla en un toque.
+ */
+@Composable
+private fun PartidoDestacado(partido: PartidoArbitro, onAbrirPartido: (String) -> Unit, modifier: Modifier = Modifier) {
+    val enJuego = partido.estado == EstadoPartido.EN_CURSO
+    val hora = partido.fechaHora?.toLocalTime()
+    val contexto = listOfNotNull(partido.torneo, partido.fase, partido.lugar).filter { it.isNotBlank() }.joinToString(" · ")
+    Surface(
+        color = colorDePanel(),
+        shape = MaterialTheme.shapes.large,
+        modifier = modifier
+            .fillMaxWidth()
+            .testTag("arbitro_partido"),
+    ) {
+        Column(Modifier.padding(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (hora != null) {
+                    Row(
+                        verticalAlignment = Alignment.Bottom,
+                        modifier = Modifier
+                            .weight(1f)
+                            .semantics(mergeDescendants = true) { },
+                    ) {
+                        Text(
+                            text = Formatos.horaSinPeriodo(hora),
+                            style = MaterialTheme.typography.displaySmall.copy(fontFeatureSettings = "tnum"),
+                            color = MaterialTheme.colorScheme.primary,
+                            maxLines = 1,
+                        )
+                        Text(
+                            text = Formatos.periodo(hora),
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(start = 6.dp, bottom = 7.dp),
+                        )
+                    }
+                } else {
+                    Spacer(Modifier.weight(1f))
+                }
+                if (enJuego) {
+                    ChipEstado(stringResource(R.string.partido_en_juego), tono = Tono.AHORA, icono = R.drawable.ic_radio_button_checked)
+                } else {
+                    ChipEstado(stringResource(R.string.partido_programado), icono = R.drawable.ic_schedule)
+                }
+            }
+            Column(
+                verticalArrangement = Arrangement.spacedBy(2.dp),
+                modifier = Modifier.padding(top = 10.dp),
+            ) {
+                EquipoDestacado(partido.local?.nombre.orEmpty(), partido.marcador?.local.takeIf { enJuego })
+                EquipoDestacado(partido.visitante?.nombre.orEmpty(), partido.marcador?.visitante.takeIf { enJuego })
+            }
+            if (contexto.isNotBlank()) {
+                Text(
+                    text = contexto,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 8.dp),
+                )
+            }
+            BotonPrimario(
+                texto = stringResource(if (enJuego) R.string.arbitro_seguir_planilla else R.string.arbitro_abrir_planilla),
+                onClick = { onAbrirPartido(partido.id) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp)
+                    .testTag("arbitro_abrir_planilla"),
+            )
+        }
+    }
+}
+
+@Composable
+private fun EquipoDestacado(nombre: String, cifra: Int?) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(
+            text = nombre.uppercase(),
+            style = MaterialTheme.typography.headlineSmall,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f),
+        )
+        if (cifra != null) {
+            Text(
+                text = cifra.toString(),
+                style = MaterialTheme.typography.headlineSmall.copy(fontFeatureSettings = "tnum"),
+                modifier = Modifier.padding(start = 12.dp),
+            )
+        }
+    }
+}
+
+/**
+ * Un partido como se lee en un fixture: la fecha a la izquierda y los dos equipos uno sobre otro,
+ * cada uno con su cifra cuando hay marcador. Quien ganó va en tinta; quien perdió, en secundaria.
+ */
 @Composable
 private fun FilaPartido(partido: PartidoArbitro, hoy: LocalDate, onAbrirPartido: (String) -> Unit) {
     val esHoy = partido.fechaHora?.toLocalDate() == hoy
     val cerrado = partido.estado.cerrado
     val enVivo = !cerrado && (esHoy || partido.estado == EstadoPartido.EN_CURSO)
-
-    val titulo = if (partido.cruceDefinido) {
-        stringResource(R.string.partido_cruce, partido.local?.nombre.orEmpty(), partido.visitante?.nombre.orEmpty())
-    } else {
-        stringResource(R.string.partido_cruce_por_definir)
-    }
     val detalle = listOfNotNull(partido.torneo.takeIf { it.isNotBlank() }, partido.lugar).joinToString(" · ")
+    val marcador = partido.marcador
+    val local = partido.local
+    val visitante = partido.visitante
+    val abrir: (() -> Unit)? = if (partido.cruceDefinido) ({ onAbrirPartido(partido.id) }) else null
 
-    Fila(
-        titulo = titulo,
-        detalle = detalle.ifBlank { null },
-        inicio = {
-            when {
-                cerrado && esHoy -> Box(Modifier.width(72.dp), contentAlignment = Alignment.Center) {
-                    Icon(painterResource(R.drawable.ic_task_alt), contentDescription = null)
-                }
-                partido.fechaHora == null -> BloqueFecha(dia = stringResource(R.string.fecha_sin_fecha), hora = null)
-                else -> BloqueFecha(
-                    dia = Formatos.diaRelativo(
-                        partido.fechaHora.toLocalDate(), hoy,
-                        stringResource(R.string.fecha_hoy), stringResource(R.string.fecha_manana),
-                    ),
-                    // De un partido cerrado importa el día, no la hora.
-                    hora = if (cerrado) null else Formatos.horaSinPeriodo(partido.fechaHora.toLocalTime()),
-                    periodo = if (cerrado) null else Formatos.periodo(partido.fechaHora.toLocalTime()),
-                    ahora = enVivo,
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 80.dp)
+            .then(if (abrir != null) Modifier.clickable(role = Role.Button, onClick = abrir) else Modifier)
+            .semantics(mergeDescendants = true) { }
+            .padding(start = 8.dp, end = 16.dp, top = 12.dp, bottom = 12.dp)
+            .testTag("arbitro_partido"),
+    ) {
+        when {
+            cerrado && esHoy -> Box(Modifier.width(72.dp), contentAlignment = Alignment.Center) {
+                Icon(
+                    painterResource(R.drawable.ic_task_alt),
+                    contentDescription = stringResource(R.string.partido_cerrado),
+                    tint = MaterialTheme.coloresExtra.exito,
                 )
             }
-        },
-        fin = {
-            val marcador = partido.marcador
-            when {
-                partido.estado == EstadoPartido.FINALIZADO && marcador != null ->
-                    ChipEstado(stringResource(R.string.partido_cerrado_marcador, marcador.local, marcador.visitante), tono = Tono.EXITO)
-                partido.estado == EstadoPartido.FINALIZADO -> ChipEstado(stringResource(R.string.partido_cerrado), tono = Tono.EXITO)
-                partido.estado == EstadoPartido.WO -> ChipEstado(stringResource(R.string.partido_wo))
-                partido.estado == EstadoPartido.APLAZADO -> ChipEstado(stringResource(R.string.partido_aplazado), tono = Tono.ADVERTENCIA)
-                enVivo && partido.cruceDefinido -> ChipEstado(stringResource(R.string.partido_planilla), tono = Tono.AHORA)
-                partido.cruceDefinido -> FlechaFila()
+            partido.fechaHora == null -> BloqueFecha(dia = stringResource(R.string.fecha_sin_fecha), hora = null)
+            else -> BloqueFecha(
+                dia = Formatos.diaRelativo(
+                    partido.fechaHora.toLocalDate(), hoy,
+                    stringResource(R.string.fecha_hoy), stringResource(R.string.fecha_manana),
+                ),
+                // De un partido cerrado importa el día, no la hora.
+                hora = if (cerrado) null else Formatos.horaSinPeriodo(partido.fechaHora.toLocalTime()),
+                periodo = if (cerrado) null else Formatos.periodo(partido.fechaHora.toLocalTime()),
+                ahora = enVivo,
+            )
+        }
+        Column(
+            verticalArrangement = Arrangement.spacedBy(2.dp),
+            modifier = Modifier
+                .weight(1f)
+                .padding(start = 8.dp),
+        ) {
+            if (local != null && visitante != null) {
+                val cifras = marcador?.takeIf { partido.estado != EstadoPartido.PROGRAMADO }
+                EquipoEnFixture(local.nombre, cifras?.local, atenuado = cifras != null && cifras.visitante > cifras.local)
+                EquipoEnFixture(visitante.nombre, cifras?.visitante, atenuado = cifras != null && cifras.local > cifras.visitante)
+            } else {
+                Text(stringResource(R.string.partido_cruce_por_definir), style = MaterialTheme.typography.titleMedium)
             }
-        },
-        onClick = if (partido.cruceDefinido) ({ onAbrirPartido(partido.id) }) else null,
-        modifier = Modifier.testTag("arbitro_partido"),
-    )
+            if (detalle.isNotBlank()) {
+                Text(
+                    text = detalle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(top = 2.dp),
+                )
+            }
+        }
+        when {
+            partido.estado == EstadoPartido.WO -> ChipEstado(stringResource(R.string.partido_wo), Modifier.padding(start = 8.dp))
+            partido.estado == EstadoPartido.APLAZADO ->
+                ChipEstado(stringResource(R.string.partido_aplazado), Modifier.padding(start = 8.dp), tono = Tono.ADVERTENCIA)
+            enVivo && partido.cruceDefinido ->
+                ChipEstado(stringResource(R.string.partido_planilla), Modifier.padding(start = 8.dp), tono = Tono.AHORA)
+            abrir != null -> Box(Modifier.padding(start = 4.dp)) { FlechaFila() }
+        }
+    }
+}
+
+@Composable
+private fun EquipoEnFixture(nombre: String, cifra: Int?, atenuado: Boolean) {
+    val color = if (atenuado) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(
+            text = nombre,
+            style = MaterialTheme.typography.titleMedium,
+            color = color,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f),
+        )
+        if (cifra != null) {
+            Text(
+                text = cifra.toString(),
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontFamily = MaterialTheme.typography.headlineSmall.fontFamily,
+                    fontWeight = FontWeight.Bold,
+                    fontFeatureSettings = "tnum",
+                ),
+                color = color,
+                modifier = Modifier.padding(start = 12.dp),
+            )
+        }
+    }
 }
 
 // ── Vistas previas ──────────────────────────────────────────────────────────

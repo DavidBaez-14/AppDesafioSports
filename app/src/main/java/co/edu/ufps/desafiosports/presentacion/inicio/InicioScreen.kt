@@ -84,6 +84,8 @@ data class AccionesInicio(
     val onAbrirCreador: () -> Unit = {},
     val onAbrirTorneo: (TorneoDeCreador) -> Unit = {},
     val onCrearTorneo: () -> Unit = {},
+    /** Buscar torneos (MOV-0005). */
+    val onExplorar: () -> Unit = {},
     val onReintentarArbitro: () -> Unit = {},
     val onReintentarCreador: () -> Unit = {},
     val onRefrescar: () -> Unit = {},
@@ -100,6 +102,7 @@ fun InicioScreen(
     onAbrirCreador: () -> Unit,
     onAbrirTorneo: (TorneoDeCreador) -> Unit,
     onCrearTorneo: () -> Unit,
+    onExplorar: () -> Unit,
     onAbrirDiagnostico: (() -> Unit)?,
     viewModel: InicioViewModel = viewModel(factory = InicioViewModel.Factory),
 ) {
@@ -107,13 +110,14 @@ fun InicioScreen(
         viewModel.alVolver()
         onPauseOrDispose { }
     }
-    val acciones = remember(viewModel, onAbrirArbitro, onAbrirPlanilla, onAbrirCreador, onAbrirTorneo, onCrearTorneo, onAbrirDiagnostico) {
+    val acciones = remember(viewModel, onAbrirArbitro, onAbrirPlanilla, onAbrirCreador, onAbrirTorneo, onCrearTorneo, onExplorar, onAbrirDiagnostico) {
         AccionesInicio(
             onAbrirArbitro = onAbrirArbitro,
             onAbrirPlanilla = onAbrirPlanilla,
             onAbrirCreador = onAbrirCreador,
             onAbrirTorneo = onAbrirTorneo,
             onCrearTorneo = onCrearTorneo,
+            onExplorar = onExplorar,
             onReintentarArbitro = viewModel::reintentarArbitro,
             onReintentarCreador = viewModel::reintentarCreador,
             onRefrescar = viewModel::refrescar,
@@ -132,7 +136,12 @@ fun InicioContenido(state: InicioState, hoy: LocalDate, acciones: AccionesInicio
         topBar = {
             TopAppBar(
                 title = { Logotipo(tamano = 26.sp, enUnaLinea = true) },
-                actions = { MenuDeCuenta(state, acciones) },
+                actions = {
+                    IconButton(onClick = acciones.onExplorar, modifier = Modifier.testTag("inicio_explorar")) {
+                        Icon(painterResource(R.drawable.ic_search), contentDescription = stringResource(R.string.inicio_buscar_torneos))
+                    }
+                    MenuDeCuenta(state, acciones)
+                },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
             )
         },

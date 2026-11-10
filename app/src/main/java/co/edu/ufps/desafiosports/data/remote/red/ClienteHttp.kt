@@ -22,8 +22,11 @@ object ClienteHttp {
         errores: ErroresHttp,
         registrarTrafico: Boolean,
     ): OkHttpClient = OkHttpClient.Builder()
-        .connectTimeout(15, TimeUnit.SECONDS)
-        .readTimeout(20, TimeUnit.SECONDS)
+        // El backend de prueba corre en el plan gratis de Render, que se duerme tras ~15 minutos sin
+        // uso: la primera petición tarda de uno a dos minutos en despertarlo (medido el 10-nov-2026). Se espera eso antes de
+        // decir "sin conexión" (la pantalla avisa mientras tanto, ver Cargando).
+        .connectTimeout(60, TimeUnit.SECONDS)
+        .readTimeout(100, TimeUnit.SECONDS)
         .addInterceptor(AuthInterceptor(proveedor))
         .addInterceptor(CuentaBloqueadaInterceptor(proveedor, errores))
         .authenticator(TokenAuthenticator(proveedor))

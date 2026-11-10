@@ -1,6 +1,16 @@
 package co.edu.ufps.desafiosports.presentacion.comun
 
 import androidx.annotation.DrawableRes
+import kotlinx.coroutines.delay
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.Dp
@@ -54,6 +64,9 @@ import co.edu.ufps.desafiosports.R
 import co.edu.ufps.desafiosports.domain.error.AppError
 import co.edu.ufps.desafiosports.presentacion.acceso.mensajeParaMostrar
 import co.edu.ufps.desafiosports.ui.theme.coloresExtra
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 
 // Piezas que comparten las pantallas con listas (MOV-0009 en adelante): encabezado de bloque,
 // fila, chip de estado, columna de fecha y los estados vacío, error y cargando.
@@ -330,19 +343,47 @@ fun BotonPrimario(
     }
 }
 
-/** Indicador centrado mientras llega la primera carga. */
+/**
+ * Indicador centrado mientras llega la primera carga. Si tarda (el servidor de prueba se duerme
+ * y tarda hasta un minuto en despertar), a los pocos segundos explica la espera para que nadie
+ * crea que la app se colgó.
+ */
 @Composable
 fun Cargando(modifier: Modifier = Modifier) {
     val descripcion = stringResource(R.string.estado_cargando)
-    Box(contentAlignment = Alignment.Center, modifier = modifier.fillMaxSize()) {
+    var tardando by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        delay(ESPERA_ANTES_DE_EXPLICAR_MS)
+        tardando = true
+    }
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 32.dp),
+    ) {
         CircularProgressIndicator(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier
                 .testTag("cargando")
                 .semantics { contentDescription = descripcion },
         )
+        AnimatedVisibility(visible = tardando, enter = fadeIn()) {
+            Text(
+                text = stringResource(R.string.estado_despertando),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .widthIn(max = 300.dp)
+                    .semantics { liveRegion = LiveRegionMode.Polite },
+            )
+        }
     }
 }
+
+private const val ESPERA_ANTES_DE_EXPLICAR_MS = 6_000L
 
 // ── MOV-0010 ────────────────────────────────────────────────────────────────
 
@@ -414,4 +455,39 @@ fun BarraDeLlenado(fraccion: Float, modifier: Modifier = Modifier) {
 fun colorDePanel(): Color {
     val esquema = MaterialTheme.colorScheme
     return if (esquema.background.luminance() > 0.5f) esquema.surfaceContainerLowest else esquema.surfaceContainerLow
+}
+
+/**
+ * Los cupos ocupados como cifra de marcador ("12/16", con "/16" en tinta secundaria) y su barra
+ * de llenado debajo (MOV-0010 · CA-8). Sin cupos, la cifra va con "inscritos". TalkBack lee [lectura].
+ */
+@Composable
+fun CifraDeCupos(inscritos: Int, cupos: Int?, lectura: String, modifier: Modifier = Modifier) {
+    Column(
+        horizontalAlignment = Alignment.End,
+        modifier = modifier
+            .width(64.dp)
+            .clearAndSetSemantics { contentDescription = lectura },
+    ) {
+        Text(
+            text = buildAnnotatedString {
+                append(inscritos.toString())
+                if (cupos != null) {
+                    withStyle(SpanStyle(color = MaterialTheme.colorScheme.onSurfaceVariant)) { append("/$cupos") }
+                }
+            },
+            style = MaterialTheme.typography.headlineSmall.copy(fontFeatureSettings = "tnum"),
+            maxLines = 1,
+        )
+        val llenado = llenadoDeCupos(inscritos, cupos)
+        if (llenado != null) {
+            BarraDeLlenado(llenado, Modifier.fillMaxWidth().padding(top = 4.dp))
+        } else {
+            Text(
+                text = stringResource(R.string.creador_inscritos_etiqueta),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
 }

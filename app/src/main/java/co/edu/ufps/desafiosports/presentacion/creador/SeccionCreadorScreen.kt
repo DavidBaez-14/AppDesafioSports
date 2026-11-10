@@ -71,6 +71,7 @@ import androidx.compose.ui.text.withStyle
 import co.edu.ufps.desafiosports.presentacion.comun.BarraDeLlenado
 import co.edu.ufps.desafiosports.presentacion.comun.Tono
 import co.edu.ufps.desafiosports.presentacion.comun.llenadoDeCupos
+import co.edu.ufps.desafiosports.presentacion.comun.CifraDeCupos
 
 /** Sección Creador (MOV-0008): mis torneos y lo que espera mi revisión. */
 @Composable
@@ -277,33 +278,7 @@ private fun FilaTorneo(torneo: TorneoDeCreador, onAbrir: (TorneoDeCreador) -> Un
                 }
             }
         }
-        Column(
-            horizontalAlignment = Alignment.End,
-            modifier = Modifier
-                .width(64.dp)
-                .clearAndSetSemantics { contentDescription = lecturaCupos },
-        ) {
-            Text(
-                text = buildAnnotatedString {
-                    append(torneo.inscritos.toString())
-                    if (cupos != null) {
-                        withStyle(SpanStyle(color = MaterialTheme.colorScheme.onSurfaceVariant)) { append("/$cupos") }
-                    }
-                },
-                style = MaterialTheme.typography.headlineSmall.copy(fontFeatureSettings = "tnum"),
-                maxLines = 1,
-            )
-            val llenado = llenadoDeCupos(torneo.inscritos, cupos)
-            if (llenado != null) {
-                BarraDeLlenado(llenado, Modifier.fillMaxWidth().padding(top = 4.dp))
-            } else {
-                Text(
-                    text = stringResource(R.string.creador_inscritos_etiqueta),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-        }
+        CifraDeCupos(torneo.inscritos, cupos, lecturaCupos)
     }
 }
 

@@ -51,6 +51,12 @@ import io.github.jan.supabase.createSupabaseClient
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.create
+import co.edu.ufps.desafiosports.data.remote.api.TorneosApi
+import co.edu.ufps.desafiosports.data.repository.TorneosRepositoryImpl
+import co.edu.ufps.desafiosports.domain.repository.TorneosRepository
+import co.edu.ufps.desafiosports.domain.use_case.competicion.AbrirTorneoPorEnlaceUseCase
+import co.edu.ufps.desafiosports.domain.use_case.competicion.ExplorarTorneosUseCase
+import co.edu.ufps.desafiosports.domain.use_case.competicion.ObtenerTorneoUseCase
 
 /**
  * Inyección manual de dependencias: el único lugar donde se conectan las capas.
@@ -87,6 +93,7 @@ class AppContainer(val configuracion: Configuracion) {
     private val sistemaApi: SistemaApi by lazy { retrofit.create() }
     private val arbitrajeApi: ArbitrajeApi by lazy { retrofit.create() }
     private val creadorApi: CreadorApi by lazy { retrofit.create() }
+    private val torneosApi: TorneosApi by lazy { retrofit.create() }
 
     // ── Repositorios ───────────────────────────────────────────────────────
     val sesionRepository: SesionRepository by lazy { SesionRepositoryImpl(supabase.auth) }
@@ -126,6 +133,12 @@ class AppContainer(val configuracion: Configuracion) {
     val obtenerInscripciones by lazy { ObtenerInscripcionesUseCase(creadorRepository) }
     val aprobarInscripcion by lazy { AprobarInscripcionUseCase(creadorRepository) }
     val rechazarInscripcion by lazy { RechazarInscripcionUseCase(creadorRepository) }
+
+    // Explorar y detalle del torneo (MOV-0005)
+    val torneosRepository: TorneosRepository by lazy { TorneosRepositoryImpl(torneosApi, erroresHttp) }
+    val explorarTorneos by lazy { ExplorarTorneosUseCase(torneosRepository) }
+    val obtenerTorneo by lazy { ObtenerTorneoUseCase(torneosRepository) }
+    val abrirTorneoPorEnlace by lazy { AbrirTorneoPorEnlaceUseCase(torneosRepository) }
 
     companion object {
         /** Lee la configuración que Gradle copió de local.properties a BuildConfig. */

@@ -25,6 +25,8 @@ import co.edu.ufps.desafiosports.presentacion.creador.SeccionCreadorScreen
 import co.edu.ufps.desafiosports.presentacion.diagnostico.AccesoProvisional
 import co.edu.ufps.desafiosports.presentacion.diagnostico.DiagnosticoScreen
 import co.edu.ufps.desafiosports.presentacion.inicio.InicioScreen
+import co.edu.ufps.desafiosports.presentacion.explorar.ExplorarScreen
+import co.edu.ufps.desafiosports.presentacion.explorar.TorneoScreen
 
 /**
  * Grafo de la app (MOV-0002).
@@ -87,6 +89,7 @@ fun AppNavigation(
                     null
                 },
                 googleWebClientId = BuildConfig.GOOGLE_WEB_CLIENT_ID.ifBlank { null },
+                onExplorar = { navController.navigate(Explorar(visitante = true)) },
             )
         }
         composable<RecuperarClave> {
@@ -127,11 +130,31 @@ fun AppNavigation(
                 onAbrirCreador = { navController.navigate(SeccionCreador) },
                 onAbrirTorneo = { torneo -> navController.navigate(InscripcionesTorneo(torneo.id, torneo.nombre)) },
                 onCrearTorneo = { navController.navigate(CrearTorneo) },
+                onExplorar = { navController.navigate(Explorar()) },
                 onAbrirDiagnostico = if (BuildConfig.DEBUG) {
                     { navController.navigate(Diagnostico) }
                 } else {
                     null
                 },
+            )
+        }
+        composable<Explorar> {
+            ExplorarScreen(
+                onVolver = { navController.popBackStack() },
+                onAbrirTorneo = { torneoId, enlaceToken -> navController.navigate(Torneo(torneoId, enlaceToken)) },
+            )
+        }
+        composable<Torneo> {
+            TorneoScreen(
+                onVolver = { navController.popBackStack() },
+                // Sin cuenta, "Entrar" vuelve al login que abrió Explorar (o lo abre si no está).
+                onEntrar = {
+                    if (!navController.popBackStack<Login>(inclusive = false)) {
+                        navController.navigate(Login) { popUpTo(navController.graph.id) { inclusive = true } }
+                    }
+                },
+                onAbrirCreador = { torneo -> navController.navigate(InscripcionesTorneo(torneo.id, torneo.nombre)) },
+                onAbrirArbitro = { navController.navigate(SeccionArbitro) },
             )
         }
         composable<Diagnostico> {

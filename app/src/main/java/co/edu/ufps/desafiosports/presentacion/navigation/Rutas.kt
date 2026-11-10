@@ -63,3 +63,13 @@ data object CrearTorneo
 /** Inscripciones de un torneo que administra: aprobar y rechazar (MOV-0008). */
 @Serializable
 data class InscripcionesTorneo(val torneoId: String, val nombre: String = "")
+
+// Explorar y detalle del torneo (MOV-0005).
+
+/** Explorar torneos públicos. Con [visitante], se entró sin cuenta desde el login. */
+@Serializable
+data class Explorar(val visitante: Boolean = false)
+
+/** Detalle de un torneo, por su id o por el token de su enlace (los NO_LISTADO solo abren así). */
+@Serializable
+data class Torneo(val torneoId: String = "", val enlaceToken: String = "")

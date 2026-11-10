@@ -75,6 +75,8 @@ fun LoginScreen(
     onAbrirDiagnostico: (() -> Unit)?,
     /** ID del cliente web de Google; null = la app no ofrece Google (MOV-0006 · CA-1). */
     googleWebClientId: String?,
+    /** Explorar torneos públicos sin cuenta (MOV-0005). */
+    onExplorar: (() -> Unit)? = null,
     viewModel: LoginViewModel = viewModel(factory = LoginViewModel.Factory),
 ) {
     val state = viewModel.state
@@ -102,6 +104,7 @@ fun LoginScreen(
         onCrearCuenta = onCrearCuenta,
         onAbrirDiagnostico = onAbrirDiagnostico,
         mostrarGoogle = googleWebClientId != null,
+        onExplorar = onExplorar,
         onGoogle = {
             if (googleWebClientId != null && viewModel.iniciarGoogle()) {
                 alcance.launch { viewModel.onResultadoGoogle(pedirCuentaGoogle(contexto, googleWebClientId)) }
@@ -123,6 +126,7 @@ fun LoginContenido(
     modifier: Modifier = Modifier,
     mostrarGoogle: Boolean = false,
     onGoogle: () -> Unit = {},
+    onExplorar: (() -> Unit)? = null,
 ) {
     val foco = LocalFocusManager.current
     val habilitado = !state.enProceso
@@ -262,6 +266,24 @@ fun LoginContenido(
                         color = MaterialTheme.colorScheme.onSurface,
                         style = MaterialTheme.typography.labelLarge,
                     )
+                }
+                // Mirar sin cuenta (MOV-0005): para inscribirse, Explorar vuelve aquí.
+                if (onExplorar != null) {
+                    TextButton(
+                        onClick = onExplorar,
+                        enabled = habilitado,
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .testTag("login_explorar"),
+                    ) {
+                        Icon(painterResource(R.drawable.ic_search), contentDescription = null, tint = MaterialTheme.colorScheme.onSurface, modifier = Modifier.size(18.dp))
+                        Text(
+                            text = stringResource(R.string.login_explorar),
+                            color = MaterialTheme.colorScheme.onSurface,
+                            style = MaterialTheme.typography.labelLarge,
+                            modifier = Modifier.padding(start = 8.dp),
+                        )
+                    }
                 }
                 Spacer(Modifier.weight(0.35f))
             }

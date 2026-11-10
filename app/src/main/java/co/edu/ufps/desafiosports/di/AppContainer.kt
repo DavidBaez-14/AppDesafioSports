@@ -2,7 +2,18 @@ package co.edu.ufps.desafiosports.di
 
 import co.edu.ufps.desafiosports.BuildConfig
 import co.edu.ufps.desafiosports.data.auth.ProveedorTokenSupabase
+import co.edu.ufps.desafiosports.data.remote.api.ArbitrajeApi
 import co.edu.ufps.desafiosports.data.remote.api.AuthApi
+import co.edu.ufps.desafiosports.data.repository.ArbitrajeRepositoryImpl
+import co.edu.ufps.desafiosports.domain.repository.ArbitrajeRepository
+import co.edu.ufps.desafiosports.domain.use_case.competicion.AlinearEquipoUseCase
+import co.edu.ufps.desafiosports.domain.use_case.competicion.AlinearJugadorUseCase
+import co.edu.ufps.desafiosports.domain.use_case.competicion.CerrarPartidoUseCase
+import co.edu.ufps.desafiosports.domain.use_case.competicion.ObtenerPartidosDeArbitroUseCase
+import co.edu.ufps.desafiosports.domain.use_case.competicion.ObtenerPlanillaUseCase
+import co.edu.ufps.desafiosports.domain.use_case.competicion.QuitarDeAlineacionUseCase
+import co.edu.ufps.desafiosports.domain.use_case.competicion.QuitarEventoUseCase
+import co.edu.ufps.desafiosports.domain.use_case.competicion.RegistrarEventoUseCase
 import co.edu.ufps.desafiosports.data.remote.api.SistemaApi
 import co.edu.ufps.desafiosports.data.remote.red.ClienteHttp
 import co.edu.ufps.desafiosports.data.remote.red.ErroresHttp
@@ -65,6 +76,7 @@ class AppContainer(val configuracion: Configuracion) {
 
     private val authApi: AuthApi by lazy { retrofit.create() }
     private val sistemaApi: SistemaApi by lazy { retrofit.create() }
+    private val arbitrajeApi: ArbitrajeApi by lazy { retrofit.create() }
 
     // ── Repositorios ───────────────────────────────────────────────────────
     val sesionRepository: SesionRepository by lazy { SesionRepositoryImpl(supabase.auth) }
@@ -84,6 +96,17 @@ class AppContainer(val configuracion: Configuracion) {
     val observarSesion by lazy { ObservarSesionUseCase(sesionRepository) }
     val obtenerCuenta by lazy { ObtenerCuentaUseCase(cuentaRepository) }
     val comprobarServidor by lazy { ComprobarServidorUseCase(servidorRepository) }
+
+    // Sección Árbitro y planilla (MOV-0009)
+    val arbitrajeRepository: ArbitrajeRepository by lazy { ArbitrajeRepositoryImpl(arbitrajeApi, erroresHttp) }
+    val obtenerPartidosDeArbitro by lazy { ObtenerPartidosDeArbitroUseCase(arbitrajeRepository) }
+    val obtenerPlanilla by lazy { ObtenerPlanillaUseCase(arbitrajeRepository) }
+    val registrarEvento by lazy { RegistrarEventoUseCase(arbitrajeRepository) }
+    val quitarEvento by lazy { QuitarEventoUseCase(arbitrajeRepository) }
+    val alinearJugador by lazy { AlinearJugadorUseCase(arbitrajeRepository) }
+    val quitarDeAlineacion by lazy { QuitarDeAlineacionUseCase(arbitrajeRepository) }
+    val alinearEquipo by lazy { AlinearEquipoUseCase(arbitrajeRepository) }
+    val cerrarPartido by lazy { CerrarPartidoUseCase(arbitrajeRepository) }
 
     companion object {
         /** Lee la configuración que Gradle copió de local.properties a BuildConfig. */

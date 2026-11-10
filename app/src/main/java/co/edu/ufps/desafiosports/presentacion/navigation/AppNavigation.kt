@@ -15,6 +15,11 @@ import co.edu.ufps.desafiosports.presentacion.acceso.LoginScreen
 import co.edu.ufps.desafiosports.presentacion.acceso.RecuperarClaveScreen
 import co.edu.ufps.desafiosports.presentacion.acceso.RegistroScreen
 import co.edu.ufps.desafiosports.presentacion.acceso.RevisaTuCorreoScreen
+import androidx.compose.ui.res.stringResource
+import co.edu.ufps.desafiosports.R
+import co.edu.ufps.desafiosports.presentacion.arbitro.PlanillaScreen
+import co.edu.ufps.desafiosports.presentacion.arbitro.SeccionArbitroScreen
+import co.edu.ufps.desafiosports.presentacion.diagnostico.AccesoProvisional
 import co.edu.ufps.desafiosports.presentacion.diagnostico.DiagnosticoScreen
 
 /**
@@ -109,6 +114,24 @@ fun AppNavigation(
                 },
             )
         }
-        composable<Diagnostico> { DiagnosticoScreen() }
+        composable<Diagnostico> {
+            // Acceso provisional a las secciones mientras llega Inicio (MOV-0004).
+            DiagnosticoScreen(
+                accesos = listOf(
+                    AccesoProvisional(stringResource(R.string.arbitro_titulo), "acceso_arbitro") {
+                        navController.navigate(SeccionArbitro)
+                    },
+                ),
+            )
+        }
+        composable<SeccionArbitro> {
+            SeccionArbitroScreen(
+                onVolver = { navController.popBackStack() },
+                onAbrirPlanilla = { partidoId -> navController.navigate(Planilla(partidoId)) },
+            )
+        }
+        composable<Planilla> {
+            PlanillaScreen(onVolver = { navController.popBackStack() })
+        }
     }
 }

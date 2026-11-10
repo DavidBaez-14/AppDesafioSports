@@ -91,4 +91,85 @@
     <string name="diagnostico_cuenta_roles">Roles: %1$s</string>
     <string name="diagnostico_cuenta_pendientes">Roles pendientes: %1$s</string>
     <string name="diagnostico_ninguno">ninguno</string>
+    <string name="diagnostico_secciones_titulo">Secciones</string>
+    <string name="diagnostico_secciones_detalle">Acceso provisional mientras llega la pantalla de Inicio.</string>
+
+    <!-- Comunes a las pantallas con listas (MOV-0009 en adelante). -->
+    <string name="accion_reintentar">Reintentar</string>
+    <string name="accion_volver">Volver</string>
+    <string name="accion_cancelar">Cancelar</string>
+    <string name="accion_deshacer">Deshacer</string>
+    <string name="estado_cargando">Cargando</string>
+    <string name="estado_error">No se pudo cargar</string>
+    <string name="estado_sin_conexion">Sin conexión</string>
+    <string name="fecha_hoy">Hoy</string>
+    <string name="fecha_manana">Mañana</string>
+    <string name="fecha_sin_fecha">Sin fecha</string>
+
+    <!-- Partidos: textos que comparten las secciones. -->
+    <string name="partido_cruce">%1$s vs %2$s</string>
+    <string name="partido_cruce_por_definir">Cruce por definir</string>
+    <string name="partido_equipo_por_definir">Por definir</string>
+    <string name="partido_planilla">Planilla</string>
+    <string name="partido_programado">Programado</string>
+    <string name="partido_en_juego">En juego</string>
+    <string name="partido_cerrado">Cerrado</string>
+    <string name="partido_cerrado_marcador">Cerrado %1$d–%2$d</string>
+    <string name="partido_wo">W.O.</string>
+    <string name="partido_aplazado">Aplazado</string>
+
+    <!-- Tipos de evento de fútbol sala. Los demás deportes llegan con sus specs. -->
+    <string name="evento_gol">Gol</string>
+    <string name="evento_amarilla">Amarilla</string>
+    <string name="evento_azul">Azul</string>
+    <string name="evento_roja">Roja</string>
+
+    <!-- Sección Árbitro (MOV-0009). -->
+    <string name="arbitro_titulo">Árbitro</string>
+    <string name="arbitro_hoy">Hoy</string>
+    <string name="arbitro_proximos">Próximos</string>
+    <string name="arbitro_jugados">Jugados</string>
+    <string name="arbitro_vacio_titulo">Aún no tienes partidos asignados</string>
+    <string name="arbitro_vacio_detalle">Cuando un organizador te invite como árbitro y te asigne partidos, aparecen aquí.</string>
+
+    <!-- Planilla del partido (MOV-0009). -->
+    <string name="planilla_titulo">Planilla</string>
+    <string name="planilla_marcador_lectura">%1$s %2$d, %3$s %4$d</string>
+    <string name="planilla_cerrado">Partido cerrado</string>
+    <string name="planilla_alineacion">Alineación</string>
+    <string name="planilla_alineacion_resumen">%1$d de %2$s · %3$d de %4$s</string>
+    <plurals name="planilla_alineados">
+        <item quantity="one">%1$d alineado de %2$d</item>
+        <item quantity="other">%1$d alineados de %2$d</item>
+    </plurals>
+    <string name="planilla_alinear_todos">Alinear a todos</string>
+    <string name="planilla_alineado">Alineado</string>
+    <string name="planilla_sin_alinear">Sin alinear</string>
+    <string name="planilla_no_apto">No puede jugar</string>
+    <string name="planilla_no_apto_motivo">No puede jugar: %1$s</string>
+    <string name="planilla_documento">Doc. %1$s</string>
+    <string name="planilla_delegado">Delegado</string>
+    <string name="planilla_plantel_vacio">Este equipo no tiene plantel</string>
+    <string name="planilla_plantel_vacio_detalle">El delegado todavía no agrega jugadores.</string>
+    <string name="planilla_evento_de">%1$s de %2$s</string>
+    <string name="planilla_quien">¿Quién?</string>
+    <string name="planilla_sin_candidatos">Nadie de este equipo puede jugar</string>
+    <string name="planilla_sin_candidatos_detalle">No tiene jugadores, o todos están suspendidos o con multas pendientes.</string>
+    <string name="planilla_eventos">Eventos en orden</string>
+    <string name="planilla_evento_fila">%1$s · %2$s</string>
+    <string name="planilla_sin_eventos">Aún no hay eventos. Elige el equipo y toca lo que pasó.</string>
+    <string name="planilla_sin_eventos_lectura">Este partido no tiene eventos.</string>
+    <string name="planilla_quitar_evento">Quitar evento %1$d</string>
+    <string name="planilla_quitar_titulo">¿Quitar este evento?</string>
+    <string name="planilla_quitar_detalle">%1$s · %2$s (%3$s). El marcador se ajusta solo.</string>
+    <string name="planilla_quitar">Quitar</string>
+    <string name="planilla_cerrar">Cerrar partido</string>
+    <string name="planilla_cerrando">Cerrando…</string>
+    <string name="planilla_cerrar_titulo">¿Cerrar el partido %1$d–%2$d?</string>
+    <string name="planilla_cerrar_detalle">Se guarda el resultado, se actualiza la tabla y se generan las multas de las tarjetas.</string>
+    <string name="planilla_seguir">Seguir editando</string>
+    <string name="planilla_aviso_registrado">Registrado: %1$s · %2$s</string>
+    <string name="planilla_aviso_quitado">Evento quitado.</string>
+    <string name="planilla_aviso_cerrado">Partido cerrado.</string>
+    <string name="planilla_aviso_sin_actualizar">Se guardó, pero no pudimos actualizar la planilla. Desliza hacia abajo para verla al día.</string>
 </resources>

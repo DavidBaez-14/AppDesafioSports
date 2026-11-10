@@ -41,9 +41,18 @@ import co.edu.ufps.desafiosports.domain.model.EstadoSesion
 import co.edu.ufps.desafiosports.domain.model.Rol
 import co.edu.ufps.desafiosports.ui.theme.DesafioSportsTheme
 
+/**
+ * Botón de paso a una sección mientras el diagnóstico hace de inicio provisional (MOV-0009).
+ * Se quita cuando Inicio (MOV-0004) esté en main.
+ */
+data class AccesoProvisional(val etiqueta: String, val testTag: String, val onClick: () -> Unit)
+
 /** Pantalla con estado: pide su ViewModel y le pasa el estado a la versión sin estado. */
 @Composable
-fun DiagnosticoScreen(viewModel: DiagnosticoViewModel = viewModel(factory = DiagnosticoViewModel.Factory)) {
+fun DiagnosticoScreen(
+    accesos: List<AccesoProvisional> = emptyList(),
+    viewModel: DiagnosticoViewModel = viewModel(factory = DiagnosticoViewModel.Factory),
+) {
     DiagnosticoContenido(
         state = viewModel.state,
         onCorreoChange = viewModel::onCorreoChange,
@@ -52,6 +61,7 @@ fun DiagnosticoScreen(viewModel: DiagnosticoViewModel = viewModel(factory = Diag
         onIniciarSesion = viewModel::iniciarSesion,
         onConsultarCuenta = viewModel::consultarCuenta,
         onCerrarSesion = viewModel::cerrarSesion,
+        accesos = accesos,
     )
 }
 
@@ -66,6 +76,7 @@ fun DiagnosticoContenido(
     onIniciarSesion: () -> Unit,
     onConsultarCuenta: () -> Unit,
     onCerrarSesion: () -> Unit,
+    accesos: List<AccesoProvisional> = emptyList(),
 ) {
     Scaffold(
         // Expone los testTag como resource-id: permite automatizar con adb/uiautomator.
@@ -94,6 +105,23 @@ fun DiagnosticoContenido(
                         color = MaterialTheme.colorScheme.error,
                         modifier = Modifier.testTag("config_incompleta"),
                     )
+                }
+            }
+
+            val conSesion = state.sesion is EstadoSesion.Activa || state.sesion == EstadoSesion.SinRenovar
+            if (conSesion && accesos.isNotEmpty()) {
+                Tarjeta(titulo = stringResource(R.string.diagnostico_secciones_titulo)) {
+                    Text(
+                        text = stringResource(R.string.diagnostico_secciones_detalle),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    accesos.forEach { acceso ->
+                        OutlinedButton(
+                            onClick = acceso.onClick,
+                            modifier = Modifier.fillMaxWidth().testTag(acceso.testTag),
+                        ) { Text(acceso.etiqueta) }
+                    }
                 }
             }
 

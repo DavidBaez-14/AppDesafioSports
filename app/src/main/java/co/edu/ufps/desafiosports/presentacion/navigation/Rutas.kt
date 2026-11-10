@@ -37,3 +37,13 @@ data object CompletarRegistro
 /** Diagnóstico de conexión (MOV-0001). Hoy también es el inicio provisional. */
 @Serializable
 data object Diagnostico
+
+// Los nombres de las rutas de las secciones son los que fija MOV-0004 §11.1: Inicio las enlaza.
+
+/** Sección Árbitro: los partidos que arbitra la persona (MOV-0009). */
+@Serializable
+data object SeccionArbitro
+
+/** Planilla de un partido (MOV-0009). */
+@Serializable
+data class Planilla(val partidoId: String)

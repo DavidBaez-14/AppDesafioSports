@@ -15,12 +15,17 @@ object Formatos {
     private val DIAS = listOf("lun", "mar", "mié", "jue", "vie", "sáb", "dom")
     private val MESES = listOf("ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic")
 
-    /** "4:00 p. m." */
-    fun hora(hora: LocalTime): String {
+    /** "4:00", en reloj de 12 horas. El "a. m." o "p. m." sale de [periodo]. */
+    fun horaSinPeriodo(hora: LocalTime): String {
         val h = if (hora.hour % 12 == 0) 12 else hora.hour % 12
-        val sufijo = if (hora.hour < 12) "a. m." else "p. m."
-        return "$h:${hora.minute.toString().padStart(2, '0')} $sufijo"
+        return "$h:${hora.minute.toString().padStart(2, '0')}"
     }
+
+    /** "a. m." o "p. m." */
+    fun periodo(hora: LocalTime): String = if (hora.hour < 12) "a. m." else "p. m."
+
+    /** "4:00 p. m." */
+    fun hora(hora: LocalTime): String = "${horaSinPeriodo(hora)} ${periodo(hora)}"
 
     fun hora(fechaHora: LocalDateTime): String = hora(fechaHora.toLocalTime())
 
@@ -34,13 +39,14 @@ object Formatos {
     }
 
     /**
-     * El día como se dice al hablar: [textoHoy] o [textoManana] cuando aplica, y si no "sáb 14".
+     * El día como se dice al hablar: [textoHoy] o [textoManana] cuando aplica, y si no la fecha
+     * con su mes ("sáb 14 nov"): sin el mes, un partido atrasado o lejano no se sabe de cuándo es.
      * Los textos llegan de `strings.xml`.
      */
     fun diaRelativo(fecha: LocalDate, hoy: LocalDate, textoHoy: String, textoManana: String): String = when (fecha) {
         hoy -> textoHoy
         hoy.plusDays(1) -> textoManana
-        else -> diaCorto(fecha)
+        else -> fecha(fecha, hoy)
     }
 
     /** "$50.000". Sin decimales: en pesos no se usan. */

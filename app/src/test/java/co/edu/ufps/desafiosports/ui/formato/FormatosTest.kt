@@ -38,8 +38,18 @@ class FormatosTest {
         val hoy = LocalDate.of(2026, 11, 12)
         assertEquals("Hoy", Formatos.diaRelativo(hoy, hoy, "Hoy", "Mañana"))
         assertEquals("Mañana", Formatos.diaRelativo(hoy.plusDays(1), hoy, "Hoy", "Mañana"))
-        assertEquals("sáb 14", Formatos.diaRelativo(hoy.plusDays(2), hoy, "Hoy", "Mañana"))
-        assertEquals("mié 11", Formatos.diaRelativo(hoy.minusDays(1), hoy, "Hoy", "Mañana"))
+        // Fuera de hoy y mañana lleva el mes: un partido atrasado o lejano se sabe de cuándo es.
+        assertEquals("sáb 14 nov", Formatos.diaRelativo(hoy.plusDays(2), hoy, "Hoy", "Mañana"))
+        assertEquals("mié 11 nov", Formatos.diaRelativo(hoy.minusDays(1), hoy, "Hoy", "Mañana"))
+        assertEquals("mar 12 ene 2027", Formatos.diaRelativo(LocalDate.of(2027, 1, 12), hoy, "Hoy", "Mañana"))
+    }
+
+    @Test
+    fun `la hora se puede partir en numero y periodo`() {
+        assertEquals("4:00", Formatos.horaSinPeriodo(LocalTime.of(16, 0)))
+        assertEquals("p. m.", Formatos.periodo(LocalTime.of(16, 0)))
+        assertEquals("12:05", Formatos.horaSinPeriodo(LocalTime.of(0, 5)))
+        assertEquals("a. m.", Formatos.periodo(LocalTime.of(0, 5)))
     }
 
     @Test

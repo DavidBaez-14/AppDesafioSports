@@ -196,7 +196,7 @@ private fun FilaPartido(partido: PartidoArbitro, hoy: LocalDate, onAbrirPartido:
         detalle = detalle.ifBlank { null },
         inicio = {
             when {
-                cerrado && esHoy -> Box(Modifier.width(64.dp), contentAlignment = Alignment.Center) {
+                cerrado && esHoy -> Box(Modifier.width(72.dp), contentAlignment = Alignment.Center) {
                     Icon(painterResource(R.drawable.ic_task_alt), contentDescription = null)
                 }
                 partido.fechaHora == null -> BloqueFecha(dia = stringResource(R.string.fecha_sin_fecha), hora = null)
@@ -205,7 +205,9 @@ private fun FilaPartido(partido: PartidoArbitro, hoy: LocalDate, onAbrirPartido:
                         partido.fechaHora.toLocalDate(), hoy,
                         stringResource(R.string.fecha_hoy), stringResource(R.string.fecha_manana),
                     ),
-                    hora = if (cerrado) null else Formatos.hora(partido.fechaHora),
+                    // De un partido cerrado importa el día, no la hora.
+                    hora = if (cerrado) null else Formatos.horaSinPeriodo(partido.fechaHora.toLocalTime()),
+                    periodo = if (cerrado) null else Formatos.periodo(partido.fechaHora.toLocalTime()),
                     ahora = enVivo,
                 )
             }

@@ -8,7 +8,8 @@ build/
 
 # Configuración local: rutas del SDK y claves. NUNCA se sube.
 local.properties
-local.properties.template
+# Copias por entorno y plantillas personales (local.properties.dev, .template…).
+local.properties.*
 
 # Android Studio / IntelliJ
 *.iml

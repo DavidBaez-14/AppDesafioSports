@@ -26,7 +26,7 @@ App Android multideporte para los torneos universitarios de la UFPS. Empieza con
 ## Configurar
 
 1. Clona el repo.
-2. Copia `local.properties.ejemplo` como `local.properties` y completa:
+2. Crea `local.properties` en la raíz del proyecto con las claves que David te pasa por privado:
    - `SUPABASE_URL` y `SUPABASE_PUBLISHABLE_KEY`: son las mismas que usa la web (`VITE_SUPABASE_URL` y `VITE_SUPABASE_PUBLISHABLE_KEY`). Pídeselas a David por privado.
    - `API_BASE_URL`: opcional. Por defecto es `http://10.0.2.2:8082/`, el PC visto desde el emulador.
 3. Abre la carpeta en Android Studio y deja que sincronice.

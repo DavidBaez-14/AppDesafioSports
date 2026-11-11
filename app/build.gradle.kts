@@ -7,7 +7,7 @@ plugins {
 }
 
 // La configuración sale de local.properties, que nunca entra a git.
-// Plantilla con las claves: local.properties.ejemplo
+// Las claves las pasa David por privado (README, sección Configurar).
 val localProperties = Properties().apply {
     val archivo = rootProject.file("local.properties")
     if (archivo.exists()) archivo.inputStream().use { load(it) }

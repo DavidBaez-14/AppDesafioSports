@@ -231,7 +231,7 @@ Arranque ──▶ Acceso (login, registro, revisa tu correo, completar registro
 
 ## 9. Configuración y entornos
 
-**`local.properties`** (nunca entra a git; la plantilla es `local.properties.ejemplo`):
+**`local.properties`** (nunca entra a git; las claves las pasa David por privado):
 
 | Clave | Valor | Por defecto |
 |---|---|---|

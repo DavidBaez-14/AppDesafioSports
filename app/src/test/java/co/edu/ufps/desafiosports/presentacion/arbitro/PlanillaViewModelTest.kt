@@ -118,6 +118,165 @@ class PlanillaViewModelTest {
         assertNull(vm.state.aviso)
     }
 
+    // ── Regresión del 14-nov: pasar lista con el servidor lento ────────────────────────────────
+    // Cada toque esperaba dos viajes al servidor con todas las casillas bloqueadas: parecía que
+    // no se podía marcar ni desmarcar a nadie.
+
+    private fun PlanillaViewModel.jugador(personaId: String) =
+        (state.planilla!!.local.jugadores + state.planilla!!.visitante.jugadores).first { it.personaId == personaId }
+
+    private fun PlanillaViewModel.alineado(personaId: String): Boolean = jugador(personaId).alineado
+
+    @Test
+    fun `CA-7 la casilla cambia al instante, sin esperar al servidor`() {
+        val vm = crearViewModel()
+        val servidor = CompletableDeferred<Unit>()
+        repositorio.bloqueoAccion = servidor
+
+        vm.abrirAlineacion()
+        vm.cambiarAlineacion(vm.jugador("j2"))
+
+        assertTrue("La casilla debe verse marcada ya", vm.alineado("j2"))
+        assertEquals(2, vm.state.planilla!!.local.alineados)
+        assertEquals(setOf("j2"), vm.state.alineando)
+        // Las demás casillas siguen libres: no hay una acción que bloquee la hoja.
+        assertFalse(vm.state.enAccion)
+
+        servidor.complete(Unit)
+
+        assertTrue(vm.state.alineando.isEmpty())
+        assertEquals(listOf("alinear:j2:eq-local"), acciones())
+    }
+
+    @Test
+    fun `CA-7 se marcan varios seguidos sin esperar y se envian en orden`() {
+        val vm = crearViewModel()
+        val servidor = CompletableDeferred<Unit>()
+        repositorio.bloqueoAccion = servidor
+
+        vm.abrirAlineacion()
+        vm.cambiarAlineacion(vm.jugador("j2"))
+        vm.cambiarAlineacion(vm.jugador("j1"))
+        vm.elegirLadoAlineacion(Lado.VISITANTE)
+        vm.cambiarAlineacion(vm.jugador("j9"))
+
+        assertTrue(vm.alineado("j2"))
+        assertFalse(vm.alineado("j1"))
+        assertTrue(vm.alineado("j9"))
+        assertEquals(listOf("alinear:j2:eq-local"), acciones())
+
+        // El servidor ya trae los tres cambios cuando se le vuelve a pedir la planilla.
+        repositorio.planilla = Result.success(vm.state.planilla!!)
+        servidor.complete(Unit)
+
+        assertEquals(listOf("alinear:j2:eq-local", "desalinear:j1", "alinear:j9:eq-visita"), acciones())
+        assertTrue(vm.state.alineando.isEmpty())
+        // Una sola recarga al terminar la tanda, no una por toque.
+        assertEquals(2, repositorio.pedidosDePlanilla)
+        assertTrue(vm.alineado("j9"))
+    }
+
+    @Test
+    fun `CA-7 desmarcar a quien se acaba de marcar se envia despues y queda sin marcar`() {
+        val vm = crearViewModel()
+        val servidor = CompletableDeferred<Unit>()
+        repositorio.bloqueoAccion = servidor
+
+        vm.cambiarAlineacion(vm.jugador("j2"))
+        vm.cambiarAlineacion(vm.jugador("j2"))
+
+        assertFalse(vm.alineado("j2"))
+        servidor.complete(Unit)
+
+        assertEquals(listOf("alinear:j2:eq-local", "desalinear:j2"), acciones())
+        assertFalse(vm.alineado("j2"))
+    }
+
+    @Test
+    fun `CA-7 marcar y desmarcar antes de que salga no envia nada`() {
+        val vm = crearViewModel()
+        val servidor = CompletableDeferred<Unit>()
+        repositorio.bloqueoAccion = servidor
+
+        vm.cambiarAlineacion(vm.jugador("j2"))
+        vm.elegirLadoAlineacion(Lado.VISITANTE)
+        vm.cambiarAlineacion(vm.jugador("j9"))
+        vm.cambiarAlineacion(vm.jugador("j9"))
+        servidor.complete(Unit)
+
+        assertEquals(listOf("alinear:j2:eq-local"), acciones())
+        assertFalse(vm.alineado("j9"))
+    }
+
+    @Test
+    fun `CA-7 si el servidor rechaza el cambio la casilla vuelve y el motivo se ve en la hoja`() {
+        val vm = crearViewModel()
+        repositorio.resultadoAccion = Result.failure(AppError.Negocio("JUGADOR_NO_APTO", "Jugador no apto: tiene una multa pendiente."))
+
+        vm.abrirAlineacion()
+        vm.cambiarAlineacion(vm.jugador("j2"))
+
+        assertFalse(vm.alineado("j2"))
+        assertEquals("Jugador no apto: tiene una multa pendiente.", vm.state.errorAlineacion)
+        assertTrue(vm.state.alineando.isEmpty())
+
+        // El siguiente toque limpia el aviso.
+        repositorio.resultadoAccion = Result.success(Unit)
+        vm.cambiarAlineacion(vm.jugador("j2"))
+        assertNull(vm.state.errorAlineacion)
+    }
+
+    @Test
+    fun `CA-7 sin conexion se devuelven todas las casillas pendientes`() {
+        val vm = crearViewModel()
+        val servidor = CompletableDeferred<Unit>()
+        repositorio.bloqueoAccion = servidor
+        repositorio.resultadoAccion = Result.failure(AppError.SinConexion())
+
+        vm.cambiarAlineacion(vm.jugador("j2"))
+        vm.cambiarAlineacion(vm.jugador("j1"))
+        servidor.complete(Unit)
+
+        assertFalse(vm.alineado("j2"))
+        assertTrue(vm.alineado("j1"))
+        assertEquals(listOf("alinear:j2:eq-local"), acciones())
+        assertTrue(vm.state.errorAlineacion!!.isNotBlank())
+    }
+
+    @Test
+    fun `CA-7 un toque mientras se vuelve a pedir la planilla tambien se envia`() {
+        val vm = crearViewModel()
+        vm.cambiarAlineacion(vm.jugador("j2"))
+        assertTrue(vm.state.alineando.isEmpty())
+
+        // El segundo cambio se guarda y la recarga de la planilla se queda esperando.
+        val recarga = CompletableDeferred<Unit>()
+        repositorio.bloqueoPlanilla = recarga
+        vm.cambiarAlineacion(vm.jugador("j1"))
+        vm.elegirLadoAlineacion(Lado.VISITANTE)
+        vm.cambiarAlineacion(vm.jugador("j9"))
+
+        assertEquals(setOf("j9"), vm.state.alineando)
+        repositorio.bloqueoPlanilla = null
+        recarga.complete(Unit)
+
+        assertEquals(listOf("alinear:j2:eq-local", "desalinear:j1", "alinear:j9:eq-visita"), acciones())
+        assertTrue(vm.state.alineando.isEmpty())
+    }
+
+    @Test
+    fun `CA-7 alinear a todos espera a que terminen los cambios sueltos`() {
+        val vm = crearViewModel()
+        val servidor = CompletableDeferred<Unit>()
+        repositorio.bloqueoAccion = servidor
+
+        vm.cambiarAlineacion(vm.jugador("j2"))
+        vm.alinearATodos()
+
+        assertEquals(listOf("alinear:j2:eq-local"), acciones())
+        servidor.complete(Unit)
+    }
+
     @Test
     fun `CA-7 la alineacion se abre en el equipo que estaba elegido y se puede cambiar`() {
         val vm = crearViewModel()
@@ -218,11 +377,13 @@ class PlanillaViewModelTest {
         vm.cambiarAlineacion(vm.state.planilla!!.local.jugadores[1])
 
         assertEquals(antes, vm.state.planilla)
-        assertEquals(AvisoPlanilla.Fallo("Jugador no apto: multa pendiente"), vm.state.aviso)
+        // El motivo va dentro de la hoja de alineación: el aviso de la pantalla queda tapado por ella.
+        assertEquals("Jugador no apto: multa pendiente", vm.state.errorAlineacion)
+        assertNull(vm.state.aviso)
         assertFalse(vm.state.enAccion)
 
-        vm.onAvisoMostrado()
-        assertNull(vm.state.aviso)
+        vm.cerrarAlineacion()
+        assertNull(vm.state.errorAlineacion)
     }
 
     @Test

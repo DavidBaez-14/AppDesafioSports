@@ -26,6 +26,7 @@ import co.edu.ufps.desafiosports.domain.use_case.competicion.RegistrarEventoUseC
 import co.edu.ufps.desafiosports.presentacion.acceso.mensajeParaMostrar
 import co.edu.ufps.desafiosports.presentacion.comun.ErrorDePantalla
 import co.edu.ufps.desafiosports.presentacion.comun.aErrorDePantalla
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import co.edu.ufps.desafiosports.presentacion.navigation.Planilla as RutaPlanilla
 
@@ -62,6 +63,10 @@ data class PlanillaState(
     val eventoPorQuitar: EventoPartido? = null,
     val confirmandoCierre: Boolean = false,
     val aviso: AvisoPlanilla? = null,
+    /** Jugadores con un cambio de alineación que el servidor aún no confirma. */
+    val alineando: Set<String> = emptySet(),
+    /** Por qué no se guardó el último cambio de alineación. Se muestra dentro de la hoja. */
+    val errorAlineacion: String? = null,
 ) {
     /** Se pueden registrar eventos, cambiar la alineación y cerrar. */
     val editable: Boolean get() = planilla?.editable == true && planilla.partido.cruceDefinido
@@ -86,6 +91,17 @@ class PlanillaViewModel(
         private set
 
     private var pidiendo = false
+
+    // Alineación: cada casilla cambia al instante y los cambios viajan de uno en uno, en orden.
+    /** Lo que la persona dejó marcado y aún no sale al servidor: personaId → alineado. */
+    private val porEnviar = LinkedHashMap<String, Boolean>()
+
+    /** El cambio que está viajando ahora. */
+    private var enVuelo: Pair<String, Boolean>? = null
+
+    /** La alineación que el servidor tiene confirmada. */
+    private val enServidor = HashMap<String, Boolean>()
+    private var trabajoAlineacion: Job? = null
 
     init {
         cargar()
@@ -117,7 +133,7 @@ class PlanillaViewModel(
             val resultado = obtenerPlanillaUseCase(partidoId)
             pidiendo = false
             resultado
-                .onSuccess { state = state.copy(cargando = false, refrescando = false, planilla = it, error = null) }
+                .onSuccess { state = state.copy(cargando = false, refrescando = false, planilla = recibir(it), error = null) }
                 .onFailure { error ->
                     state = if (state.planilla == null) {
                         state.copy(cargando = false, refrescando = false, error = error.aErrorDePantalla(), sinPermiso = error.esSinPermiso())
@@ -181,27 +197,114 @@ class PlanillaViewModel(
     }
 
     fun cerrarAlineacion() {
-        state = state.copy(alineacionAbierta = false)
+        state = state.copy(alineacionAbierta = false, errorAlineacion = null)
     }
 
     fun elegirLadoAlineacion(lado: Lado) {
         state = state.copy(ladoAlineacion = lado)
     }
 
-    /** Marca o desmarca a un jugador. A quien no es apto no se le puede marcar. */
+    /**
+     * Marca o desmarca a un jugador. A quien no es apto no se le puede marcar.
+     *
+     * La casilla cambia ya, sin esperar al servidor, y el cambio se pone en cola: se puede pasar
+     * lista de corrido aunque el servidor tarde. Si un cambio no se guarda, esa casilla vuelve a
+     * como estaba y el motivo queda en [PlanillaState.errorAlineacion].
+     */
     fun cambiarAlineacion(jugador: JugadorPlanilla) {
-        val equipo = state.planilla?.equipo(state.ladoAlineacion) ?: return
-        when {
-            jugador.alineado ->
-                accion(operacion = { quitarDeAlineacionUseCase(partidoId, jugador.personaId) }, alTerminar = { null })
-            jugador.apto ->
-                accion(operacion = { alinearJugadorUseCase(partidoId, jugador.personaId, equipo.equipoTorneoId) }, alTerminar = { null })
-        }
+        if (!state.editable || state.enAccion) return
+        val planilla = state.planilla ?: return
+        // Se mira la casilla como está en pantalla, no la copia que traía la fila al dibujarse.
+        val actual = planilla.equipoDe(jugador.personaId)?.jugadores?.firstOrNull { it.personaId == jugador.personaId } ?: return
+        val quiere = !actual.alineado
+        if (quiere && !actual.apto) return
+
+        porEnviar[actual.personaId] = quiere
+        state = state.copy(
+            planilla = planilla.conAlineado(actual.personaId, quiere),
+            alineando = pendientes(),
+            errorAlineacion = null,
+        )
+        if (trabajoAlineacion?.isActive != true) trabajoAlineacion = viewModelScope.launch { enviarAlineacion() }
     }
 
     fun alinearATodos() {
+        // Con cambios sueltos en camino se espera: mezclarlos dejaría casillas a medias.
+        if (pendientes().isNotEmpty()) return
         val equipo = state.planilla?.equipo(state.ladoAlineacion) ?: return
+        state = state.copy(errorAlineacion = null)
         accion(operacion = { alinearEquipoUseCase(partidoId, equipo.equipoTorneoId) }, alTerminar = { null })
+    }
+
+    /** Envía la cola de cambios, uno a la vez, y al terminar vuelve a pedir la planilla. */
+    private suspend fun enviarAlineacion() {
+        // Mientras se vuelve a pedir la planilla pueden llegar más toques: se repite hasta vaciar la cola.
+        do {
+            val guardados = enviarPendientes()
+            // Los aptos, los goles y los conteos son siempre los del servidor.
+            if (guardados > 0) {
+                obtenerPlanillaUseCase(partidoId).onSuccess { state = state.copy(planilla = recibir(it)) }
+            }
+        } while (porEnviar.isNotEmpty())
+    }
+
+    /** Envía lo que hay en la cola y dice cuántos cambios quedaron guardados. */
+    private suspend fun enviarPendientes(): Int {
+        var guardados = 0
+        while (true) {
+            val (personaId, quiere) = porEnviar.entries.firstOrNull()?.toPair() ?: break
+            porEnviar.remove(personaId)
+            // Marcó y desmarcó antes de que saliera: no hay nada que enviar.
+            if ((enServidor[personaId] ?: false) == quiere) {
+                state = state.copy(alineando = pendientes())
+                continue
+            }
+            enVuelo = personaId to quiere
+            val resultado = if (quiere) {
+                val equipo = state.planilla?.equipoDe(personaId)?.equipoTorneoId.orEmpty()
+                alinearJugadorUseCase(partidoId, personaId, equipo)
+            } else {
+                quitarDeAlineacionUseCase(partidoId, personaId)
+            }
+            enVuelo = null
+            val fallo = resultado.exceptionOrNull()
+            // Quitar a quien ya no estaba es lo que se quería: no es un error.
+            if (fallo == null || (!quiere && fallo is AppError.NoEncontrado)) {
+                enServidor[personaId] = quiere
+                guardados++
+            } else {
+                // Sin conexión no tiene caso seguir: todo lo pendiente vuelve a como estaba.
+                if (fallo is AppError.SinConexion) porEnviar.clear()
+                state = state.copy(
+                    planilla = state.planilla?.let { conPendientes(conLoDelServidor(it)) },
+                    errorAlineacion = fallo.mensajeParaMostrar(),
+                )
+            }
+            state = state.copy(alineando = pendientes())
+        }
+        return guardados
+    }
+
+    private fun pendientes(): Set<String> = porEnviar.keys + listOfNotNull(enVuelo?.first)
+
+    /** Llega una planilla del servidor: se anota su alineación y se conserva lo que aún no se ha enviado. */
+    private fun recibir(planilla: Planilla): Planilla {
+        enServidor.clear()
+        (planilla.local.jugadores + planilla.visitante.jugadores).forEach { enServidor[it.personaId] = it.alineado }
+        return conPendientes(planilla)
+    }
+
+    private fun conPendientes(planilla: Planilla): Planilla {
+        var resultado = planilla
+        enVuelo?.let { (id, quiere) -> resultado = resultado.conAlineado(id, quiere) }
+        porEnviar.forEach { (id, quiere) -> resultado = resultado.conAlineado(id, quiere) }
+        return resultado
+    }
+
+    private fun conLoDelServidor(planilla: Planilla): Planilla {
+        var resultado = planilla
+        enServidor.forEach { (id, alineado) -> resultado = resultado.conAlineado(id, alineado) }
+        return resultado
     }
 
     // ── Cierre ──────────────────────────────────────────────────────────────
@@ -254,7 +357,7 @@ class PlanillaViewModel(
             state = state.copy(
                 enAccion = false,
                 cerrando = false,
-                planilla = recarga?.getOrNull() ?: state.planilla,
+                planilla = recarga?.getOrNull()?.let { recibir(it) } ?: state.planilla,
                 aviso = aviso,
             )
         }

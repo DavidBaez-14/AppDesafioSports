@@ -61,4 +61,18 @@ data class Planilla(
     val marcador: Marcador get() = partido.marcador ?: Marcador(0, 0)
 
     fun equipo(lado: Lado): EquipoPlanilla = if (lado == Lado.LOCAL) local else visitante
+
+    /** El equipo en el que está inscrita la persona, o null si no es de ninguno de los dos. */
+    fun equipoDe(personaId: String): EquipoPlanilla? =
+        listOf(local, visitante).firstOrNull { equipo -> equipo.jugadores.any { it.personaId == personaId } }
+
+    /** La misma planilla con [personaId] marcado o desmarcado en la alineación. */
+    fun conAlineado(personaId: String, alineado: Boolean): Planilla = copy(
+        local = local.conAlineado(personaId, alineado),
+        visitante = visitante.conAlineado(personaId, alineado),
+    )
 }
+
+private fun EquipoPlanilla.conAlineado(personaId: String, alineado: Boolean): EquipoPlanilla =
+    if (jugadores.none { it.personaId == personaId && it.alineado != alineado }) this
+    else copy(jugadores = jugadores.map { if (it.personaId == personaId) it.copy(alineado = alineado) else it })

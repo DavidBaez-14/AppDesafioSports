@@ -214,6 +214,8 @@ fun PlanillaContenido(
                 lado = state.ladoAlineacion,
                 editable = state.editable,
                 enAccion = state.enAccion,
+                guardando = state.alineando.isNotEmpty(),
+                error = state.errorAlineacion,
                 onLado = acciones.onLadoAlineacion,
                 onCambiar = acciones.onCambiarAlineacion,
                 onTodos = acciones.onAlinearATodos,

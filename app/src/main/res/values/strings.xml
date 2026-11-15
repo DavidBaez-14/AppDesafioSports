@@ -142,12 +142,11 @@
     <string name="inicio_saludo">Hola, %1$s</string>
     <string name="inicio_saludo_generico">Hola</string>
     <string name="inicio_tus_secciones">Tus secciones</string>
-    <string name="inicio_cuenta">Tu cuenta</string>
     <string name="inicio_cerrar_sesion">Cerrar sesión</string>
     <string name="inicio_cerrando_sesion">Cerrando sesión…</string>
     <string name="inicio_diagnostico">Diagnóstico de conexión</string>
     <string name="inicio_ver_seccion">Abrir %1$s</string>
-    <string name="inicio_arbitro_proximo">Tu próximo partido</string>
+    <string name="inicio_arbitro_proximo">Próximo que arbitras</string>
     <string name="inicio_arbitro_nada">No tienes partidos por arbitrar. Los jugados siguen en la sección.</string>
     <plurals name="inicio_arbitro_por_jugar">
         <item quantity="one">%d partido por arbitrar</item>
@@ -179,6 +178,8 @@
     <string name="planilla_cerrado">Partido cerrado</string>
     <string name="planilla_alineacion">Alineación</string>
     <string name="planilla_alineacion_resumen">%1$d de %2$s · %3$d de %4$s</string>
+    <string name="planilla_alineacion_guardando">Guardando la alineación</string>
+    <string name="planilla_alineacion_error">No se guardó el cambio: %1$s</string>
     <plurals name="planilla_alineados">
         <item quantity="one">%1$d alineado de %2$d</item>
         <item quantity="other">%1$d alineados de %2$d</item>
@@ -330,7 +331,6 @@
     <!-- Explorar y detalle del torneo (MOV-0005). -->
     <string name="explorar_titulo">Explorar</string>
     <string name="login_explorar">Explorar torneos sin cuenta</string>
-    <string name="inicio_buscar_torneos">Buscar torneos</string>
     <string name="explorar_buscar">Busca un torneo por su nombre</string>
     <string name="explorar_borrar_busqueda">Borrar la búsqueda</string>
     <string name="explorar_todos">Todos</string>
@@ -392,4 +392,67 @@
     <string name="torneo_documento">Documento</string>
     <string name="torneo_documento_detalle">Este torneo pide el número de documento de cada jugador.</string>
     <string name="inscripcion_pendiente">Pendiente</string>
+
+    <!-- MOV-0004 · Inicio, barra inferior y Perfil -->
+    <string name="nav_inicio">Inicio</string>
+    <string name="nav_explorar">Explorar</string>
+    <string name="nav_perfil">Perfil</string>
+    <string name="inicio_tu_proximo_partido">Tu próximo partido</string>
+    <string name="inicio_mis_equipos">Mis equipos</string>
+    <string name="inicio_juegas">Juegas · %1$s</string>
+    <string name="inicio_delegas">Delegas · %1$s</string>
+    <string name="inicio_rival_por_definir">Rival por definir</string>
+    <string name="inicio_vacio_titulo">Aún no juegas en ningún torneo</string>
+    <string name="inicio_vacio_detalle">Los torneos en los que juegues o delegues aparecerán aquí.</string>
+    <string name="inicio_ir_a_explorar">Ir a Explorar</string>
+    <string name="tramite_falta_comprobante">Falta comprobante</string>
+    <string name="tramite_en_revision">En revisión</string>
+    <string name="tramite_comprobante_rechazado">Comprobante rechazado</string>
+    <string name="tramite_inscripcion_pendiente">Inscripción pendiente</string>
+    <string name="tramite_rechazada">Rechazada</string>
+    <string name="tramite_expulsado">Expulsado</string>
+    <string name="perfil_titulo">Perfil</string>
+    <string name="perfil_nombre_publico">Así te ven en lo público: %1$s</string>
+    <string name="perfil_cifra_partidos">Partidos</string>
+    <string name="perfil_cifra_goles">Goles</string>
+    <string name="perfil_cifra_titulos">Títulos</string>
+    <string name="perfil_cifras_lectura">%1$d partidos, %2$d goles, %3$d títulos</string>
+    <string name="perfil_trayectoria">Trayectoria</string>
+    <string name="perfil_trayectoria_vacia">Tu trayectoria empieza con tu primer partido</string>
+    <string name="perfil_puesto_campeon">Campeón</string>
+    <string name="perfil_puesto_subcampeon">Subcampeón</string>
+    <string name="perfil_puesto_tercero">Tercer puesto</string>
+    <string name="perfil_sanciones">Sanciones</string>
+    <string name="perfil_tarjetas">%1$s, %2$s, %3$s</string>
+    <plurals name="perfil_amarillas">
+        <item quantity="one">%1$d amarilla</item>
+        <item quantity="other">%1$d amarillas</item>
+    </plurals>
+    <plurals name="perfil_azules">
+        <item quantity="one">%1$d azul</item>
+        <item quantity="other">%1$d azules</item>
+    </plurals>
+    <plurals name="perfil_rojas">
+        <item quantity="one">%1$d roja</item>
+        <item quantity="other">%1$d rojas</item>
+    </plurals>
+    <string name="perfil_tarjetas_titulo">Tarjetas</string>
+    <string name="multa_generica">Multa</string>
+    <string name="multa_amarilla">Multa por tarjeta amarilla</string>
+    <string name="multa_azul">Multa por tarjeta azul</string>
+    <string name="multa_roja">Multa por tarjeta roja</string>
+    <string name="multa_acumulacion">Multa por acumulación de amarillas</string>
+    <string name="multa_roja_directa">Multa por roja directa</string>
+    <string name="multa_detalle">%1$s · %2$s</string>
+    <string name="multa_pendiente">Pendiente</string>
+    <string name="multa_en_revision">En revisión</string>
+    <string name="multa_pagada">Pagada</string>
+    <string name="multa_condonada">Condonada</string>
+    <string name="perfil_cuenta">Cuenta</string>
+    <string name="perfil_deportivo">Perfil deportivo</string>
+    <string name="perfil_deportivo_sin_completar">Sin completar</string>
+    <string name="perfil_altura">%1$d cm</string>
+    <string name="perfil_pierna_derecha">Pierna derecha</string>
+    <string name="perfil_pierna_izquierda">Pierna izquierda</string>
+    <string name="perfil_pierna_ambas">Ambas piernas</string>
 </resources>

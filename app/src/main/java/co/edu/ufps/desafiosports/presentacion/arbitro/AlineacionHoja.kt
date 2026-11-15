@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -14,6 +15,7 @@ import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SegmentedButton
@@ -25,14 +27,19 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import co.edu.ufps.desafiosports.R
@@ -89,14 +96,20 @@ internal fun NumeroCamiseta(numero: Int?, modifier: Modifier = Modifier) {
 /**
  * Hoja de alineación (MOV-0009 · CA-7 y CA-8): quién juega de cada equipo. Quien no es apto
  * aparece con el motivo y no se puede marcar. Con [editable] en false solo se consulta.
+ *
+ * Cada casilla cambia al tocarla; [guardando] solo enciende la barra de progreso. [enAccion] es
+ * "Alinear a todos" viajando: ahí sí se espera. [error] es por qué no se guardó el último cambio:
+ * va dentro de la hoja porque los avisos de la pantalla quedan tapados por ella.
  */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 internal fun AlineacionHoja(
     planilla: Planilla,
     lado: Lado,
     editable: Boolean,
     enAccion: Boolean,
+    guardando: Boolean,
+    error: String?,
     onLado: (Lado) -> Unit,
     onCambiar: (JugadorPlanilla) -> Unit,
     onTodos: () -> Unit,
@@ -107,7 +120,10 @@ internal fun AlineacionHoja(
         onDismissRequest = onCerrar,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-        modifier = Modifier.testTag("hoja_alineacion"),
+        // La hoja es otra ventana: sin esto sus testTag no se ven desde fuera.
+        modifier = Modifier
+            .semantics { testTagsAsResourceId = true }
+            .testTag("hoja_alineacion"),
     ) {
         Text(
             text = stringResource(R.string.planilla_alineacion).uppercase(),
@@ -137,7 +153,7 @@ internal fun AlineacionHoja(
                 modifier = Modifier.weight(1f),
             )
             if (editable && equipo.jugadores.isNotEmpty()) {
-                TextButton(onClick = onTodos, enabled = !enAccion, modifier = Modifier.testTag("alineacion_todos")) {
+                TextButton(onClick = onTodos, enabled = !enAccion && !guardando, modifier = Modifier.testTag("alineacion_todos")) {
                     Icon(painterResource(R.drawable.ic_done_all), contentDescription = null, modifier = Modifier.size(18.dp))
                     Text(
                         stringResource(R.string.planilla_alinear_todos),
@@ -146,6 +162,36 @@ internal fun AlineacionHoja(
                     )
                 }
             }
+        }
+        // La barra ocupa siempre su alto: la lista no salta cuando aparece y desaparece.
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .height(2.dp),
+        ) {
+            if (enAccion || guardando) {
+                val guardandoTexto = stringResource(R.string.planilla_alineacion_guardando)
+                LinearProgressIndicator(
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    trackColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(2.dp)
+                        .semantics { contentDescription = guardandoTexto }
+                        .testTag("alineacion_guardando"),
+                )
+            }
+        }
+        if (error != null) {
+            Text(
+                text = stringResource(R.string.planilla_alineacion_error, error),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier
+                    .padding(start = 24.dp, end = 24.dp, top = 8.dp, bottom = 4.dp)
+                    .semantics { liveRegion = LiveRegionMode.Polite }
+                    .testTag("alineacion_error"),
+            )
         }
         if (equipo.jugadores.isEmpty()) {
             EstadoVacio(
@@ -188,8 +234,8 @@ private fun FilaAlineacion(jugador: JugadorPlanilla, editable: Boolean, enAccion
                     Modifier
                 },
             )
-            .padding(horizontal = 24.dp, vertical = 8.dp)
-            .testTag("alineacion_jugador"),
+            .testTag("alineacion_jugador")
+            .padding(horizontal = 24.dp, vertical = 8.dp),
     ) {
         NumeroCamiseta(jugador.numeroCamiseta)
         Column(modifier = Modifier.weight(1f)) {

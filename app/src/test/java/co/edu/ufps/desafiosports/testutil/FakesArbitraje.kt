@@ -33,6 +33,9 @@ class FakeArbitrajeRepository : ArbitrajeRepository {
     /** Si no es null, registrarEvento espera a que se complete (doble toque). */
     var bloqueoEvento: CompletableDeferred<Unit>? = null
 
+    /** Si no es null, las demás acciones (alinear, quitar, cerrar) esperan a que se complete: el servidor lento. */
+    var bloqueoAccion: CompletableDeferred<Unit>? = null
+
     val pedidosDePlanilla: Int get() = llamadas.count { it == "planilla" }
 
     override suspend fun misPartidos(): Result<List<PartidoArbitro>> {
@@ -40,8 +43,12 @@ class FakeArbitrajeRepository : ArbitrajeRepository {
         return partidos
     }
 
+    /** Si no es null, planilla() espera a que se complete: la recarga lenta. */
+    var bloqueoPlanilla: CompletableDeferred<Unit>? = null
+
     override suspend fun planilla(partidoId: String): Result<Planilla> {
         llamadas += "planilla"
+        bloqueoPlanilla?.await()
         return planilla
     }
 
@@ -63,8 +70,9 @@ class FakeArbitrajeRepository : ArbitrajeRepository {
 
     override suspend fun cerrarPartido(partidoId: String): Result<Unit> = accion("cerrar")
 
-    private fun accion(nombre: String): Result<Unit> {
+    private suspend fun accion(nombre: String): Result<Unit> {
         llamadas += nombre
+        bloqueoAccion?.await()
         alActuar?.invoke()
         return resultadoAccion
     }

@@ -1,0 +1,7 @@
+PlanillaViewModelTest > CA-7 la casilla cambia al instante, sin esperar al servidor FAILED
+PlanillaViewModelTest > CA-7 se marcan varios seguidos sin esperar y se envian en orden FAILED
+PlanillaViewModelTest > CA-7 si el servidor rechaza el cambio la casilla vuelve y el motivo se ve en la hoja FAILED
+PlanillaViewModelTest > CA-7 desmarcar a quien se acaba de marcar se envia despues y queda sin marcar FAILED
+PlanillaViewModelTest > CA-7 sin conexion se devuelven todas las casillas pendientes FAILED
+23 tests completed, 5 failed
+BUILD FAILED in 25s

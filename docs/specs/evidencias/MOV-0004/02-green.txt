@@ -1,0 +1,4 @@
+MOV-0004 + arreglo de alineacion (MOV-0009) - 14-nov-2026
+./gradlew testDebugUnitTest assembleDebug
+283 tests (284 tras el ultimo arreglo), 0 fallos, 3 saltadas (las de humo)
+BUILD SUCCESSFUL in 20s

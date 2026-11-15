@@ -113,3 +113,4 @@ rama: mov-0006-google
 | 2026-11-09 | Borrador y paso a en-curso por pedido del usuario |
 | 2026-11-09 | RED (10 tests fallando, `evidencias/MOV-0006/01-red.txt`) → GREEN (106 tests, 0 fallos). Capturas 02 a 05: el selector de Google abre y cancelar libera el login. Falta el cliente OAuth Android para entrar de verdad (`06-green.txt`) |
 | 2026-11-09 | Verificada por el usuario con su cuenta real de Google en el emulador (después de poner el ID del cliente web). Integrada a `main`: pasa a `hecha` |
+| 2026-11-14 | `DesafioSportsDev` pasa a ser el Supabase principal del equipo. Allí el proveedor Google está apagado (`/auth/v1/settings` → `google: false`), así que falta activarlo con el mismo cliente web y registrar la huella SHA-1 de cada integrante. Pasos por máquina en el `README.md`. Sin cambios de código: 11 tests de Google en verde. Falta la verificación manual contra `DesafioSportsDev` |

@@ -34,11 +34,11 @@ data class RevisaTuCorreo(val correo: String)
 @Serializable
 data object CompletarRegistro
 
-/** Inicio provisional con "Tus secciones" (MOV-0010). El Inicio completo llega con MOV-0004. */
+/** La pantalla principal: la barra inferior con Inicio, Explorar y Perfil (MOV-0004). */
 @Serializable
-data object Inicio
+data object Principal
 
-/** Diagnóstico de conexión (MOV-0001). Desde MOV-0010 solo se abre en debug, desde Inicio o el login. */
+/** Diagnóstico de conexión (MOV-0001). Solo se abre en debug, desde Perfil o el login. */
 @Serializable
 data object Diagnostico
 

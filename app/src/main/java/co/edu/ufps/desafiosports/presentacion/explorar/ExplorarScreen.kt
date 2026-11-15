@@ -94,7 +94,8 @@ data class AccionesExplorar(
 /** Explorar torneos públicos (MOV-0005). */
 @Composable
 fun ExplorarScreen(
-    onVolver: () -> Unit,
+    /** Null dentro de la pestaña de la pantalla principal: ahí no hay a dónde volver (MOV-0004). */
+    onVolver: (() -> Unit)?,
     onAbrirTorneo: (torneoId: String, enlaceToken: String) -> Unit,
     viewModel: ExplorarViewModel = viewModel(factory = ExplorarViewModel.Factory),
 ) {
@@ -124,7 +125,7 @@ fun ExplorarScreen(
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
-fun ExplorarContenido(state: ExplorarState, hoy: LocalDate, acciones: AccionesExplorar, onVolver: () -> Unit, modifier: Modifier = Modifier) {
+fun ExplorarContenido(state: ExplorarState, hoy: LocalDate, acciones: AccionesExplorar, onVolver: (() -> Unit)?, modifier: Modifier = Modifier) {
     val avisos = remember { SnackbarHostState() }
     LaunchedEffect(state.aviso) {
         val aviso = state.aviso ?: return@LaunchedEffect
@@ -139,8 +140,10 @@ fun ExplorarContenido(state: ExplorarState, hoy: LocalDate, acciones: AccionesEx
             TopAppBar(
                 title = { Text(stringResource(R.string.explorar_titulo)) },
                 navigationIcon = {
-                    IconButton(onClick = onVolver, modifier = Modifier.testTag("explorar_atras")) {
-                        Icon(painterResource(R.drawable.ic_arrow_back), contentDescription = stringResource(R.string.accion_atras))
+                    if (onVolver != null) {
+                        IconButton(onClick = onVolver, modifier = Modifier.testTag("explorar_atras")) {
+                            Icon(painterResource(R.drawable.ic_arrow_back), contentDescription = stringResource(R.string.accion_atras))
+                        }
                     }
                 },
                 actions = {

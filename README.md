@@ -4,16 +4,10 @@ App Android multideporte para los torneos universitarios de la UFPS. Empieza con
 
 - **Tecnología:** Kotlin + Jetpack Compose (Material 3).
 - **De dónde saca todo:** inicia sesión con **Supabase Auth** y consume **BackendCodeCup**, el mismo backend de la web CodeCup.
-- **Tres modos sobre una misma cuenta:** Jugador, Árbitro y Creador, más el Visitante sin sesión.
+- **Todos entran como jugador.** Árbitro y Creador son secciones que aparecen en Inicio si la cuenta las tiene. El visitante explora sin sesión.
 
-> **Estado: base lista ([MOV-0001](docs/specs/MOV-0001-estructura-base.md)).**
-> - Ya está la estructura del proyecto, con la red y la sesión funcionando.
-> - Por ahora hay una **pantalla temporal de diagnóstico**: comprueba el backend, inicia sesión y consulta `GET /api/auth/me`.
-> - Las pantallas reales se diseñan con Impeccable: [plan de UI](docs/plan-ui-impeccable.md).
-
-<p align="center">
-  <img src="docs/specs/evidencias/MOV-0001/02-sesion-y-cuenta.png" width="260" alt="Diagnóstico: sesión activa y la cuenta de /api/auth/me">
-</p>
+> **Estado (14-nov-2026):** ya se puede entrar (correo o Google), ver Inicio con tus equipos y tu próximo partido, explorar torneos, ver tu perfil, crear un torneo, aprobar inscripciones y llevar la planilla de un partido como árbitro.
+> El detalle de cada parte está en el [índice de specs](docs/specs/README.md).
 
 ## Requisitos
 
@@ -29,7 +23,18 @@ App Android multideporte para los torneos universitarios de la UFPS. Empieza con
 2. Crea `local.properties` en la raíz del proyecto con las claves que David te pasa por privado:
    - `SUPABASE_URL` y `SUPABASE_PUBLISHABLE_KEY`: son las mismas que usa la web (`VITE_SUPABASE_URL` y `VITE_SUPABASE_PUBLISHABLE_KEY`). Pídeselas a David por privado.
    - `API_BASE_URL`: opcional. Por defecto es `http://10.0.2.2:8082/`, el PC visto desde el emulador.
+   - `GOOGLE_WEB_CLIENT_ID`: opcional. Sin él, el botón "Continuar con Google" no aparece. Ver [Continuar con Google](#continuar-con-google).
 3. Abre la carpeta en Android Studio y deja que sincronice.
+
+### Continuar con Google
+
+El login con Google es nativo ([MOV-0006](docs/specs/MOV-0006-google.md)). Para que funcione en tu máquina hacen falta tres cosas:
+
+1. **`GOOGLE_WEB_CLIENT_ID` en `local.properties`.** Es el ID del cliente de tipo **Aplicación web** de Google Cloud, el mismo que está en Supabase → Authentication → Providers → Google → Client IDs. **No** es el del cliente Android: con ese, el selector falla con "No pudimos continuar con Google".
+2. **Un cliente Android con tu huella.** Google solo entrega el token a las apps firmadas con una llave registrada, y cada máquina tiene su propia llave de debug.
+   - Saca tu SHA-1 con `gradlew signingReport` (variante `debug`).
+   - En Google Cloud → Google Auth Platform → Clients → Create client → **Android**: paquete `co.edu.ufps.desafiosports` y tu SHA-1. Su ID no se copia en ningún lado.
+3. **Un emulador con Google Play** (o un teléfono) y una cuenta de Google iniciada en el dispositivo. Mientras la app de Google esté en modo *Testing*, la cuenta debe estar en Audience → Test users.
 
 > `local.properties` está en `.gitignore`. **Nunca subas claves.** La clave secreta de Supabase (`sb_secret_…`) no va en la app.
 
@@ -43,7 +48,7 @@ App Android multideporte para los torneos universitarios de la UFPS. Empieza con
 ## Probar
 
 ```bash
-./gradlew testDebugUnitTest      # 31 tests; las 3 pruebas de humo se saltan solas
+./gradlew testDebugUnitTest      # toda la suite; las 3 pruebas de humo se saltan solas
 ./gradlew assembleDebug          # compila el APK de debug
 
 # Prueba de humo contra el backend real (con el backend levantado):

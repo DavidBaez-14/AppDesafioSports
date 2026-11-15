@@ -2,12 +2,12 @@
 id: MOV-0004
 titulo: Inicio (jugador), navegación principal y Perfil
 tipo: feature
-estado: borrador
+estado: en-revision
 prioridad: P1
 fase: F1
 modo: Jugador
-responsable: —
-depende_de: [MOV-0003, backend 0026, backend 0029]
+responsable: David
+depende_de: [MOV-0003, MOV-0005, MOV-0010, backend 0026, backend 0029]
 rama: mov-0004-inicio-y-perfil
 ---
 
@@ -17,16 +17,16 @@ rama: mov-0004-inicio-y-perfil
 
 ## 1. Contexto
 
-- **Hoy, después de entrar, la app abre el diagnóstico de conexión.** Es un inicio provisional que dejó MOV-0002. Esta spec pone el Inicio real.
+- **Hoy, después de entrar, la app abre el Inicio provisional de MOV-0010:** el saludo y "Tus secciones", sin barra inferior, sin equipos y sin Perfil. Esta spec pone el Inicio real y **conserva los bloques de sección de MOV-0010** (§11.5).
 - **Estructura decidida** (`PRODUCT.md`, 8-nov-2026): todos entran como **jugador**. **Creador** y **Árbitro** no son modos: son **secciones** a las que se entra desde Inicio, y solo aparecen si la persona las tiene.
-- **Inicio es de donde cuelga todo lo demás.** Las secciones Creador y Árbitro, Crear torneo y Explorar se construyen en otras specs, en paralelo. Por eso esta spec también fija los **nombres de las rutas** que usarán (§11.1).
+- **Inicio es de donde cuelga todo lo demás.** Las secciones Creador y Árbitro, Crear torneo y Explorar ya están en `main` (MOV-0005, 0007, 0008, 0009 y 0010): esta spec las enlaza con las rutas de §11.1.
 
 ## 2. Alcance
 
 ### 2.1 Navegación principal
 
 - **Barra inferior** de Material 3 con tres destinos: **Inicio · Explorar · Perfil**.
-- **Explorar** muestra solo un estado vacío ("Pronto podrás buscar torneos"). La pantalla real llega con MOV-0005.
+- **Explorar** abre la pantalla real de MOV-0005, sin la flecha de volver (decisión del 14-nov, §11.5). El visitante sin cuenta sigue entrando a Explorar desde el login, con su flecha.
 - **Después de entrar, crear cuenta o completar registro**, la app abre Inicio y no el diagnóstico.
 - **Atrás:** desde Explorar o Perfil vuelve a Inicio; desde Inicio sale de la app.
 
@@ -34,11 +34,13 @@ rama: mov-0004-inicio-y-perfil
 
 De arriba hacia abajo, como en la pantalla `inicio` del prototipo (estructura "Jugador de base"):
 
-1. **"Tus secciones".** Una fila por cada sección que la persona tiene. Si no tiene ninguna, el bloque no aparece.
-   - **Creador:** el texto depende de si hay algo por revisar (§3.3). Abre la sección Creador.
-   - **Árbitro:** si tiene un partido hoy, muestra el partido y el chip naranja "Planilla", y abre la planilla de ese partido. Si no, muestra cuántos partidos tiene asignados y abre la sección Árbitro.
-2. **"Tu próximo partido".** El partido más cercano entre todos sus equipos. Si no hay ninguno, el bloque no aparece.
-3. **"Mis equipos".** Cada equipo con su torneo, si la persona **juega** o **delega**, y el estado del trámite en un chip (§3.3).
+0. **El saludo** ("Hola, Carlos"), como en MOV-0010.
+1. **"Tus secciones".** Un bloque por cada sección que la persona tiene según `secciones` de `/api/auth/me`. Si no tiene ninguna, "Tus secciones" no aparece.
+   - Los bloques son los de MOV-0010, sin cambios: la cabecera abre la sección y dentro va lo urgente (§3.3).
+   - **Creador:** el torneo que más espera revisión abre sus inscripciones.
+   - **Árbitro:** el partido que sigue abre su planilla; si es hoy, la hora y el chip "Planilla" van en naranja.
+2. **"Tu próximo partido".** El partido más cercano entre todos sus equipos. Si no hay ninguno, el bloque no aparece. Abre el torneo.
+3. **"Mis equipos".** Cada equipo con su torneo, si la persona **juega** o **delega**, y el estado del trámite en un chip (§3.3). Cada fila abre el torneo.
 4. **Botón flotante "Crear torneo".** Abre el flujo de crear torneo.
 5. **Estado vacío** para una cuenta sin equipos: "Aún no juegas en ningún torneo", con el botón "Ir a Explorar".
 
@@ -80,7 +82,7 @@ Inicio consulta `/api/auth/me` al abrir. Con eso se cierra un hueco de MOV-0002,
 |---|---|---|---|---|---|
 | Inicio | Esqueleto de las listas, con la barra y el botón flotante ya visibles | "Aún no juegas en ningún torneo" + "Ir a Explorar". El botón flotante sigue | Mensaje del error + "Reintentar" | "Sin conexión. Revisa tu internet." + "Reintentar" | Bloques de §2.2 |
 | Perfil | Esqueleto; el encabezado se pinta en cuanto llega la cuenta | "Tu trayectoria empieza con tu primer partido" | Mensaje + "Reintentar". "Cerrar sesión" **siempre** visible | Igual que el error, con el texto de sin conexión | Bloques de §2.3 |
-| Explorar | — | "Pronto podrás buscar torneos por deporte o por nombre." | — | — | — |
+| Explorar | Los de MOV-0005 | | | | |
 
 - **Si falla la actualización** y ya había datos en pantalla, se conservan y el error sale en un `Snackbar`.
 
@@ -88,18 +90,22 @@ Inicio consulta `/api/auth/me` al abrir. Con eso se cierra un hueco de MOV-0002,
 
 Todos van a `strings.xml`. Los que llevan número usan `plurals`.
 
-**Tus secciones**
+**Tus secciones** (los bloques de MOV-0010; aquí solo cambia cuándo aparecen)
 
-| Caso | Título | Texto | Al final |
-|---|---|---|---|
-| Creador, `porRevisar > 0` | Creador | "3 por revisar" / "1 por revisar" | `Badge` con el número |
-| Creador, `porRevisar = 0` | Creador | "2 torneos · nada por revisar" / "1 torneo · nada por revisar" | Flecha |
-| Árbitro, con `hoy` | Árbitro | "Hoy 4:00 p. m. · Sistemas vs Civil" | Chip naranja "Planilla" |
-| Árbitro, sin `hoy` | Árbitro | "2 partidos asignados" / "1 partido asignado" / "Sin partidos asignados" | Flecha |
+| Caso | Cabecera | Dentro del bloque |
+|---|---|---|
+| Creador, algo por revisar | "Creador" · "2 torneos" · chip naranja "3 por revisar" | "*Torneo* te espera" con sus inscripciones y comprobantes: abre las inscripciones |
+| Creador, nada por revisar | "Creador" · "2 torneos" | "Nada espera tu revisión." |
+| Árbitro, con partidos por jugar | "Árbitro" · "2 por jugar" | El partido que sigue, con el chip "Planilla" (naranja si es hoy): abre la planilla |
+| Árbitro, sin partidos por jugar | "Árbitro" | "No tienes partidos por arbitrar. Los jugados siguen en la sección." |
+
+- **Cuándo aparece cada bloque:** lo decide `secciones` de `/api/auth/me` (`creador` o `arbitro` distinto de `null`). Antes, Creador salía siempre y Árbitro solo con partidos.
+- **Mientras llega el detalle** de un bloque, la cabecera de Creador ya muestra cuántos torneos tiene, con el dato de `secciones`.
+- **Si falla el detalle de un bloque,** el error sale dentro de ese bloque con su "Reintentar" y el resto de Inicio se ve igual (MOV-0010 · CA-5).
 
 **Tu próximo partido**
 
-- **Cuál:** entre los equipos de `yo/equipos`, el `proximoPartido` con la `fechaHora` más cercana. Los que no tienen fecha no cuentan.
+- **Cuál:** entre los equipos de `yo/equipos`, el `proximoPartido` con la `fechaHora` más temprana. Los que no tienen fecha no cuentan. Un partido atrasado que sigue sin jugarse cuenta: es el que el backend manda como próximo.
 - **Título:** "Local vs Visitante". Si `local` es `true`, el equipo propio va primero. Si `rival` es `null`, "Rival por definir".
 - **Texto:** "*torneo* · *lugar*". Sin lugar, solo el torneo.
 - **Al inicio:** el día y la hora ("sáb 14" y "4:00 p. m."; "Hoy" o "Mañana" cuando aplique).
@@ -120,7 +126,7 @@ Todos van a `strings.xml`. Los que llevan número usan `plurals`.
 | `RECHAZADO` | cualquiera | — | "Rechazada" (error) |
 | `EXPULSADO` | cualquiera | — | "Expulsado" (error) |
 
-- **Las filas de equipo y de próximo partido no se pueden tocar todavía.** El detalle del torneo llega con MOV-0005; hasta entonces no hay botones que no lleven a nada.
+- **Las filas de equipo y la de próximo partido abren el detalle del torneo** (`Torneo(torneoId)`, MOV-0005). Decisión del 14-nov (§11.5).
 
 **Perfil**
 
@@ -186,6 +192,7 @@ El resto de la respuesta no cambia. `secciones` viene siempre; una sección en `
 
 - `creador` va si administra al menos un torneo. `porRevisar` suma las inscripciones pendientes y los comprobantes por revisar de sus torneos.
 - `arbitro` va si es árbitro de al menos un torneo, **aunque no tenga partidos** (`partidosAsignados` puede ser 0). `hoy` es su próximo partido del día, o `null`.
+- **La app lee de `secciones` solo qué secciones hay y cuántos torneos administra.** El partido del árbitro y lo que espera revisión salen de `GET /api/supercopa/arbitro/partidos` y `GET /api/supercopa/creador/torneos`, que ya usan los bloques de MOV-0010 y solo se piden si la sección existe.
 - `roles` puede traer valores que la app no conoce, como `SUPERADMIN`. Ya se ignoran; no cambies eso.
 
 ### 4.2 `GET /api/supercopa/yo/equipos`
@@ -246,8 +253,8 @@ El resto de la respuesta no cambia. `secciones` viene siempre; una sección en `
 ## 5. Criterios de aceptación
 
 1. **CA-1** · **Dado** que entro con una cuenta registrada, o abro la app con la sesión guardada, **cuando** termina el arranque, **entonces** veo Inicio con la barra Inicio · Explorar · Perfil y no el diagnóstico. Atrás desde Inicio sale de la app; desde Explorar o Perfil vuelve a Inicio.
-2. **CA-2** · **Dado** que `secciones` trae `creador` y `arbitro`, **cuando** se pinta Inicio, **entonces** "Tus secciones" muestra las dos filas con los textos de §3.3. **Dado** que las dos vienen en `null`, **entonces** el bloque "Tus secciones" no aparece.
-3. **CA-3** · **Dado** que soy árbitro con un partido `hoy`, **cuando** toco la fila Árbitro, **entonces** se abre la ruta `Planilla` con ese `partidoId`. **Dado** que no tengo partido hoy, **entonces** se abre `SeccionArbitro`. La fila Creador abre `SeccionCreador` y el botón flotante abre `CrearTorneo`.
+2. **CA-2** · **Dado** que `secciones` trae `creador` y `arbitro`, **cuando** se pinta Inicio, **entonces** "Tus secciones" muestra los dos bloques y se piden sus detalles. **Dado** que solo viene una, **entonces** solo se muestra y se pide esa. **Dado** que las dos vienen en `null`, **entonces** "Tus secciones" no aparece y no se pide ningún detalle.
+3. **CA-3** · **Dado** el bloque Árbitro con su partido que sigue, **cuando** toco el partido, **entonces** se abre `Planilla` con ese `partidoId`; la cabecera abre `SeccionArbitro`. La cabecera de Creador abre `SeccionCreador`, su torneo en espera abre `InscripcionesTorneo` y el botón flotante abre `CrearTorneo`.
 4. **CA-4** · **Dado** que `yo/equipos` trae varios equipos con `proximoPartido`, **cuando** se pinta Inicio, **entonces** "Tu próximo partido" muestra el de `fechaHora` más cercana, con el equipo local primero. **Dado** que ninguno tiene partido con fecha, **entonces** el bloque no aparece.
 5. **CA-5** · **Dado** un equipo de `yo/equipos`, **cuando** se pinta "Mis equipos", **entonces** muestra "Juegas" o "Delegas" según `rol` y el chip que le toca según la tabla de §3.3.
 6. **CA-6** · **Dado** que la cuenta no tiene equipos ni secciones, **cuando** se pinta Inicio, **entonces** veo el estado vacío con "Ir a Explorar" (que cambia a la pestaña Explorar) y el botón flotante "Crear torneo".
@@ -259,10 +266,13 @@ El resto de la respuesta no cambia. `secciones` viene siempre; una sección en `
 12. **CA-12** · **Dado** que el backend responde un deporte o un estado que la app no conoce, **entonces** la pantalla se pinta con el caso genérico y la app no se cierra.
 13. **CA-13** · **Dado** que vuelvo a Inicio desde otra pantalla, o deslizo hacia abajo, **entonces** los datos se vuelven a pedir.
 14. **CA-14** · Inicio y Perfil se ven bien en claro, en oscuro y con la letra al 130 %, sin textos cortados (emulador).
+15. **CA-15** · **Dado** un equipo de "Mis equipos" o "Tu próximo partido", **cuando** lo toco, **entonces** se abre `Torneo` con el `torneoId` de ese equipo.
+16. **CA-16** · **Dado** que estoy en la pestaña Explorar, **entonces** veo la pantalla de MOV-0005 sin flecha de volver y con la barra inferior; abrir un torneo y volver me deja en Explorar.
 
 ## 6. Fuera de alcance / qué NO debe cambiar
 
-- **Las pantallas de otras specs:** sección Creador (MOV-0008), sección Árbitro y planilla (MOV-0009), Crear torneo (MOV-0007) y Explorar con el detalle del torneo (MOV-0005). Aquí solo se declaran sus rutas y se enlazan (§11.1).
+- **Las pantallas de otras specs:** sección Creador (MOV-0008), sección Árbitro y planilla (MOV-0009), Crear torneo (MOV-0007) y Explorar con el detalle del torneo (MOV-0005). Aquí solo se enlazan (§11.1). De Explorar cambia una sola cosa: la flecha de volver pasa a ser opcional.
+- **Los bloques de sección de MOV-0010** (cabecera, partido que sigue, torneo en espera, error por bloque) no cambian de aspecto ni de comportamiento.
 - **Editar** el perfil deportivo, los datos personales o la foto.
 - **Pagar una multa o subir su comprobante** desde la app. El backend aún no lo ofrece para el jugador.
 - **El aviso de "cuenta bloqueada" en el login al arrancar.** Basta con volver al login; el aviso ya sale al intentar entrar (MOV-0002).
@@ -275,9 +285,9 @@ El resto de la respuesta no cambia. `secciones` viene siempre; una sección en `
 | Criterio | Prueba (clase › método) o verificación | Nivel |
 |---|---|---|
 | CA-1 | `RaizViewModelTest › CA-1 con sesion el destino es el inicio` y verificación en el emulador (Atrás) | ViewModel + emulador |
-| CA-2 | `InicioViewModelTest › CA-2 muestra solo las secciones que vienen` | ViewModel |
+| CA-2 | `InicioViewModelTest › MOV-0004 CA-2 …` (las dos, una sola y ninguna) | ViewModel |
 | CA-2 | `CuentaRepositoryImplTest › CA-2 lee secciones de me` (con las dos, con una y con ninguna) | Red (MockWebServer) |
-| CA-3 | `InicioViewModelTest › CA-3 el arbitro con partido hoy abre la planilla` | ViewModel |
+| CA-3 | Los de MOV-0010 que ya cubren el partido que sigue y el torneo en espera (`InicioViewModelTest › CA-2 …` y `› CA-4 …`), y verificación en el emulador | ViewModel + emulador |
 | CA-4 | `MisEquiposTest › CA-4 el proximo partido es el mas cercano` y `› CA-4 sin fechas no hay proximo partido` | Dominio |
 | CA-5 | `EstadoTramiteTest › CA-5 …` (un caso por fila de la tabla de §3.3) | Dominio |
 | CA-5 | `MisEquiposRepositoryImplTest › CA-5 convierte la respuesta de yo equipos` | Red (MockWebServer) |
@@ -291,6 +301,8 @@ El resto de la respuesta no cambia. `secciones` viene siempre; una sección en `
 | CA-12 | `MisEquiposRepositoryImplTest › CA-12 un deporte o estado desconocido no falla` | Red (MockWebServer) |
 | CA-13 | `InicioViewModelTest › CA-13 recargar vuelve a pedir los datos` | ViewModel |
 | CA-14 | Capturas del emulador | Emulador |
+| CA-15 | Verificación en el emulador (tocar un equipo abre su torneo) | Emulador |
+| CA-16 | Verificación en el emulador | Emulador |
 
 - Las pruebas usan las implementaciones falsas de `testutil/Fakes.kt`, no librerías de mocks.
 - Los JSON de las pruebas de red son los de §4.
@@ -323,29 +335,27 @@ Lista cerrada. Si hace falta tocar algo fuera de aquí, primero se actualiza est
 - `data/remote/dto/`: `SeccionesDto.kt`, `MiEquipoDto.kt`, `PerfilDto.kt`, `MultaDto.kt`
 - `data/repository/`: `MisEquiposRepositoryImpl.kt`, `PerfilRepositoryImpl.kt`, `MultasRepositoryImpl.kt`
 - `presentacion/principal/`: `PrincipalScreen.kt` (el `Scaffold` con la barra inferior y las tres pestañas)
-- `presentacion/inicio/`: `InicioScreen.kt`, `InicioState.kt`, `InicioViewModel.kt`
-- `presentacion/perfil/`: `PerfilScreen.kt`, `PerfilState.kt`, `PerfilViewModel.kt`
-- `presentacion/explorar/`: `ExplorarPendienteScreen.kt` (solo el estado vacío)
-- `presentacion/comun/`: `EstadosDePantalla.kt` (vacío, error con reintentar, esqueleto) y `EnConstruccionScreen.kt` (§11.1)
-- `ui/deporte/Deportes.kt` (icono y nombre por código de deporte)
-- `ui/formato/Formatos.kt` (fechas, horas y pesos)
-- `res/drawable/ic_*.xml` (los iconos nuevos)
+- `presentacion/perfil/`: `PerfilScreen.kt` y `PerfilViewModel.kt` (con su `PerfilState`)
+- `res/drawable/ic_*.xml` (los iconos nuevos: inicio, explorar y perfil de la barra)
 - Las pruebas de §7, en `app/src/test/…`
 - `docs/specs/evidencias/MOV-0004/`
 
 **Modificados**
 
+- `presentacion/inicio/InicioScreen.kt` e `InicioViewModel.kt` (ya existían por MOV-0010): se suman la carga de la cuenta con sus secciones, "Tu próximo partido", "Mis equipos" y el estado vacío; salen la lupa y el menú de la cuenta (pasan a la barra y a Perfil)
+- `presentacion/explorar/ExplorarScreen.kt`: `onVolver` opcional (sin flecha dentro de la pestaña)
+- `presentacion/comun/Componentes.kt`: el esqueleto de carga
 - `data/remote/dto/MeResponseDto.kt` y `domain/model/Cuenta.kt`: se agrega `secciones`
 - `data/repository/CuentaRepositoryImpl.kt`: convierte `secciones`
 - `di/AppContainer.kt`: las API, los repositorios y los casos de uso nuevos
-- `presentacion/navigation/Rutas.kt` y `AppNavigation.kt`: las rutas de §11.1; después de entrar se abre `Principal`
+- `presentacion/navigation/Rutas.kt` y `AppNavigation.kt`: la ruta `Inicio` pasa a llamarse `Principal`; después de entrar se abre `Principal`
 - `presentacion/navigation/RaizViewModel.kt`: solo el comentario de `DestinoRaiz.INICIO`
 - `res/values/strings.xml`
-- `app/src/test/…/testutil/Fakes.kt`, `RaizViewModelTest.kt` y `CuentaRepositoryImplTest.kt`
+- `app/src/test/…/testutil/Fakes.kt`, `RaizViewModelTest.kt`, `CuentaRepositoryImplTest.kt` e `InicioViewModelTest.kt` (los casos de MOV-0010 se conservan; cambian los dos que decían cuándo aparece una sección)
 - `docs/arquitectura.md`: §1 (secciones en lugar de modos), §3 (los paquetes nuevos) y §8 (la navegación real)
 - `docs/specs/README.md` y esta spec (estado y registro)
 
-**`testTag` mínimos:** `nav_inicio`, `nav_explorar`, `nav_perfil`, `seccion_creador`, `seccion_arbitro`, `fab_crear_torneo`, `inicio_ir_a_explorar`, `inicio_reintentar`, `perfil_reintentar`, `perfil_diagnostico` y `perfil_cerrar_sesion`.
+**`testTag` mínimos:** `nav_inicio`, `nav_explorar`, `nav_perfil`, `inicio_creador`, `inicio_arbitro` e `inicio_crear_torneo` (los de MOV-0010), `inicio_proximo_partido_equipo`, `inicio_equipo`, `inicio_ir_a_explorar`, `inicio_reintentar`, `perfil_reintentar`, `perfil_diagnostico` y `perfil_cerrar_sesion`.
 
 ## 10. Datos de prueba
 
@@ -372,7 +382,7 @@ Lista cerrada. Si hace falta tocar algo fuera de aquí, primero se actualiza est
 
 ### 11.1 Rutas compartidas con las otras specs
 
-Las otras pantallas se construyen **en paralelo** en sus propias ramas. Para que nadie se bloquee, esta spec declara sus rutas en `Rutas.kt` **con estos nombres exactos** y las registra en `AppNavigation.kt`:
+Las rutas de las otras pantallas ya existen en `Rutas.kt` con estos nombres (las fijó esta spec en su borrador y las llenaron MOV-0007 a MOV-0009):
 
 | Ruta | Qué abre | La llena |
 |---|---|---|
@@ -382,13 +392,13 @@ Las otras pantallas se construyen **en paralelo** en sus propias ramas. Para que
 | `Planilla(partidoId: String)` | Planilla de un partido | MOV-0009 |
 | `CrearTorneo` | Crear torneo en tres pasos | MOV-0007 |
 
-- **Mientras su spec no esté en `main`,** cada una de las cuatro últimas muestra `EnConstruccionScreen`: el título de la pantalla, "Estamos construyendo esta pantalla" y la flecha de volver. Es temporal y se borra cuando la última se reemplace.
-- **Si al hacer `git pull --rebase` la ruta ya existe** porque otra spec llegó primero, se conserva la pantalla real y se descarta el `EnConstruccionScreen` de esa ruta.
-- **`InicioScreen` no conoce las rutas.** Recibe funciones (`onAbrirCreador`, `onAbrirArbitro`, `onAbrirPlanilla(partidoId)`, `onCrearTorneo`, `onCompletarRegistro`) y `AppNavigation` las conecta.
+- **Las cuatro tienen ya su pantalla real,** así que no hace falta ninguna pantalla "en construcción".
+- **`InicioScreen` no conoce las rutas.** Recibe funciones (`onAbrirCreador`, `onAbrirArbitro`, `onAbrirPlanilla(partidoId)`, `onAbrirInscripciones(torneo)`, `onAbrirTorneo(torneoId)`, `onCrearTorneo`, `onExplorar`, `onCompletarRegistro`) y `AppNavigation` las conecta.
 
 ### 11.2 Las tres pestañas
 
 - `Principal` es **una sola ruta**. La pestaña elegida se guarda con `rememberSaveable` dentro de `PrincipalScreen`; no hay un `NavHost` anidado.
+- Cada pestaña conserva su posición al cambiar de pestaña (`SaveableStateHolder`).
 - Cada pestaña pide su ViewModel con `viewModel(factory = …)`, como dice la arquitectura.
 
 ### 11.3 Diferencias con el prototipo, a propósito
@@ -400,8 +410,17 @@ Las otras pantallas se construyen **en paralelo** en sus propias ramas. Para que
 
 ### 11.4 Pendientes que no bloquean
 
+- Tocar "Tu próximo partido" abre el torneo, no el partido: todavía no hay pantalla de partido para el jugador.
 - Que la multa traiga el nombre del torneo: se pide como spec del backend si hace falta.
 - Editar el perfil deportivo: spec propia. `PUT /api/supercopa/mi-perfil` ya existe.
+
+### 11.5 Decisiones del 14-nov-2026 (el código adelantó a la spec)
+
+La spec se escribió el 9-nov. Entre el 10 y el 11 llegaron a `main` Explorar y el detalle del torneo (MOV-0005), las secciones (MOV-0007 a 0009) y el Inicio provisional con su diseño (MOV-0010). David aprobó estos tres ajustes:
+
+1. **La pestaña Explorar abre la pantalla real,** no un estado vacío.
+2. **"Mis equipos" y "Tu próximo partido" abren el detalle del torneo,** que ya existe.
+3. **No hay pantallas "en construcción"** y el Inicio provisional se reemplaza por este, **conservando el diseño de sus bloques de sección.** Por eso "Tus secciones" no usa las filas simples del borrador (§3.3): quitar el partido que sigue o el torneo en espera habría sido perder algo que ya funciona.
 
 ## 12. Registro
 
@@ -409,3 +428,6 @@ Las otras pantallas se construyen **en paralelo** en sus propias ramas. Para que
 |---|---|
 | 2026-11-09 | Borrador para revisión del usuario |
 | 2026-11-09 | Reescrita con el contrato real del backend (0026 y 0029 ya están en `main`): `secciones` en `/me`, `yo/equipos`, `mi-perfil` y `multas/mias`. Se agregan las rutas compartidas, los estados, los textos, el plan de pruebas y la lista de archivos |
+| 2026-11-14 | Aprobada por David con los tres ajustes de §11.5 y pasa a `en-curso`. Se actualizan el alcance, CA-2, CA-3, CA-15, CA-16, el plan de pruebas y la lista de archivos |
+| 2026-11-14 | Implementada. 283 tests, 0 fallos (`evidencias/MOV-0004/02-green.txt`). Las pruebas se escribieron junto con el código, no antes: en lugar de un RED previo se hizo la prueba de dientes de `sdd.md` §6, rompiendo el código a propósito (`01-dientes.txt`, 6 pruebas fallan). El contrato se comprobó contra el backend desplegado con las cuentas del seed. Dentro del bloque Árbitro, "Tu próximo partido" pasa a decir "Próximo que arbitras", para no repetir el título del bloque del jugador. Pasa a `en-revision` |
+| 2026-11-14 | Verificada en el emulador (Pixel 8) contra el backend desplegado, con `arbitro02`, `jugador01` y `admin01`: Inicio con sus secciones, el partido de hoy en naranja, "Tu próximo partido", "Mis equipos" (abre el torneo), el estado vacío, Explorar en su pestaña sin flecha, Atrás, Perfil y cerrar sesión. Capturas 03 a 12 en `evidencias/MOV-0004/` (oscuro, claro y letra al 130 %). **Sin verificar en el emulador:** el modo avión (CA-11, cubierto por pruebas), el giro del teléfono y una cuenta recién creada |

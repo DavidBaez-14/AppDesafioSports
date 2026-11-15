@@ -24,14 +24,14 @@ import co.edu.ufps.desafiosports.presentacion.creador.InscripcionesScreen
 import co.edu.ufps.desafiosports.presentacion.creador.SeccionCreadorScreen
 import co.edu.ufps.desafiosports.presentacion.diagnostico.AccesoProvisional
 import co.edu.ufps.desafiosports.presentacion.diagnostico.DiagnosticoScreen
-import co.edu.ufps.desafiosports.presentacion.inicio.InicioScreen
+import co.edu.ufps.desafiosports.presentacion.principal.PrincipalScreen
 import co.edu.ufps.desafiosports.presentacion.explorar.ExplorarScreen
 import co.edu.ufps.desafiosports.presentacion.explorar.TorneoScreen
 
 /**
  * Grafo de la app (MOV-0002).
  *
- * Arranque → Login o Inicio (MOV-0010). Cerrar sesión desde cualquier lado
+ * Arranque → Login o la pantalla principal (MOV-0004). Cerrar sesión desde cualquier lado
  * vuelve al login y borra la pila, así Atrás no regresa a una pantalla de sesión cerrada.
  */
 @Composable
@@ -59,7 +59,7 @@ fun AppNavigation(
                 onDestino = { destino ->
                     val ruta: Any = when (destino) {
                         DestinoRaiz.LOGIN -> Login
-                        DestinoRaiz.INICIO -> Inicio
+                        DestinoRaiz.INICIO -> Principal
                         // Sin configuración completa no hay sesión posible: el diagnóstico dice qué falta.
                         DestinoRaiz.DIAGNOSTICO -> Diagnostico
                     }
@@ -72,7 +72,7 @@ fun AppNavigation(
         composable<Login> {
             LoginScreen(
                 onIngresado = {
-                    navController.navigate(Inicio) {
+                    navController.navigate(Principal) {
                         popUpTo<Login> { inclusive = true }
                     }
                 },
@@ -117,20 +117,26 @@ fun AppNavigation(
         composable<CompletarRegistro> {
             CompletarRegistroScreen(
                 onRegistrado = {
-                    navController.navigate(Inicio) {
+                    navController.navigate(Principal) {
                         popUpTo(navController.graph.id) { inclusive = true }
                     }
                 },
             )
         }
-        composable<Inicio> {
-            InicioScreen(
+        composable<Principal> {
+            PrincipalScreen(
                 onAbrirArbitro = { navController.navigate(SeccionArbitro) },
                 onAbrirPlanilla = { partidoId -> navController.navigate(Planilla(partidoId)) },
                 onAbrirCreador = { navController.navigate(SeccionCreador) },
-                onAbrirTorneo = { torneo -> navController.navigate(InscripcionesTorneo(torneo.id, torneo.nombre)) },
+                onAbrirInscripciones = { torneo -> navController.navigate(InscripcionesTorneo(torneo.id, torneo.nombre)) },
+                onAbrirTorneo = { torneoId, enlaceToken -> navController.navigate(Torneo(torneoId, enlaceToken)) },
                 onCrearTorneo = { navController.navigate(CrearTorneo) },
-                onExplorar = { navController.navigate(Explorar()) },
+                // Sesión de una cuenta sin registro en el backend: no hay Inicio que mostrar (CA-10).
+                onCompletarRegistro = {
+                    navController.navigate(CompletarRegistro) {
+                        popUpTo(navController.graph.id) { inclusive = true }
+                    }
+                },
                 onAbrirDiagnostico = if (BuildConfig.DEBUG) {
                     { navController.navigate(Diagnostico) }
                 } else {

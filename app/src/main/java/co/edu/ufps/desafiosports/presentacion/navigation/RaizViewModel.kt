@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 enum class DestinoRaiz {
     LOGIN,
 
-    /** Con sesión. Hoy es el diagnóstico (inicio provisional); Inicio llega con su propia spec. */
+    /** Con sesión: la pantalla principal, que abre en Inicio (MOV-0004). */
     INICIO,
 
     /** Falta configurar local.properties: el diagnóstico dice qué. */

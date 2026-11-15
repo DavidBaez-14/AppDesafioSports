@@ -52,6 +52,17 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.create
 import co.edu.ufps.desafiosports.data.remote.api.TorneosApi
+import co.edu.ufps.desafiosports.data.remote.api.CompeticionApi
+import co.edu.ufps.desafiosports.data.remote.api.FinanzasApi
+import co.edu.ufps.desafiosports.data.repository.MisEquiposRepositoryImpl
+import co.edu.ufps.desafiosports.data.repository.MultasRepositoryImpl
+import co.edu.ufps.desafiosports.data.repository.PerfilRepositoryImpl
+import co.edu.ufps.desafiosports.domain.repository.MisEquiposRepository
+import co.edu.ufps.desafiosports.domain.repository.MultasRepository
+import co.edu.ufps.desafiosports.domain.repository.PerfilRepository
+import co.edu.ufps.desafiosports.domain.use_case.competicion.ObtenerMiPerfilUseCase
+import co.edu.ufps.desafiosports.domain.use_case.competicion.ObtenerMisEquiposUseCase
+import co.edu.ufps.desafiosports.domain.use_case.finanzas.ObtenerMisMultasUseCase
 import co.edu.ufps.desafiosports.data.repository.TorneosRepositoryImpl
 import co.edu.ufps.desafiosports.domain.repository.TorneosRepository
 import co.edu.ufps.desafiosports.domain.use_case.competicion.AbrirTorneoPorEnlaceUseCase
@@ -94,6 +105,8 @@ class AppContainer(val configuracion: Configuracion) {
     private val arbitrajeApi: ArbitrajeApi by lazy { retrofit.create() }
     private val creadorApi: CreadorApi by lazy { retrofit.create() }
     private val torneosApi: TorneosApi by lazy { retrofit.create() }
+    private val competicionApi: CompeticionApi by lazy { retrofit.create() }
+    private val finanzasApi: FinanzasApi by lazy { retrofit.create() }
 
     // ── Repositorios ───────────────────────────────────────────────────────
     val sesionRepository: SesionRepository by lazy { SesionRepositoryImpl(supabase.auth) }
@@ -139,6 +152,14 @@ class AppContainer(val configuracion: Configuracion) {
     val explorarTorneos by lazy { ExplorarTorneosUseCase(torneosRepository) }
     val obtenerTorneo by lazy { ObtenerTorneoUseCase(torneosRepository) }
     val abrirTorneoPorEnlace by lazy { AbrirTorneoPorEnlaceUseCase(torneosRepository) }
+
+    // Inicio y Perfil (MOV-0004)
+    val misEquiposRepository: MisEquiposRepository by lazy { MisEquiposRepositoryImpl(competicionApi, erroresHttp) }
+    val perfilRepository: PerfilRepository by lazy { PerfilRepositoryImpl(competicionApi, erroresHttp) }
+    val multasRepository: MultasRepository by lazy { MultasRepositoryImpl(finanzasApi, erroresHttp) }
+    val obtenerMisEquipos by lazy { ObtenerMisEquiposUseCase(misEquiposRepository) }
+    val obtenerMiPerfil by lazy { ObtenerMiPerfilUseCase(perfilRepository) }
+    val obtenerMisMultas by lazy { ObtenerMisMultasUseCase(multasRepository) }
 
     companion object {
         /** Lee la configuración que Gradle copió de local.properties a BuildConfig. */

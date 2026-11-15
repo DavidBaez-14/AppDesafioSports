@@ -291,9 +291,9 @@ Firmes y anchos, hechos para el pulgar.
 
 ### Navigation
 - **Barra superior (TopAppBar):** fondo igual al de la pantalla (no se separa), título en title (Barlow SemiBold 22), flecha atrás Rounded a la izquierda. El Atrás del sistema siempre funciona.
-- **Barra superior de Inicio:** el logotipo en una línea ("DESAFÍO SPORTS", 26) a la izquierda y el avatar de la cuenta a la derecha, que abre el menú (cerrar sesión; en debug, el diagnóstico).
+- **Barra superior de Inicio:** solo el logotipo en una línea ("DESAFÍO SPORTS", 26). Buscar torneos y la cuenta viven en la barra inferior (Explorar y Perfil).
 - **FAB "Crear torneo"** (Inicio y Creador): extendido, naranja, sin elevación (Regla Plana). Es la acción principal de esas pantallas.
-- **Pendiente:** barra de navegación inferior (Inicio · Explorar · Perfil), con MOV-0004. No se muestra mientras sus destinos no existan.
+- **Barra inferior** (Inicio · Explorar · Perfil, MOV-0004): fondo `contenedor-bajo`, la pestaña elegida en tinta principal sobre una píldora `contenedor-maximo` y las demás en tinta secundaria. Sin naranja: no es la acción principal de ninguna pantalla.
 
 ### Logotipo (signature)
 Tipográfico y provisional: "DESAFÍO" sobre "SPORTS", Barlow Condensed ExtraBold Itálica en mayúsculas, "SPORTS" en el color primario. Centrado en el arranque, alineado a la izquierda en el login. El logo definitivo lo reemplaza en un solo lugar.

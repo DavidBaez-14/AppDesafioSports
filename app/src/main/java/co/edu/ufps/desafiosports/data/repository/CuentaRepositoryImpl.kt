@@ -8,6 +8,9 @@ import co.edu.ufps.desafiosports.data.remote.red.llamarApi
 import co.edu.ufps.desafiosports.domain.model.Cuenta
 import co.edu.ufps.desafiosports.domain.model.DatosRegistro
 import co.edu.ufps.desafiosports.domain.model.Rol
+import co.edu.ufps.desafiosports.domain.model.SeccionDeArbitro
+import co.edu.ufps.desafiosports.domain.model.SeccionDeCreador
+import co.edu.ufps.desafiosports.domain.model.Secciones
 import co.edu.ufps.desafiosports.domain.repository.CuentaRepository
 
 class CuentaRepositoryImpl(
@@ -41,6 +44,10 @@ internal fun MeResponseDto.aDominio(): Cuenta = Cuenta(
     estado = estado.orEmpty(),
     roles = roles.aRoles(),
     rolesPendientes = rolesPendientes.aRoles(),
+    secciones = Secciones(
+        creador = secciones?.creador?.let { SeccionDeCreador(torneos = it.torneos ?: 0, porRevisar = it.porRevisar ?: 0) },
+        arbitro = secciones?.arbitro?.let { SeccionDeArbitro(partidosAsignados = it.partidosAsignados ?: 0) },
+    ),
 )
 
 private fun List<String>.aRoles(): Set<Rol> =

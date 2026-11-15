@@ -10,16 +10,17 @@
 
 Desafío Sports es la app Android multideporte de los torneos universitarios. Empieza solo con fútbol sala.
 
-**Tres modos sobre la misma cuenta:**
-- **Jugador**;
-- **Árbitro**;
-- **Creador**: administra solo los torneos que crea. No hay administradores globales.
+**Todos entran como jugador.** Además, una cuenta puede tener dos **secciones**, a las que se entra desde Inicio (MOV-0004):
+- **Árbitro**, si es árbitro de algún torneo;
+- **Creador**, si administra algún torneo: solo los que crea o le comparten. No hay administradores globales.
+
+Qué secciones tiene una cuenta lo dice el backend en `secciones` de `GET /api/auth/me`.
 
 Además está el **Visitante**, que entra sin sesión.
 
 | Necesidad | Quién la resuelve | Cómo |
 |---|---|---|
-| Sesión: correo y contraseña, Google, recuperar contraseña | **Supabase Auth** (proyecto Supabase #1) | `supabase-kt`, solo su módulo de Auth |
+| Sesión: correo y contraseña, Google, recuperar contraseña | **Supabase Auth** (el proyecto que diga `SUPABASE_URL`) | `supabase-kt`, solo su módulo de Auth |
 | Datos: torneos, equipos, partidos, multas… | **BackendCodeCup** (Spring Boot, puerto 8082) | REST con Retrofit. Cada petición lleva `Authorization: Bearer <JWT de Supabase>` |
 | Archivos (comprobantes de pago) | Supabase Storage, a través del backend | El backend firma una URL y la app sube el archivo con `PUT` |
 
@@ -96,7 +97,13 @@ app/src/main/java/co/edu/ufps/desafiosports/
 │   └── repository/            # …RepositoryImpl: llaman a la API o a Supabase y convierten DTO → modelo
 ├── presentacion/
 │   ├── navigation/            # Rutas (tipadas) y AppNavigation
-│   └── diagnostico/           # pantalla temporal de MOV-0001 (Screen + ViewModel + State)
+│   ├── principal/             # la barra inferior con Inicio, Explorar y Perfil
+│   ├── inicio/ · perfil/      # las pestañas del jugador
+│   ├── explorar/              # Explorar y el detalle del torneo
+│   ├── arbitro/ · creador/    # las secciones y sus pantallas (planilla, crear torneo, inscripciones)
+│   ├── acceso/                # login, crear cuenta, completar registro, recuperar contraseña
+│   ├── comun/                 # piezas que comparten las pantallas con listas
+│   └── diagnostico/           # diagnóstico de conexión de MOV-0001 (solo en debug)
 └── ui/
     └── theme/                 # Color, Type, Shape y Theme con los tokens del Design System
 ```
@@ -216,14 +223,17 @@ El cliente HTTP (`data/remote/red/ClienteHttp.kt`) **se comporta igual que `src/
 ## 8. Navegación
 
 - **Una sola Activity** con Navigation Compose y rutas tipadas (`presentacion/navigation/Rutas.kt`).
-- **Hoy** solo existe `Diagnostico`, una pantalla temporal.
-- **Plan**, que llega con las specs de acceso y modos:
+- **Grafo actual** (MOV-0004):
 
 ```
-Arranque ──▶ Acceso (login, registro, revisa tu correo, completar registro, recuperar, bloqueada)
-         └─▶ Elegir modo ──▶ Grafo del modo (Jugador | Árbitro | Creador), cada uno con su barra inferior
-                              └─ pantallas compartidas: detalle de torneo, de partido y perfil
+Arranque ──▶ Acceso (login, crear cuenta, revisa tu correo, completar registro, recuperar contraseña)
+         └─▶ Principal ── barra inferior: Inicio · Explorar · Perfil
+                └─ desde Inicio: Sección Árbitro ▶ Planilla · Sección Creador ▶ Inscripciones · Crear torneo
+                └─ desde cualquier pestaña: Torneo (detalle)
 ```
+
+- **`Principal` es una sola ruta.** La pestaña elegida se guarda dentro de `PrincipalScreen` y no hay un grafo anidado. Atrás desde Explorar o Perfil vuelve a Inicio; desde Inicio sale de la app.
+- **El visitante sin cuenta** entra a `Explorar` desde el login, fuera de `Principal`.
 
 - El botón Atrás del sistema siempre funciona; nunca se intercepta para atrapar al usuario.
 

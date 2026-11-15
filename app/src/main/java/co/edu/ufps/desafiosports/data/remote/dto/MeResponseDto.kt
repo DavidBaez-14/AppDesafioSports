@@ -16,4 +16,6 @@ data class MeResponseDto(
     val estado: String? = null,
     val roles: List<String> = emptyList(),
     val rolesPendientes: List<String> = emptyList(),
+    /** Backend 0026: qué secciones tiene la cuenta (MOV-0004). */
+    val secciones: SeccionesDto? = null,
 )

@@ -385,6 +385,54 @@ fun Cargando(modifier: Modifier = Modifier) {
 
 private const val ESPERA_ANTES_DE_EXPLICAR_MS = 6_000L
 
+/**
+ * Bloques en el lugar de la lista mientras llega la primera carga (MOV-0004): dicen dónde va a
+ * aparecer el contenido sin tapar la barra ni el botón flotante. Si tarda, explica la espera
+ * igual que [Cargando].
+ */
+@Composable
+fun EsqueletoDeLista(modifier: Modifier = Modifier, bloques: Int = 3) {
+    val descripcion = stringResource(R.string.estado_cargando)
+    var tardando by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        delay(ESPERA_ANTES_DE_EXPLICAR_MS)
+        tardando = true
+    }
+    Column(
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        modifier = modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp)
+            .semantics { contentDescription = descripcion },
+    ) {
+        Box(
+            Modifier
+                .fillMaxWidth(0.55f)
+                .height(32.dp)
+                .clip(MaterialTheme.shapes.small)
+                .background(MaterialTheme.colorScheme.surfaceContainer),
+        )
+        repeat(bloques) {
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .height(96.dp)
+                    .clip(MaterialTheme.shapes.large)
+                    .background(colorDePanel()),
+            )
+        }
+        AnimatedVisibility(visible = tardando, enter = fadeIn()) {
+            Text(
+                text = stringResource(R.string.estado_despertando),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
+            )
+        }
+    }
+}
+
 // ── MOV-0010 ────────────────────────────────────────────────────────────────
 
 /**

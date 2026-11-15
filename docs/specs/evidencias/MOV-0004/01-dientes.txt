@@ -1,0 +1,10 @@
+Prueba de dientes (sdd.md 6): se rompio el codigo a proposito y fallaron las pruebas esperadas.
+Mutaciones: pedir la seccion Arbitro aunque no exista; tratar todo fallo como si hubiera datos; maxByOrNull en vez de minByOrNull; 'Falta comprobante' -> 'En revision'.
+EstadoTramiteTest > CA-5 delegado pendiente sin comprobante ve Falta comprobante FAILED
+MisEquiposTest > CA-4 el proximo partido es el mas cercano FAILED
+InicioViewModelTest > MOV-0004 CA-11 sin conexion muestra reintentar y se recupera FAILED
+InicioViewModelTest > MOV-0004 CA-4 muestra el proximo partido mas cercano entre los equipos FAILED
+InicioViewModelTest > MOV-0004 CA-2 sin secciones no se pide ningun detalle FAILED
+InicioViewModelTest > MOV-0004 CA-11 si fallan los equipos sin datos previos tambien se ofrece reintentar FAILED
+31 tests completed, 6 failed
+BUILD FAILED in 22s

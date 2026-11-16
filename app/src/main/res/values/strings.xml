@@ -455,4 +455,86 @@
     <string name="perfil_pierna_derecha">Pierna derecha</string>
     <string name="perfil_pierna_izquierda">Pierna izquierda</string>
     <string name="perfil_pierna_ambas">Ambas piernas</string>
+
+    <!-- Gestión del torneo (MOV-0011) -->
+    <string name="accion_listo">Listo</string>
+    <string name="gestion_titulo">Gestionar torneo</string>
+    <string name="gestion_inscripciones_detalle">Aprueba o rechaza a los equipos</string>
+    <string name="gestion_arbitros">Árbitros</string>
+    <string name="gestion_arbitros_detalle">Invita árbitros y dales permisos</string>
+    <string name="gestion_partidos">Partidos</string>
+    <string name="gestion_partidos_detalle">Genera los partidos y ponles árbitro</string>
+
+    <string name="arbitros_invitar">Invitar árbitro</string>
+    <string name="arbitros_vacio_titulo">Aún no hay árbitros</string>
+    <string name="arbitros_vacio_detalle">Invita a quien va a llevar la planilla de los partidos.</string>
+    <string name="arbitros_del_torneo">Árbitros del torneo</string>
+    <string name="arbitros_invitaciones">Invitaciones pendientes</string>
+    <string name="arbitro_todos">Arbitra todos los partidos</string>
+    <string name="arbitro_todos_lectura">%1$s arbitra todos los partidos</string>
+    <string name="arbitro_quitar">Quitar</string>
+    <string name="arbitro_quitar_lectura">Quitar a %1$s</string>
+    <string name="arbitros_quitar_titulo">¿Quitar a %1$s?</string>
+    <string name="arbitros_quitar_detalle">Dejará de ser árbitro del torneo y perderá los partidos que tenía asignados.</string>
+    <string name="arbitros_aviso_quitado">%1$s ya no es árbitro del torneo</string>
+    <string name="arbitros_aviso_invitacion_cancelada">Invitación cancelada</string>
+    <string name="invitacion_por_enlace">Cualquiera con el enlace</string>
+    <string name="invitacion_creada">Creada %1$s</string>
+    <string name="invitacion_compartir">Compartir</string>
+    <string name="invitacion_cancelar">Cancelar invitación</string>
+    <string name="invitar_correo">Correo (opcional)</string>
+    <string name="invitar_ayuda">Con correo, solo esa persona puede aceptar. Sin correo, acepta quien abra el enlace.</string>
+    <string name="invitar_confirmar">Crear invitación</string>
+    <string name="invitar_creando">Creando…</string>
+    <string name="invitar_compartir_texto">Te invito a arbitrar en %1$s. Abre Desafío Sports, entra a Perfil y pega este enlace en «Tengo una invitación»: %2$s</string>
+
+    <string name="partidos_vacio_titulo">Aún no hay partidos</string>
+    <string name="partidos_vacio_detalle">Se arman solos según el formato del torneo.</string>
+    <plurals name="partidos_equipos_aprobados">
+        <item quantity="one">%1$d equipo aprobado</item>
+        <item quantity="other">%1$d equipos aprobados</item>
+    </plurals>
+    <string name="partidos_generar">Generar partidos</string>
+    <string name="partidos_generando">Generando…</string>
+    <string name="partidos_faltan_equipos">Necesitas al menos 2 equipos aprobados. Tienes %1$d.</string>
+    <string name="partidos_torneo_borrador">Publica el torneo antes de generar los partidos.</string>
+    <string name="partidos_torneo_finalizado">El torneo ya terminó.</string>
+    <string name="partidos_confirmar_titulo">¿Empezar el torneo?</string>
+    <string name="partidos_confirmar_detalle">Al generar los partidos el torneo empieza y deja de recibir inscripciones.</string>
+    <string name="partidos_confirmar">Empezar y generar</string>
+    <string name="partidos_jornada">Jornada %1$d</string>
+    <string name="partidos_grupo_jornada">Grupo %1$s · Jornada %2$d</string>
+    <string name="partidos_grupo">Grupo %1$s</string>
+    <string name="partidos_fase_grupos">Fase de grupos</string>
+    <string name="fase_repechaje">Repechaje</string>
+    <string name="fase_octavos">Octavos de final</string>
+    <string name="fase_cuartos">Cuartos de final</string>
+    <string name="fase_semis">Semifinales</string>
+    <string name="fase_tercer_puesto">Tercer puesto</string>
+    <string name="fase_final">Final</string>
+    <string name="partido_sin_arbitro">Sin árbitro</string>
+    <string name="partido_descansa">Descansa</string>
+    <string name="partido_marcador">%1$d–%2$d</string>
+    <string name="asignar_titulo">Árbitros del partido</string>
+    <string name="asignar_sin_arbitros">Este torneo todavía no tiene árbitros.</string>
+    <string name="asignar_invitar">Invitar árbitros</string>
+
+    <string name="perfil_invitacion">Tengo una invitación</string>
+    <string name="invitacion_titulo">Invitación</string>
+    <string name="invitacion_explicacion">Pega el enlace que te enviaron para unirte a un torneo como árbitro u organizador.</string>
+    <string name="invitacion_enlace">Enlace o código</string>
+    <string name="invitacion_buscar">Buscar</string>
+    <string name="invitacion_buscando">Buscando…</string>
+    <string name="invitacion_rol_arbitro">árbitro</string>
+    <string name="invitacion_rol_admin">organizador</string>
+    <string name="invitacion_rol_delegado">delegado</string>
+    <string name="invitacion_te_invitan">Te invitan como %1$s</string>
+    <string name="invitacion_te_invitan_sin_rol">Tienes una invitación</string>
+    <string name="invitacion_invita">Invita %1$s</string>
+    <string name="invitacion_para">Es para la cuenta %1$s</string>
+    <string name="invitacion_no_vigente">Esta invitación ya fue usada o cancelada.</string>
+    <string name="invitacion_aceptar">Aceptar</string>
+    <string name="invitacion_aceptando">Aceptando…</string>
+    <string name="invitacion_aceptada_titulo">Invitación aceptada</string>
+    <string name="invitacion_aceptada_detalle">Vuelve a Inicio para ver tu sección nueva.</string>
 </resources>

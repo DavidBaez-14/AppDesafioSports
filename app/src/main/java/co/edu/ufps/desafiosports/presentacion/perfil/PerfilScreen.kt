@@ -75,25 +75,29 @@ data class AccionesPerfil(
     val onAvisoMostrado: () -> Unit = {},
     /** Solo en debug: el diagnóstico de conexión de MOV-0001. */
     val onAbrirDiagnostico: (() -> Unit)? = null,
+    /** Aceptar una invitación pegando su enlace (MOV-0011). */
+    val onAbrirInvitacion: () -> Unit = {},
 )
 
 /** Perfil (MOV-0004). Tercera pestaña de la pantalla principal. */
 @Composable
 fun PerfilScreen(
     onAbrirDiagnostico: (() -> Unit)?,
+    onAbrirInvitacion: () -> Unit,
     viewModel: PerfilViewModel = viewModel(factory = PerfilViewModel.Factory),
 ) {
     LifecycleResumeEffect(Unit) {
         viewModel.alVolver()
         onPauseOrDispose { }
     }
-    val acciones = remember(viewModel, onAbrirDiagnostico) {
+    val acciones = remember(viewModel, onAbrirDiagnostico, onAbrirInvitacion) {
         AccionesPerfil(
             onReintentar = viewModel::cargar,
             onRefrescar = viewModel::refrescar,
             onCerrarSesion = viewModel::cerrarSesion,
             onAvisoMostrado = viewModel::onAvisoMostrado,
             onAbrirDiagnostico = onAbrirDiagnostico,
+            onAbrirInvitacion = onAbrirInvitacion,
         )
     }
     PerfilContenido(state = viewModel.state, hoy = LocalDate.now(), acciones = acciones)
@@ -398,6 +402,15 @@ private fun Cuenta(state: PerfilState, acciones: AccionesPerfil) {
             titulo = stringResource(R.string.perfil_deportivo),
             detalle = textoDelPerfilDeportivo(state.perfil),
             modifier = Modifier.testTag("perfil_deportivo"),
+        )
+        Divisor()
+        FilaDeDato(
+            titulo = stringResource(R.string.perfil_invitacion),
+            detalle = null,
+            fin = { FlechaFila() },
+            modifier = Modifier
+                .clickable(role = Role.Button, onClick = acciones.onAbrirInvitacion)
+                .testTag("perfil_invitacion"),
         )
         acciones.onAbrirDiagnostico?.let { abrir ->
             Divisor()

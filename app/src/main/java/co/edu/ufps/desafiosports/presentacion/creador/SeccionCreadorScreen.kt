@@ -78,6 +78,7 @@ import co.edu.ufps.desafiosports.presentacion.comun.CifraDeCupos
 fun SeccionCreadorScreen(
     onVolver: () -> Unit,
     onCrearTorneo: () -> Unit,
+    onRevisarTorneo: (TorneoDeCreador) -> Unit,
     onAbrirTorneo: (TorneoDeCreador) -> Unit,
     viewModel: SeccionCreadorViewModel = viewModel(factory = SeccionCreadorViewModel.Factory),
 ) {
@@ -91,6 +92,7 @@ fun SeccionCreadorScreen(
         onReintentar = viewModel::cargar,
         onRefrescar = viewModel::refrescar,
         onCrearTorneo = onCrearTorneo,
+        onRevisarTorneo = onRevisarTorneo,
         onAbrirTorneo = onAbrirTorneo,
         onAvisoMostrado = viewModel::onAvisoMostrado,
     )
@@ -104,6 +106,7 @@ fun SeccionCreadorContenido(
     onReintentar: () -> Unit,
     onRefrescar: () -> Unit,
     onCrearTorneo: () -> Unit,
+    onRevisarTorneo: (TorneoDeCreador) -> Unit,
     onAbrirTorneo: (TorneoDeCreador) -> Unit,
     onAvisoMostrado: () -> Unit,
     modifier: Modifier = Modifier,
@@ -188,7 +191,7 @@ fun SeccionCreadorContenido(
                             item(key = "titulo_revisar") { EncabezadoBloque(stringResource(R.string.creador_por_revisar)) }
                             itemsIndexed(porRevisar, key = { _, t -> "revisar_${t.id}" }) { indice, torneo ->
                                 if (indice > 0) Separador()
-                                FilaPorRevisar(torneo, onAbrirTorneo)
+                                FilaPorRevisar(torneo, onRevisarTorneo)
                             }
                         }
                         item(key = "titulo_torneos") { EncabezadoBloque(stringResource(R.string.creador_mis_torneos)) }
@@ -295,7 +298,7 @@ private val torneosDeEjemplo = listOf(
 @Composable
 private fun SeccionCreadorPreview() {
     DesafioSportsTheme {
-        SeccionCreadorContenido(SeccionCreadorState(cargando = false, torneos = torneosDeEjemplo), {}, {}, {}, {}, {}, {})
+        SeccionCreadorContenido(SeccionCreadorState(cargando = false, torneos = torneosDeEjemplo), {}, {}, {}, {}, {}, {}, {})
     }
 }
 
@@ -303,6 +306,6 @@ private fun SeccionCreadorPreview() {
 @Composable
 private fun SeccionCreadorVaciaPreview() {
     DesafioSportsTheme {
-        SeccionCreadorContenido(SeccionCreadorState(cargando = false, torneos = emptyList()), {}, {}, {}, {}, {}, {})
+        SeccionCreadorContenido(SeccionCreadorState(cargando = false, torneos = emptyList()), {}, {}, {}, {}, {}, {}, {})
     }
 }

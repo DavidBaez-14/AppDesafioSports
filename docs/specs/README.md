@@ -18,8 +18,9 @@
 | [MOV-0008](MOV-0008-seccion-creador.md) | Sección Creador, mis torneos y por revisar | hecha | F3 | David | MOV-0007 · backend 0024 y 0029 | `mov-0007-crear-torneo` |
 | [MOV-0009](MOV-0009-seccion-arbitro-y-planilla.md) | Sección Árbitro y planilla del partido | hecha | F2 | David | MOV-0003 · backend 0025 y 0029 | `mov-0009-seccion-arbitro` |
 | [MOV-0010](MOV-0010-diseno-secciones.md) | Diseño de las secciones Árbitro y Creador, e Inicio provisional | hecha | F2 | David | MOV-0007, MOV-0008, MOV-0009 | `mov-0010-diseno-secciones` |
+| [MOV-0011](MOV-0011-arbitros-y-partidos.md) | Gestión del torneo, árbitros y partidos automáticos | en-revision | F3 | David | MOV-0004, MOV-0008, MOV-0009 · backend 0024 y 0025 | `mov-0011-arbitros-y-partidos` |
 
-- **Todo lo anterior está en `main`** (16-nov-2026). MOV-0003 sigue `en-revision` solo porque falta probar el registro real con un correo propio.
+- **MOV-0001 a MOV-0010 están en `main`** (16-nov-2026). **MOV-0011** está en su rama: falta probar en el emulador generar los partidos y asignar árbitros con un torneo que tenga dos equipos aprobados. MOV-0003 sigue `en-revision` solo porque falta probar el registro real con un correo propio.
 - **MOV-0005, 0007 y 0008 se pusieron al día el 16-nov:** sus specs eran borradores anteriores al backend real y ahora describen lo que hace el código.
 - **Pendiente de MOV-0009:** medir en la app si pasar lista sigue lento; si se confirma, va como spec de bug.
 
@@ -32,4 +33,5 @@ Salen del plan de UI ([`../plan-ui-impeccable.md`](../plan-ui-impeccable.md) §5
 | Inscribirme o inscribir un equipo (individual y por equipos) | MOV-0005 |
 | Delegado: plantel, solicitudes de ingreso e inscripciones | MOV-0004 |
 | Comprobantes (inscripción y multa) y mis multas | backend: subida de multas por el jugador |
-| Configuración del torneo (formato, cuota, premios, multas y árbitros) | MOV-0008 |
+| Programar los partidos (fecha, hora y lugar) y volver a generarlos | MOV-0011 |
+| Configuración del torneo (formato, cuota, premios y multas) | MOV-0008 |

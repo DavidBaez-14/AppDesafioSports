@@ -5,9 +5,8 @@ import kotlinx.serialization.Serializable
 /**
  * Rutas tipadas de Navigation Compose. Una por pantalla.
  *
- * MOV-0002 agrega el acceso: arranque, login y recuperar contraseña. Inicio, con las
- * secciones Creador y Árbitro (PRODUCT.md), llega con su propia spec; mientras tanto el
- * diagnóstico de MOV-0001 hace de inicio provisional.
+ * El acceso (MOV-0002, 0003 y 0006) lleva a [Principal] (MOV-0004), de donde cuelgan las
+ * secciones Árbitro y Creador y la gestión de cada torneo (MOV-0011).
  */
 
 /** Primera pantalla: muestra el logotipo mientras se lee la sesión guardada (A-1). */
@@ -63,6 +62,24 @@ data object CrearTorneo
 /** Inscripciones de un torneo que administra: aprobar y rechazar (MOV-0008). */
 @Serializable
 data class InscripcionesTorneo(val torneoId: String, val nombre: String = "")
+
+// Gestión de un torneo que administra (MOV-0011).
+
+/** Las tres puertas de un torneo: inscripciones, árbitros y partidos. */
+@Serializable
+data class GestionTorneo(val torneoId: String, val nombre: String = "")
+
+/** Árbitros del torneo e invitaciones pendientes. */
+@Serializable
+data class ArbitrosTorneo(val torneoId: String, val nombre: String = "")
+
+/** Partidos del torneo: generarlos y asignarles árbitros. */
+@Serializable
+data class PartidosTorneo(val torneoId: String, val nombre: String = "")
+
+/** Aceptar una invitación recibida: se pega el enlace. */
+@Serializable
+data object Invitacion
 
 // Explorar y detalle del torneo (MOV-0005).
 

@@ -19,7 +19,12 @@ import androidx.compose.ui.res.stringResource
 import co.edu.ufps.desafiosports.R
 import co.edu.ufps.desafiosports.presentacion.arbitro.PlanillaScreen
 import co.edu.ufps.desafiosports.presentacion.arbitro.SeccionArbitroScreen
+import androidx.navigation.toRoute
+import co.edu.ufps.desafiosports.presentacion.creador.ArbitrosTorneoScreen
 import co.edu.ufps.desafiosports.presentacion.creador.CrearTorneoScreen
+import co.edu.ufps.desafiosports.presentacion.creador.GestionTorneoScreen
+import co.edu.ufps.desafiosports.presentacion.creador.PartidosTorneoScreen
+import co.edu.ufps.desafiosports.presentacion.perfil.InvitacionScreen
 import co.edu.ufps.desafiosports.presentacion.creador.InscripcionesScreen
 import co.edu.ufps.desafiosports.presentacion.creador.SeccionCreadorScreen
 import co.edu.ufps.desafiosports.presentacion.diagnostico.AccesoProvisional
@@ -142,6 +147,7 @@ fun AppNavigation(
                 } else {
                     null
                 },
+                onAbrirInvitacion = { navController.navigate(Invitacion) },
             )
         }
         composable<Explorar> {
@@ -159,7 +165,7 @@ fun AppNavigation(
                         navController.navigate(Login) { popUpTo(navController.graph.id) { inclusive = true } }
                     }
                 },
-                onAbrirCreador = { torneo -> navController.navigate(InscripcionesTorneo(torneo.id, torneo.nombre)) },
+                onAbrirCreador = { torneo -> navController.navigate(GestionTorneo(torneo.id, torneo.nombre)) },
                 onAbrirArbitro = { navController.navigate(SeccionArbitro) },
             )
         }
@@ -183,8 +189,33 @@ fun AppNavigation(
             SeccionCreadorScreen(
                 onVolver = { navController.popBackStack() },
                 onCrearTorneo = { navController.navigate(CrearTorneo) },
-                onAbrirTorneo = { torneo -> navController.navigate(InscripcionesTorneo(torneo.id, torneo.nombre)) },
+                // "Por revisar" va directo a lo urgente; un torneo de la lista abre su gestión (MOV-0011).
+                onRevisarTorneo = { torneo -> navController.navigate(InscripcionesTorneo(torneo.id, torneo.nombre)) },
+                onAbrirTorneo = { torneo -> navController.navigate(GestionTorneo(torneo.id, torneo.nombre)) },
             )
+        }
+        composable<GestionTorneo> { entrada ->
+            val ruta = entrada.toRoute<GestionTorneo>()
+            GestionTorneoScreen(
+                torneo = ruta.nombre,
+                onVolver = { navController.popBackStack() },
+                onInscripciones = { navController.navigate(InscripcionesTorneo(ruta.torneoId, ruta.nombre)) },
+                onArbitros = { navController.navigate(ArbitrosTorneo(ruta.torneoId, ruta.nombre)) },
+                onPartidos = { navController.navigate(PartidosTorneo(ruta.torneoId, ruta.nombre)) },
+            )
+        }
+        composable<ArbitrosTorneo> {
+            ArbitrosTorneoScreen(onVolver = { navController.popBackStack() })
+        }
+        composable<PartidosTorneo> { entrada ->
+            val ruta = entrada.toRoute<PartidosTorneo>()
+            PartidosTorneoScreen(
+                onVolver = { navController.popBackStack() },
+                onInvitarArbitros = { navController.navigate(ArbitrosTorneo(ruta.torneoId, ruta.nombre)) },
+            )
+        }
+        composable<Invitacion> {
+            InvitacionScreen(onVolver = { navController.popBackStack() })
         }
         composable<CrearTorneo> {
             CrearTorneoScreen(

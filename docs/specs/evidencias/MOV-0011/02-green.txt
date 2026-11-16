@@ -1,0 +1,2 @@
+./gradlew testDebugUnitTest assembleDebug  (2026-11-16)
+355 tests, 0 fallos, 3 omitidos (los de humo contra el backend real). BUILD SUCCESSFUL

@@ -44,6 +44,22 @@ import co.edu.ufps.desafiosports.domain.use_case.identidad.ObservarSesionUseCase
 import co.edu.ufps.desafiosports.domain.use_case.identidad.ObtenerCuentaUseCase
 import co.edu.ufps.desafiosports.domain.use_case.identidad.RecuperarClaveUseCase
 import co.edu.ufps.desafiosports.domain.use_case.sistema.ComprobarServidorUseCase
+import co.edu.ufps.desafiosports.data.remote.api.GestionTorneoApi
+import co.edu.ufps.desafiosports.data.repository.GestionTorneoRepositoryImpl
+import co.edu.ufps.desafiosports.data.repository.InvitacionesRepositoryImpl
+import co.edu.ufps.desafiosports.domain.repository.GestionTorneoRepository
+import co.edu.ufps.desafiosports.domain.repository.InvitacionesRepository
+import co.edu.ufps.desafiosports.domain.use_case.competicion.AsignarArbitroUseCase
+import co.edu.ufps.desafiosports.domain.use_case.competicion.CambiarTodosLosPartidosUseCase
+import co.edu.ufps.desafiosports.domain.use_case.competicion.CancelarInvitacionUseCase
+import co.edu.ufps.desafiosports.domain.use_case.competicion.GenerarPartidosUseCase
+import co.edu.ufps.desafiosports.domain.use_case.competicion.InvitarArbitroUseCase
+import co.edu.ufps.desafiosports.domain.use_case.competicion.ObtenerPartidosDeTorneoUseCase
+import co.edu.ufps.desafiosports.domain.use_case.competicion.ObtenerPersonalDeArbitrajeUseCase
+import co.edu.ufps.desafiosports.domain.use_case.competicion.QuitarArbitroDePartidoUseCase
+import co.edu.ufps.desafiosports.domain.use_case.competicion.QuitarArbitroUseCase
+import co.edu.ufps.desafiosports.domain.use_case.identidad.AceptarInvitacionUseCase
+import co.edu.ufps.desafiosports.domain.use_case.identidad.VerInvitacionUseCase
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.auth
@@ -107,6 +123,7 @@ class AppContainer(val configuracion: Configuracion) {
     private val torneosApi: TorneosApi by lazy { retrofit.create() }
     private val competicionApi: CompeticionApi by lazy { retrofit.create() }
     private val finanzasApi: FinanzasApi by lazy { retrofit.create() }
+    private val gestionTorneoApi: GestionTorneoApi by lazy { retrofit.create() }
 
     // ── Repositorios ───────────────────────────────────────────────────────
     val sesionRepository: SesionRepository by lazy { SesionRepositoryImpl(supabase.auth) }
@@ -160,6 +177,21 @@ class AppContainer(val configuracion: Configuracion) {
     val obtenerMisEquipos by lazy { ObtenerMisEquiposUseCase(misEquiposRepository) }
     val obtenerMiPerfil by lazy { ObtenerMiPerfilUseCase(perfilRepository) }
     val obtenerMisMultas by lazy { ObtenerMisMultasUseCase(multasRepository) }
+
+    // Gestión del torneo: árbitros, partidos e invitaciones (MOV-0011)
+    val gestionTorneoRepository: GestionTorneoRepository by lazy { GestionTorneoRepositoryImpl(gestionTorneoApi, erroresHttp) }
+    val invitacionesRepository: InvitacionesRepository by lazy { InvitacionesRepositoryImpl(authApi, erroresHttp) }
+    val obtenerPersonalDeArbitraje by lazy { ObtenerPersonalDeArbitrajeUseCase(gestionTorneoRepository) }
+    val invitarArbitro by lazy { InvitarArbitroUseCase(gestionTorneoRepository) }
+    val cancelarInvitacion by lazy { CancelarInvitacionUseCase(gestionTorneoRepository) }
+    val quitarArbitro by lazy { QuitarArbitroUseCase(gestionTorneoRepository) }
+    val cambiarTodosLosPartidos by lazy { CambiarTodosLosPartidosUseCase(gestionTorneoRepository) }
+    val obtenerPartidosDeTorneo by lazy { ObtenerPartidosDeTorneoUseCase(gestionTorneoRepository) }
+    val generarPartidos by lazy { GenerarPartidosUseCase(gestionTorneoRepository) }
+    val asignarArbitro by lazy { AsignarArbitroUseCase(gestionTorneoRepository) }
+    val quitarArbitroDePartido by lazy { QuitarArbitroDePartidoUseCase(gestionTorneoRepository) }
+    val verInvitacion by lazy { VerInvitacionUseCase(invitacionesRepository) }
+    val aceptarInvitacion by lazy { AceptarInvitacionUseCase(invitacionesRepository) }
 
     companion object {
         /** Lee la configuración que Gradle copió de local.properties a BuildConfig. */

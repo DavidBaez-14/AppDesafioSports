@@ -1,0 +1,14 @@
+Prueba de dientes (sdd.md §6), 2026-11-16. Se rompieron a proposito tres reglas:
+ 1. GenerarPartidosUseCase: no inicia el torneo antes de generar.
+ 2. RolTorneoDto.aArbitro: deja pasar a los administradores.
+ 3. PartidosTorneoViewModel.alternarArbitro: sin la guarda de doble toque ni la de 'todos los partidos'.
+
+FALLA GestionRepositoryImplTest > CA-2 de los roles del torneo solo quedan los arbitros
+FALLA GestionTorneoTest > CA-7 si no se puede iniciar el torneo no se intenta generar
+FALLA GestionTorneoTest > CA-7 con el torneo publicado primero lo inicia y despues genera
+FALLA PartidosViewModelTest > CA-9 quien arbitra todos los partidos no se asigna, y un partido cerrado no abre la hoja
+FALLA PartidosViewModelTest > CA-7 con las inscripciones abiertas pide confirmar, inicia el torneo y genera
+FALLA PartidosViewModelTest > CA-7 si generar falla se ve el mensaje y la pantalla refleja el estado real del torneo
+6 pruebas fallan con el codigo roto
+
+Con el codigo restaurado la suite vuelve a verde (02-green.txt).

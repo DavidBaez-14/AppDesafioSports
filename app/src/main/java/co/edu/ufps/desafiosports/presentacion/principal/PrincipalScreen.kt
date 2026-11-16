@@ -58,6 +58,7 @@ fun PrincipalScreen(
     onCrearTorneo: () -> Unit,
     onCompletarRegistro: () -> Unit,
     onAbrirDiagnostico: (() -> Unit)?,
+    onAbrirInvitacion: () -> Unit,
 ) {
     var pestana by rememberSaveable { mutableStateOf(Pestana.INICIO) }
     // Cada pestaña conserva dónde iba (la lista, lo que se estaba buscando) al cambiar a otra.
@@ -113,7 +114,7 @@ fun PrincipalScreen(
                         onCompletarRegistro = onCompletarRegistro,
                     )
                     Pestana.EXPLORAR -> ExplorarScreen(onVolver = null, onAbrirTorneo = onAbrirTorneo)
-                    Pestana.PERFIL -> PerfilScreen(onAbrirDiagnostico = onAbrirDiagnostico)
+                    Pestana.PERFIL -> PerfilScreen(onAbrirDiagnostico = onAbrirDiagnostico, onAbrirInvitacion = onAbrirInvitacion)
                 }
             }
         }

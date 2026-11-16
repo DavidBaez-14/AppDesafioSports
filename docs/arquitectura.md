@@ -100,7 +100,7 @@ app/src/main/java/co/edu/ufps/desafiosports/
 │   ├── principal/             # la barra inferior con Inicio, Explorar y Perfil
 │   ├── inicio/ · perfil/      # las pestañas del jugador
 │   ├── explorar/              # Explorar y el detalle del torneo
-│   ├── arbitro/ · creador/    # las secciones y sus pantallas (planilla, crear torneo, inscripciones)
+│   ├── arbitro/ · creador/    # las secciones y sus pantallas (planilla, crear torneo, inscripciones, gestión del torneo)
 │   ├── acceso/                # login, crear cuenta, completar registro, recuperar contraseña
 │   ├── comun/                 # piezas que comparten las pantallas con listas
 │   └── diagnostico/           # diagnóstico de conexión de MOV-0001 (solo en debug)
@@ -223,12 +223,14 @@ El cliente HTTP (`data/remote/red/ClienteHttp.kt`) **se comporta igual que `src/
 ## 8. Navegación
 
 - **Una sola Activity** con Navigation Compose y rutas tipadas (`presentacion/navigation/Rutas.kt`).
-- **Grafo actual** (MOV-0004):
+- **Grafo actual** (MOV-0004 y MOV-0011):
 
 ```
 Arranque ──▶ Acceso (login, crear cuenta, revisa tu correo, completar registro, recuperar contraseña)
          └─▶ Principal ── barra inferior: Inicio · Explorar · Perfil
-                └─ desde Inicio: Sección Árbitro ▶ Planilla · Sección Creador ▶ Inscripciones · Crear torneo
+                └─ desde Inicio: Sección Árbitro ▶ Planilla · Crear torneo
+                └─ desde Inicio: Sección Creador ▶ Gestión del torneo ▶ Inscripciones · Árbitros · Partidos
+                └─ desde Perfil: Invitación (aceptar pegando el enlace)
                 └─ desde cualquier pestaña: Torneo (detalle)
 ```
 

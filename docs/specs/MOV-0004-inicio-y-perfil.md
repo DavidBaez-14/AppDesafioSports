@@ -2,7 +2,7 @@
 id: MOV-0004
 titulo: Inicio (jugador), navegación principal y Perfil
 tipo: feature
-estado: en-revision
+estado: hecha
 prioridad: P1
 fase: F1
 modo: Jugador
@@ -431,3 +431,4 @@ La spec se escribió el 9-nov. Entre el 10 y el 11 llegaron a `main` Explorar y 
 | 2026-11-14 | Aprobada por David con los tres ajustes de §11.5 y pasa a `en-curso`. Se actualizan el alcance, CA-2, CA-3, CA-15, CA-16, el plan de pruebas y la lista de archivos |
 | 2026-11-14 | Implementada. 283 tests, 0 fallos (`evidencias/MOV-0004/02-green.txt`). Las pruebas se escribieron junto con el código, no antes: en lugar de un RED previo se hizo la prueba de dientes de `sdd.md` §6, rompiendo el código a propósito (`01-dientes.txt`, 6 pruebas fallan). El contrato se comprobó contra el backend desplegado con las cuentas del seed. Dentro del bloque Árbitro, "Tu próximo partido" pasa a decir "Próximo que arbitras", para no repetir el título del bloque del jugador. Pasa a `en-revision` |
 | 2026-11-14 | Verificada en el emulador (Pixel 8) contra el backend desplegado, con `arbitro02`, `jugador01` y `admin01`: Inicio con sus secciones, el partido de hoy en naranja, "Tu próximo partido", "Mis equipos" (abre el torneo), el estado vacío, Explorar en su pestaña sin flecha, Atrás, Perfil y cerrar sesión. Capturas 03 a 12 en `evidencias/MOV-0004/` (oscuro, claro y letra al 130 %). **Sin verificar en el emulador:** el modo avión (CA-11, cubierto por pruebas), el giro del teléfono y una cuenta recién creada |
+| 2026-11-16 | **Integrada a `main`** por decisión de David, con 284 tests y 0 fallos. Pasa a `hecha`. Siguen sin verificar en el emulador el modo avión (CA-11, cubierto por pruebas), el giro del teléfono y una cuenta recién creada |

@@ -2,7 +2,7 @@
 id: MOV-0010
 titulo: Diseño de las secciones Árbitro y Creador, e Inicio provisional
 tipo: diseño
-estado: en-revision
+estado: hecha
 prioridad: P1
 fase: F2
 modo: Transversal
@@ -133,3 +133,4 @@ Sin cambios. Inicio reúne tres lecturas que ya existen:
 |---|---|
 | 2026-11-10 | Borrador inicial y en curso |
 | 2026-11-10 | Implementada y verificada en el emulador (Pixel_8): 13 capturas en `evidencias/MOV-0010/`; pasa a en-revision |
+| 2026-11-16 | Integrada a `main` desde el 11-nov (`e5baf0e`, `d027e1b`). MOV-0004 conserva sus bloques de sección. Pasa a `hecha` |

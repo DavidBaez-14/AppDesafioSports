@@ -2,16 +2,18 @@
 id: MOV-0005
 titulo: Explorar torneos públicos y detalle del torneo
 tipo: feature
-estado: borrador
+estado: hecha
 prioridad: P1
 fase: F4
 modo: Visitante y Jugador
-responsable: —
-depende_de: [MOV-0004, backend "Lecturas públicas" (M4, §4.2)]
+responsable: equipo
+depende_de: [MOV-0002, backend 0029]
 rama: mov-0005-explorar-y-torneo
 ---
 
 # MOV-0005 · Explorar torneos públicos y detalle del torneo
+
+> **Spec puesta al día el 16-nov-2026 con lo que hace el código de `main`.** El borrador del 9-nov proponía un backend que todavía no existía; el contrato de §4 es el real (backend 0029).
 
 ## 1. Contexto
 
@@ -21,87 +23,72 @@ rama: mov-0005-explorar-y-torneo
 
 ## 2. Alcance
 
-- **Explorar:**
-  - barra de búsqueda por nombre;
-  - chips por deporte;
-  - secciones por deporte con los torneos públicos: nombre, estado, cupos libres y cierre.
-- **Detalle del torneo:**
-  - cabecera con el deporte, el formato, el estado, la visibilidad y los datos clave (inicio, cupos, cuota y organizador);
-  - pestañas según el estado: inscritos o equipos y cruces mientras hay inscripciones; tabla y partidos cuando está en curso; e Info (reglas, premios y visibilidad);
-  - **franja por relación**, que lee `miRelacion`:
-    - sin cuenta o sin relación → "Inscribirme" o "Inscribir equipo" (la acción en sí va en otra spec; aquí se pide cuenta);
-    - juega → su estado o su próximo partido;
-    - delega → su comprobante;
-    - arbitra → acceso a la sección Árbitro;
-    - organiza → acceso a la sección Creador.
-- **Login:** el botón "Explorar sin cuenta" abre Explorar en modo visitante.
-- **Compartir:** la hoja de compartir de Android con el enlace del torneo.
+- **Explorar** (`ExplorarScreen`):
+  - búsqueda por nombre, que espera a que se deje de escribir;
+  - chips por deporte, del catálogo `GET /api/public/deportes`;
+  - la lista de torneos públicos con el nombre, el estado, los cupos y el cierre; "Ver más" trae la página siguiente;
+  - **"Abrir con enlace":** se pega el enlace o el token de un torneo y se abre su detalle. Es la única forma de llegar a un torneo `NO_LISTADO`.
+- **Detalle del torneo** (`TorneoScreen`):
+  - cabecera con el deporte, el formato, el estado, la visibilidad y los datos clave;
+  - pestañas **Equipos · Partidos · Tabla · Info** (reglas y premios);
+  - **franja por relación**, que sale de `miRelacion` (`AccionDelTorneo` en `domain/model/Publico.kt`). Lo que la persona ya es pesa más que lo que podría hacer:
+    - sin sesión y con inscripciones abiertas → "Entrar" (vuelve al login);
+    - organiza → abre las inscripciones del torneo (la gestión del torneo, desde MOV-0011);
+    - arbitra → abre la sección Árbitro;
+    - delega o juega → el estado de su equipo;
+    - sin relación → inscribirse (la acción en sí va en otra spec), "inscripción individual pendiente" o "inscripciones cerradas".
+  - **Compartir:** la hoja de compartir de Android con el enlace del torneo.
+- **Login:** el botón "Explorar sin cuenta" abre Explorar en modo visitante, con flecha de volver. Con sesión, Explorar es una pestaña de la barra inferior y no lleva flecha (MOV-0004).
 
 ## 3. Diseño
 
-- **Prototipo:** pantallas `explorar` y `torneo`. En Compose: `SearchBar`, `FilterChip`, `TabRow`, la tabla con cifras de ancho fijo y la franja como una superficie contenedora.
-- **Las columnas de la tabla dependen del deporte:** fútbol sala usa PJ, G, E, P, DG y Pts; voleibol usa PJ, G, P, Sets y Pts.
+- **Prototipo:** pantallas `explorar` y `torneo`.
+- **Estados:** cargando, vacío (con filtro explica que los torneos con enlace no salen en la búsqueda), error y sin conexión con "Reintentar". Un fallo al refrescar conserva lo que había y avisa con un `Snackbar`.
 
 ## 4. Contrato con el backend
 
-### 4.1 Lo que ya existe
+Todo es de backend 0029 y **no necesita sesión** (`/api/public/**`). Si la petición trae token, el detalle suma `miRelacion`.
 
-- **Datos del torneo:** tabla, partidos y premios existen en los endpoints con sesión (`/api/supercopa/...`). **No hay lecturas públicas.**
+| Endpoint | Método | Responde |
+|---|---|---|
+| `/api/public/deportes` | GET | `[{codigo, nombre, tipoCompetencia}]` (`EQUIPO` o `INDIVIDUAL`) |
+| `/api/public/torneos?deporte=&q=&page=&size=` | GET | Página (`contenido`, `pagina`, `totalPaginas`) con **solo los `PUBLICO`**. `q` busca cada palabra en el nombre, sin mayúsculas ni tildes |
+| `/api/public/torneos/{torneoId}` | GET | El detalle: datos, equipos aprobados, tabla por grupo, partidos, premios y `miRelacion` |
+| `/api/public/t/{enlaceToken}` | GET | El mismo detalle por enlace; abre también los `NO_LISTADO` |
 
-### 4.2 Lo que falta (backend, **M4 mínima**, spec propia en `CODECUP/.context/specs/`)
+- **`miRelacion`:** `{ administra, arbitra, delegadoDe, juegaEn }`. Las dos últimas traen `equipoTorneoId`, `equipo`, `estadoInscripcion` y `comprobante`.
+- **Errores:** 404 `NO_ENCONTRADO`. Un torneo que no existe y uno que no se puede ver responden igual, para no revelar torneos privados.
+- **Privacidad:** en lo público los nombres van como "Nombres A.", sin documento ni correo.
 
-Diseño de referencia: `CODECUP/.context/docs/plan_auth_modos_identidad.md` §6.
+## 5. Criterios de aceptación
 
-1. **Columnas nuevas:**
-   - `torneos.visibilidad`: `PUBLICO` | `NO_LISTADO` | `PRIVADO`, con un valor por defecto que aún no se decide (ver MOV-0007, Q1);
-   - `torneos.enlace_token`: aleatorio y regenerable;
-   - `torneos.deporte`: FK a un catálogo `deportes (codigo, nombre, tipo_competencia EQUIPO|INDIVIDUAL)`. Arranca con FUTSAL, VOLEIBOL, BALONCESTO y TENIS_MESA.
-
-   La migración deja los torneos existentes como `FUTSAL`, con la visibilidad que se decida.
-2. **Endpoints sin sesión** (`permitAll` en `/api/public/**`):
-   - `GET /api/public/deportes` → `[{codigo, nombre, tipoCompetencia}]`.
-   - `GET /api/public/torneos?deporte=&q=&page=&size=`: **solo `PUBLICO`**. `q` busca por nombre sin distinguir mayúsculas ni tildes.
-     ```json
-     { "contenido": [{ "id": 3, "nombre": "Relámpago de Tenis de Mesa", "deporte": "TENIS_MESA",
-         "formato": "ELIMINACION_DIRECTA", "estado": "INSCRIPCIONES", "cupos": 16, "inscritos": 12,
-         "cierreInscripciones": "2026-11-13", "inicio": "2026-11-21T08:00:00",
-         "organizador": "Andrés P." }], "pagina": 0, "totalPaginas": 1 }
-     ```
-   - `GET /api/public/torneos/{id}`: lo ve quien cumpla `VisibilidadService.puedeVer(quien, torneo)`. `PUBLICO` lo ve cualquiera; `PRIVADO`, solo sus participantes. Responde el detalle, los inscritos o equipos **aprobados**, la tabla por grupo, los partidos por fecha y los premios.
-   - `GET /api/public/t/{enlaceToken}`: el mismo detalle para un torneo `NO_LISTADO`.
-3. **`miRelacion` en el detalle,** solo si la petición trae token:
-   ```json
-   "miRelacion": { "administra": false, "arbitra": true,
-     "delegadoDe": { "equipoTorneoId": 7, "equipo": "Los Pibes FC", "comprobante": "PENDIENTE" },
-     "inscrito": { "estado": "APROBADA" } }
-   ```
-   Un solo campo pinta toda la franja: **no hacen falta endpoints por rol.**
-4. **Privacidad:** en todo lo público, los nombres van como "Nombres A." (nombre más la inicial del apellido), sin documento ni correo.
-
-**Errores:** 404 `NO_ENCONTRADO` (un torneo que no existe o que no se puede ver responde igual, para no revelar torneos privados).
-
-## 5. Criterios de aceptación (borrador)
-
-1. **CA-1** · Explorar lista solo los torneos públicos, agrupados por deporte. Los `NO_LISTADO` y los `PRIVADO` no aparecen aunque la persona participe en ellos.
-2. **CA-2** · La búsqueda por nombre y el chip de deporte filtran la lista. Sin resultados, se ve un estado vacío que explica que los torneos con enlace no salen.
-3. **CA-3** · Sin cuenta se puede explorar y ver el detalle. "Inscribirme" pide entrar o crear cuenta.
-4. **CA-4** · La franja del detalle cambia según `miRelacion`, y sin relación y sin inscripciones abiertas no hay franja.
-5. **CA-5** · Las pestañas y las columnas de la tabla dependen del estado y del deporte.
+1. **CA-1** · Explorar lista los torneos públicos y los deportes; "Ver más" suma la página siguiente sin repetir. Sin conexión, la primera carga muestra el error con "Reintentar".
+2. **CA-2** · La búsqueda por nombre y el chip de deporte filtran la lista y vuelven a pedir desde la primera página. Sin filtro no se envían `deporte` ni `q`.
+3. **CA-3** · "Abrir con enlace" acepta el enlace completo o el token suelto. Lo que no parece un enlace de torneo se avisa sin llamar al backend. Un torneo abierto por enlace se vuelve a pedir por enlace.
+4. **CA-4** · La franja del detalle sale de `miRelacion`. Sin sesión invita a entrar solo si las inscripciones están abiertas.
+5. **CA-5** · Un torneo privado o inexistente muestra el error y no la franja. Un fallo al refrescar conserva el detalle y avisa.
 6. **CA-6** · Compartir abre la hoja de Android con el enlace.
-7. **CA-7** · Claro, oscuro, letra al 130 %, sin conexión y estado vacío (emulador).
 
-## 6. Fuera de alcance
+## 6. Plan de pruebas
+
+| Criterio | Prueba |
+|---|---|
+| CA-1, CA-2, CA-3 | `ExplorarYTorneoViewModelTest`, `TorneosRepositoryImplTest` |
+| CA-3, CA-4 | `TorneoDetalleTest` |
+| CA-4, CA-5 | `ExplorarYTorneoViewModelTest`, `TorneosRepositoryImplTest` |
+| CA-6 | Verificación en el emulador |
+
+## 7. Fuera de alcance
 
 - Inscribirse o inscribir un equipo (spec propia, con el flujo de comprobante).
-- El salón de la fama.
-- El perfil público de un jugador.
-
-## 7. Dudas para David
-
-- **Q1.** Torneos existentes al migrar: ¿quedan `PUBLICO` (la Supercopa es pública en codecup.games) o `NO_LISTADO`?
+- Las columnas de la tabla según el deporte: hoy son las de fútbol sala para todos.
+- El salón de la fama y el perfil público de un jugador.
 
 ## 8. Registro
 
 | Fecha | Cambio |
 |---|---|
 | 2026-11-09 | Borrador para revisión del usuario |
+| 2026-11-11 | Implementada por el equipo e integrada a `main` (`460baa7`), sobre el backend 0029 |
+| 2026-11-14 | MOV-0004 la pone como pestaña de la barra inferior: `onVolver` pasa a ser opcional |
+| 2026-11-16 | Spec puesta al día con el código: contrato real, "Abrir con enlace", criterios y plan de pruebas. Pasa a `hecha` |

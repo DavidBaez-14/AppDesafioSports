@@ -2,7 +2,7 @@
 id: MOV-0009
 titulo: Sección Árbitro y planilla del partido
 tipo: feature
-estado: en-revision
+estado: hecha
 prioridad: P1
 fase: F2
 modo: Árbitro
@@ -199,3 +199,4 @@ rama: mov-0009-seccion-arbitro
 | 2026-11-09 | Reescrita con el contrato real del backend (0025 y 0029 en `main`). W.O. y cancelar salen del alcance. Implementada: pasa a `en-revision` |
 | 2026-11-14 | **Bug: no se podía pasar lista jugador por jugador** (lo reportó David). Causa: cada toque esperaba dos viajes al servidor (guardar y volver a pedir la planilla, unos 5 a 7 s contra el backend desplegado) y mientras tanto la casilla no cambiaba y **todas** las filas quedaban bloqueadas; además, si el cambio fallaba, el aviso salía detrás de la hoja. Arreglo en `PlanillaViewModel` y `AlineacionHoja`: la casilla cambia al tocarla, los cambios viajan en cola de uno en uno, se puede marcar y desmarcar de corrido, una barra fina indica que se está guardando y el motivo de un rechazo sale dentro de la hoja. Al terminar la tanda se vuelve a pedir la planilla una sola vez. RED: 5 pruebas de regresión fallando (`evidencias/MOV-0009/01-red-alineacion.txt`); GREEN con toda la suite (`02-green-alineacion.txt`). CA-7 queda: "marcar o desmarcar se ve al instante y se guarda en segundo plano" |
 | 2026-11-14 | Verificado en el emulador contra el backend desplegado: tres casillas tocadas seguidas quedan marcadas al instante, desmarcar funciona y lo que se ve coincide con lo que guardó el servidor (`evidencias/MOV-0009/03-alineacion-una-por-una.png`). Al probar apareció un segundo fallo, ya corregido con su prueba: un toque hecho mientras la planilla se volvía a pedir se quedaba sin enviar |
+| 2026-11-16 | El arreglo de pasar lista entra a `main` junto con MOV-0004. Pasa a `hecha`. **Pendiente (David):** pasar lista todavía se siente lento. Primero hay que medirlo en la app contra el backend desplegado; si se confirma, se abre una spec de bug propia |

@@ -59,6 +59,8 @@ import co.edu.ufps.desafiosports.domain.use_case.competicion.ObtenerPersonalDeAr
 import co.edu.ufps.desafiosports.domain.use_case.competicion.QuitarArbitroDePartidoUseCase
 import co.edu.ufps.desafiosports.domain.use_case.competicion.QuitarArbitroUseCase
 import co.edu.ufps.desafiosports.domain.use_case.identidad.AceptarInvitacionUseCase
+import co.edu.ufps.desafiosports.domain.use_case.identidad.ObtenerMisInvitacionesUseCase
+import co.edu.ufps.desafiosports.domain.use_case.competicion.ReabrirPartidoUseCase
 import co.edu.ufps.desafiosports.domain.use_case.identidad.VerInvitacionUseCase
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.Auth
@@ -154,6 +156,7 @@ class AppContainer(val configuracion: Configuracion) {
     val quitarDeAlineacion by lazy { QuitarDeAlineacionUseCase(arbitrajeRepository) }
     val alinearEquipo by lazy { AlinearEquipoUseCase(arbitrajeRepository) }
     val cerrarPartido by lazy { CerrarPartidoUseCase(arbitrajeRepository) }
+    val reabrirPartido by lazy { ReabrirPartidoUseCase(arbitrajeRepository) }
 
     // Crear torneo y sección Creador (MOV-0007 y MOV-0008)
     val creadorRepository: CreadorRepository by lazy { CreadorRepositoryImpl(creadorApi, erroresHttp) }
@@ -192,6 +195,7 @@ class AppContainer(val configuracion: Configuracion) {
     val quitarArbitroDePartido by lazy { QuitarArbitroDePartidoUseCase(gestionTorneoRepository) }
     val verInvitacion by lazy { VerInvitacionUseCase(invitacionesRepository) }
     val aceptarInvitacion by lazy { AceptarInvitacionUseCase(invitacionesRepository) }
+    val obtenerMisInvitaciones by lazy { ObtenerMisInvitacionesUseCase(invitacionesRepository) }
 
     companion object {
         /** Lee la configuración que Gradle copió de local.properties a BuildConfig. */

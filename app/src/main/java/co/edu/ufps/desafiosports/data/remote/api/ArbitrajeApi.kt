@@ -43,4 +43,8 @@ interface ArbitrajeApi {
     /** Responde el partido cerrado; no se usa porque la planilla se vuelve a pedir. */
     @POST("api/supercopa/admin/partidos/{partidoId}/cerrar")
     suspend fun cerrarPartido(@Path("partidoId") partidoId: String)
+
+    /** Solo quien organiza el torneo (MOV-0012). Responde el partido; no se usa. */
+    @POST("api/supercopa/admin/partidos/{partidoId}/reabrir")
+    suspend fun reabrirPartido(@Path("partidoId") partidoId: String)
 }

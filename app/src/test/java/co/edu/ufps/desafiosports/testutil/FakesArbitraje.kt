@@ -70,6 +70,8 @@ class FakeArbitrajeRepository : ArbitrajeRepository {
 
     override suspend fun cerrarPartido(partidoId: String): Result<Unit> = accion("cerrar")
 
+    override suspend fun reabrirPartido(partidoId: String): Result<Unit> = accion("reabrir")
+
     private suspend fun accion(nombre: String): Result<Unit> {
         llamadas += nombre
         bloqueoAccion?.await()

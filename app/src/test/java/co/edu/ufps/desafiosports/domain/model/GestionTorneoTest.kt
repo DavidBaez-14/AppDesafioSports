@@ -204,4 +204,18 @@ class GestionTorneoTest {
         assertNull(tokenDeInvitacion("https://desafio.test/t/$TOKEN_DE_PRUEBA"))
         assertNull(tokenDeInvitacion("https://desafio.test/invitacion/corto"))
     }
+
+    @Test
+    fun `MOV-0012 CA-5 tiene planilla el partido con los dos equipos, aunque ya este cerrado`() {
+        val abierto = partidoDeTorneoDePrueba("p1")
+        val cerrado = partidoDeTorneoDePrueba("p2", estado = EstadoPartido.FINALIZADO)
+        val porDefinir = partidoDeTorneoDePrueba("p3").copy(visitante = null)
+        val descanso = partidoDeTorneoDePrueba("p4", estadoCodigo = "DESCANSO")
+
+        assertTrue(abierto.tienePlanilla && abierto.admiteArbitros)
+        assertTrue(cerrado.tienePlanilla)
+        assertFalse(cerrado.admiteArbitros)
+        assertFalse(porDefinir.tienePlanilla)
+        assertFalse(descanso.tienePlanilla)
+    }
 }

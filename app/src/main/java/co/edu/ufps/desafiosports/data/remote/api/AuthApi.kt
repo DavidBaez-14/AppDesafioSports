@@ -2,6 +2,7 @@ package co.edu.ufps.desafiosports.data.remote.api
 
 import co.edu.ufps.desafiosports.data.remote.dto.InvitacionVistaDto
 import co.edu.ufps.desafiosports.data.remote.dto.MeResponseDto
+import co.edu.ufps.desafiosports.data.remote.dto.MiInvitacionDto
 import co.edu.ufps.desafiosports.data.remote.dto.RegistroRequestDto
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -20,6 +21,10 @@ interface AuthApi {
     /** Qué es una invitación antes de aceptarla (MOV-0011). No necesita sesión. */
     @GET("api/auth/invitaciones/{token}")
     suspend fun verInvitacion(@Path("token") token: String): InvitacionVistaDto
+
+    /** Las invitaciones pendientes dirigidas al correo de la sesión, con su token (MOV-0012). */
+    @GET("api/auth/mis-invitaciones")
+    suspend fun misInvitaciones(): List<MiInvitacionDto>
 
     /** Responde la cuenta con sus roles; no se usa: Inicio vuelve a pedir `/me`. */
     @POST("api/auth/invitaciones/{token}/aceptar")

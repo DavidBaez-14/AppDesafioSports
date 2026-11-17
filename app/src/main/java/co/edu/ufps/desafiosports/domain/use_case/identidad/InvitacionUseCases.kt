@@ -22,3 +22,11 @@ class VerInvitacionUseCase(private val repositorio: InvitacionesRepository) {
 class AceptarInvitacionUseCase(private val repositorio: InvitacionesRepository) {
     suspend operator fun invoke(token: String): Result<Unit> = repositorio.aceptar(token)
 }
+
+/**
+ * Las invitaciones que le hicieron a la persona por su correo y aún no acepta (MOV-0012). Así no
+ * depende de que alguien le pase el enlace.
+ */
+class ObtenerMisInvitacionesUseCase(private val repositorio: InvitacionesRepository) {
+    suspend operator fun invoke(): Result<List<InvitacionRecibida>> = repositorio.mias()
+}

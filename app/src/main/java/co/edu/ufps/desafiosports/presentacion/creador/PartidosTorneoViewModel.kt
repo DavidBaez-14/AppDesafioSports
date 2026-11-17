@@ -103,8 +103,12 @@ class PartidosTorneoViewModel(
         pedir()
     }
 
-    /** Al volver de invitar árbitros: se vuelven a pedir, porque pudo cambiar quién arbitra. */
+    /**
+     * Al volver de invitar árbitros o de una planilla: se vuelven a pedir los partidos (el marcador
+     * y el estado pudieron cambiar, MOV-0012) y quién arbitra.
+     */
     fun alVolver() {
+        if (state.estado != null && state.asignando == null && !pidiendo && !state.generando) pedir()
         if (state.asignando != null || state.arbitros == null) return
         state = state.copy(arbitros = null)
         cargarArbitros()

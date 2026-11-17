@@ -22,6 +22,7 @@ import co.edu.ufps.desafiosports.domain.use_case.competicion.CerrarPartidoUseCas
 import co.edu.ufps.desafiosports.domain.use_case.competicion.ObtenerPlanillaUseCase
 import co.edu.ufps.desafiosports.domain.use_case.competicion.QuitarDeAlineacionUseCase
 import co.edu.ufps.desafiosports.domain.use_case.competicion.QuitarEventoUseCase
+import co.edu.ufps.desafiosports.domain.use_case.competicion.ReabrirPartidoUseCase
 import co.edu.ufps.desafiosports.domain.use_case.competicion.RegistrarEventoUseCase
 import co.edu.ufps.desafiosports.presentacion.acceso.mensajeParaMostrar
 import co.edu.ufps.desafiosports.presentacion.comun.ErrorDePantalla
@@ -36,6 +37,7 @@ sealed interface AvisoPlanilla {
     data class EventoRegistrado(val evento: EventoPartido) : AvisoPlanilla
     data object EventoQuitado : AvisoPlanilla
     data object PartidoCerrado : AvisoPlanilla
+    data object PartidoReabierto : AvisoPlanilla
 
     /** La acción se guardó, pero la planilla no se pudo volver a pedir: lo que se ve puede estar viejo. */
     data object SinActualizar : AvisoPlanilla
@@ -62,6 +64,9 @@ data class PlanillaState(
     /** Evento que espera confirmación para quitarse. */
     val eventoPorQuitar: EventoPartido? = null,
     val confirmandoCierre: Boolean = false,
+    /** Diálogo abierto: reabrir el partido cerrado (solo quien organiza el torneo). */
+    val confirmandoReabrir: Boolean = false,
+    val reabriendo: Boolean = false,
     val aviso: AvisoPlanilla? = null,
     /** Jugadores con un cambio de alineación que el servidor aún no confirma. */
     val alineando: Set<String> = emptySet(),
@@ -70,6 +75,9 @@ data class PlanillaState(
 ) {
     /** Se pueden registrar eventos, cambiar la alineación y cerrar. */
     val editable: Boolean get() = planilla?.editable == true && planilla.partido.cruceDefinido
+
+    /** El partido está cerrado y quien lo ve organiza el torneo: puede reabrirlo (MOV-0012). */
+    val puedeReabrir: Boolean get() = planilla?.puedeReabrir == true && !editable
 }
 
 /**
@@ -85,6 +93,7 @@ class PlanillaViewModel(
     private val quitarDeAlineacionUseCase: QuitarDeAlineacionUseCase,
     private val alinearEquipoUseCase: AlinearEquipoUseCase,
     private val cerrarPartidoUseCase: CerrarPartidoUseCase,
+    private val reabrirPartidoUseCase: ReabrirPartidoUseCase,
 ) : ViewModel() {
 
     var state by mutableStateOf(PlanillaState())
@@ -194,6 +203,11 @@ class PlanillaViewModel(
 
     fun abrirAlineacion() {
         state = state.copy(alineacionAbierta = true, ladoAlineacion = state.lado)
+    }
+
+    /** Desde la hoja de un evento sin nadie alineado: se pasa lista del equipo elegido (MOV-0012). */
+    fun irAAlineacion() {
+        state = state.copy(tipoEnSeleccion = null, alineacionAbierta = true, ladoAlineacion = state.lado)
     }
 
     fun cerrarAlineacion() {
@@ -328,6 +342,27 @@ class PlanillaViewModel(
         )
     }
 
+    // ── Reabrir (MOV-0012) ──────────────────────────────────────────────────
+
+    fun pedirReabrir() {
+        if (!state.puedeReabrir || state.enAccion) return
+        state = state.copy(confirmandoReabrir = true)
+    }
+
+    fun cancelarReabrir() {
+        state = state.copy(confirmandoReabrir = false)
+    }
+
+    fun confirmarReabrir() {
+        if (!state.confirmandoReabrir) return
+        state = state.copy(confirmandoReabrir = false)
+        accion(
+            operacion = { reabrirPartidoUseCase(partidoId) },
+            alTerminar = { AvisoPlanilla.PartidoReabierto },
+            esReapertura = true,
+        )
+    }
+
     fun onAvisoMostrado() {
         state = state.copy(aviso = null)
     }
@@ -340,9 +375,12 @@ class PlanillaViewModel(
         operacion: suspend () -> Result<T>,
         alTerminar: (T) -> AvisoPlanilla?,
         esCierre: Boolean = false,
+        esReapertura: Boolean = false,
     ) {
-        if (state.enAccion || !state.editable) return
-        state = state.copy(enAccion = true, cerrando = esCierre)
+        // Reabrir es lo único que se hace con el partido cerrado.
+        val permitido = if (esReapertura) state.puedeReabrir else state.editable
+        if (state.enAccion || !permitido) return
+        state = state.copy(enAccion = true, cerrando = esCierre, reabriendo = esReapertura)
         viewModelScope.launch {
             val resultado = operacion()
             val fallo = resultado.exceptionOrNull()
@@ -357,6 +395,7 @@ class PlanillaViewModel(
             state = state.copy(
                 enAccion = false,
                 cerrando = false,
+                reabriendo = false,
                 planilla = recarga?.getOrNull()?.let { recibir(it) } ?: state.planilla,
                 aviso = aviso,
             )
@@ -378,6 +417,7 @@ class PlanillaViewModel(
                     quitarDeAlineacionUseCase = c.quitarDeAlineacion,
                     alinearEquipoUseCase = c.alinearEquipo,
                     cerrarPartidoUseCase = c.cerrarPartido,
+                    reabrirPartidoUseCase = c.reabrirPartido,
                 )
             }
         }

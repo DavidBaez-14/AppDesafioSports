@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -70,10 +71,13 @@ import co.edu.ufps.desafiosports.presentacion.comun.BloqueFecha
 import co.edu.ufps.desafiosports.presentacion.comun.BotonContorno
 import co.edu.ufps.desafiosports.presentacion.comun.ChipEstado
 import co.edu.ufps.desafiosports.presentacion.comun.EncabezadoBloque
+import co.edu.ufps.desafiosports.domain.model.InvitacionRecibida
+import co.edu.ufps.desafiosports.domain.model.RolInvitado
 import co.edu.ufps.desafiosports.presentacion.comun.ErrorDePantalla
 import co.edu.ufps.desafiosports.presentacion.comun.EsqueletoDeLista
 import co.edu.ufps.desafiosports.presentacion.comun.EstadoError
 import co.edu.ufps.desafiosports.presentacion.comun.EstadoVacio
+import co.edu.ufps.desafiosports.presentacion.comun.Fila
 import co.edu.ufps.desafiosports.presentacion.comun.FlechaFila
 import co.edu.ufps.desafiosports.presentacion.comun.IconoEnCirculo
 import co.edu.ufps.desafiosports.presentacion.comun.Tono
@@ -95,6 +99,8 @@ data class AccionesInicio(
     /** Un equipo o el próximo partido abren el detalle de su torneo (MOV-0005). */
     val onAbrirTorneo: (torneoId: String) -> Unit = {},
     val onCrearTorneo: () -> Unit = {},
+    /** Una invitación pendiente abre la pantalla donde se acepta (MOV-0012). */
+    val onAbrirInvitacion: () -> Unit = {},
     /** "Ir a Explorar" del estado vacío: cambia a esa pestaña. */
     val onExplorar: () -> Unit = {},
     val onReintentar: () -> Unit = {},
@@ -115,6 +121,7 @@ fun InicioScreen(
     onCrearTorneo: () -> Unit,
     onExplorar: () -> Unit,
     onCompletarRegistro: () -> Unit,
+    onAbrirInvitacion: () -> Unit = {},
     viewModel: InicioViewModel = viewModel(factory = InicioViewModel.Factory),
 ) {
     // Vuelve a pedir los datos cada vez que Inicio se ve de nuevo: al regresar de una sección
@@ -130,8 +137,9 @@ fun InicioScreen(
             onCompletarRegistro()
         }
     }
-    val acciones = remember(viewModel, onAbrirArbitro, onAbrirPlanilla, onAbrirCreador, onAbrirInscripciones, onAbrirTorneo, onCrearTorneo, onExplorar) {
+    val acciones = remember(viewModel, onAbrirArbitro, onAbrirPlanilla, onAbrirCreador, onAbrirInscripciones, onAbrirTorneo, onCrearTorneo, onExplorar, onAbrirInvitacion) {
         AccionesInicio(
+            onAbrirInvitacion = onAbrirInvitacion,
             onAbrirArbitro = onAbrirArbitro,
             onAbrirPlanilla = onAbrirPlanilla,
             onAbrirCreador = onAbrirCreador,
@@ -228,6 +236,14 @@ private fun ListaDeInicio(state: InicioState, hoy: LocalDate, acciones: Acciones
             )
         }
 
+        // Lo primero: alguien espera su respuesta (MOV-0012).
+        if (state.invitaciones.isNotEmpty()) {
+            item(key = "titulo_invitaciones") { EncabezadoBloque(stringResource(R.string.inicio_invitaciones)) }
+            items(state.invitaciones, key = { "invitacion_${it.token}" }) { invitacion ->
+                FilaDeInvitacion(invitacion, acciones.onAbrirInvitacion)
+            }
+        }
+
         // "Tus secciones" solo existe para quien tiene alguna (CA-2).
         if (!state.secciones.ninguna) {
             item(key = "titulo_secciones") { EncabezadoBloque(stringResource(R.string.inicio_tus_secciones)) }
@@ -281,6 +297,29 @@ private fun ListaDeInicio(state: InicioState, hoy: LocalDate, acciones: Acciones
  * "Tu próximo partido": cuándo, contra quién y dónde. El equipo local va primero. Un toque abre
  * el torneo (todavía no hay pantalla de partido para el jugador).
  */
+/** "Te invitan como árbitro · Copa X": tocarla abre la pantalla donde se acepta. */
+@Composable
+private fun FilaDeInvitacion(invitacion: InvitacionRecibida, onAbrir: () -> Unit) {
+    val rol = when (invitacion.rol) {
+        RolInvitado.ARBITRO -> stringResource(R.string.invitacion_rol_arbitro)
+        RolInvitado.ADMINISTRADOR -> stringResource(R.string.invitacion_rol_admin)
+        RolInvitado.DELEGADO -> stringResource(R.string.invitacion_rol_delegado)
+        RolInvitado.DESCONOCIDO -> null
+    }
+    Fila(
+        titulo = rol?.let { stringResource(R.string.invitacion_te_invitan, it) }
+            ?: stringResource(R.string.invitacion_te_invitan_sin_rol),
+        detalle = listOfNotNull(
+            invitacion.torneo,
+            invitacion.invitadoPor?.let { stringResource(R.string.invitacion_invita, it) },
+        ).joinToString(" · ").ifBlank { null },
+        inicio = { IconoEnCirculo(R.drawable.ic_mark_email_read) },
+        fin = { FlechaFila() },
+        onClick = onAbrir,
+        modifier = Modifier.testTag("inicio_invitacion"),
+    )
+}
+
 @Composable
 private fun ProximoPartidoDeEquipo(
     proximo: PartidoDeMiEquipo,

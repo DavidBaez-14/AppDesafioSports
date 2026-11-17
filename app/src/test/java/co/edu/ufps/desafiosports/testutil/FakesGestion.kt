@@ -114,7 +114,18 @@ class FakeInvitacionesRepository : InvitacionesRepository {
     val llamadas = mutableListOf<String>()
     var resultadoVer: Result<InvitacionRecibida> = Result.success(invitacionRecibidaDePrueba())
     var resultadoAceptar: Result<Unit> = Result.success(Unit)
+
+    /** Las invitaciones dirigidas al correo de la sesión (MOV-0012). */
+    var resultadoMias: Result<List<InvitacionRecibida>> = Result.success(emptyList())
     var bloqueo: CompletableDeferred<Unit>? = null
+
+    /** Va aparte de [llamadas]: se pide sola al abrir la pantalla. */
+    var pedidosDeMias = 0
+
+    override suspend fun mias(): Result<List<InvitacionRecibida>> {
+        pedidosDeMias++
+        return resultadoMias
+    }
 
     override suspend fun ver(token: String): Result<InvitacionRecibida> {
         llamadas += "ver:$token"

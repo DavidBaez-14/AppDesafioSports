@@ -14,4 +14,7 @@ interface ArbitrajeRepository {
     suspend fun quitarDeAlineacion(partidoId: String, personaId: String): Result<Unit>
     suspend fun alinearEquipo(partidoId: String, equipoTorneoId: String): Result<Unit>
     suspend fun cerrarPartido(partidoId: String): Result<Unit>
+
+    /** Vuelve a abrir un partido cerrado. Solo lo puede hacer quien organiza el torneo. */
+    suspend fun reabrirPartido(partidoId: String): Result<Unit>
 }

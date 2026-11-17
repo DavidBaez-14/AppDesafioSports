@@ -2,6 +2,7 @@ package co.edu.ufps.desafiosports.presentacion.perfil
 
 import co.edu.ufps.desafiosports.domain.error.AppError
 import co.edu.ufps.desafiosports.domain.use_case.identidad.AceptarInvitacionUseCase
+import co.edu.ufps.desafiosports.domain.use_case.identidad.ObtenerMisInvitacionesUseCase
 import co.edu.ufps.desafiosports.domain.use_case.identidad.VerInvitacionUseCase
 import co.edu.ufps.desafiosports.testutil.FakeInvitacionesRepository
 import co.edu.ufps.desafiosports.testutil.MainDispatcherRule
@@ -23,7 +24,9 @@ class InvitacionViewModelTest {
 
     private val repositorio = FakeInvitacionesRepository()
 
-    private fun crear() = InvitacionViewModel(VerInvitacionUseCase(repositorio), AceptarInvitacionUseCase(repositorio))
+    private fun crear() = InvitacionViewModel(
+        VerInvitacionUseCase(repositorio), AceptarInvitacionUseCase(repositorio), ObtenerMisInvitacionesUseCase(repositorio),
+    )
 
     @Test
     fun `CA-11 pegar el enlace y buscar muestra la invitacion`() {
@@ -141,5 +144,52 @@ class InvitacionViewModelTest {
         assertFalse(vm.state.aceptada)
         // La invitación sigue a la vista.
         assertEquals(TOKEN_DE_PRUEBA, vm.state.invitacion!!.token)
+    }
+
+    @Test
+    fun `MOV-0012 CA-1 al abrir salen las invitaciones de mi correo y se aceptan sin enlace`() {
+        val mia = invitacionRecibidaDePrueba().copy(token = "tok-mia")
+        repositorio.resultadoMias = Result.success(listOf(mia))
+        val vm = crear()
+
+        assertEquals(listOf("tok-mia"), vm.state.pendientes.map { it.token })
+        assertTrue(repositorio.llamadas.isEmpty())
+
+        vm.aceptarPendiente(mia)
+
+        assertEquals(listOf("aceptar:tok-mia"), repositorio.llamadas)
+        assertTrue(vm.state.aceptada)
+    }
+
+    @Test
+    fun `MOV-0012 CA-1 el doble toque en una pendiente no acepta dos veces y el error queda en ella`() {
+        val mia = invitacionRecibidaDePrueba().copy(token = "tok-mia")
+        repositorio.resultadoMias = Result.success(listOf(mia))
+        repositorio.resultadoAceptar = Result.failure(AppError.Negocio("INVITACION_NO_VIGENTE", "Esta invitación ya fue usada o revocada."))
+        repositorio.bloqueo = CompletableDeferred()
+        val vm = crear()
+
+        vm.aceptarPendiente(mia)
+        vm.aceptarPendiente(mia)
+        assertTrue(vm.state.aceptando)
+        repositorio.bloqueo!!.complete(Unit)
+
+        assertEquals(listOf("aceptar:tok-mia"), repositorio.llamadas)
+        assertFalse(vm.state.aceptada)
+        assertEquals("tok-mia", vm.state.invitacion!!.token)
+        assertEquals("Esta invitación ya fue usada o revocada.", vm.state.errorAlAceptar)
+    }
+
+    @Test
+    fun `MOV-0012 CA-1 si no se pueden pedir, la pantalla sigue sirviendo para pegar el enlace`() {
+        repositorio.resultadoMias = Result.failure(AppError.SinConexion())
+        val vm = crear()
+
+        assertTrue(vm.state.pendientes.isEmpty())
+        assertNull(vm.state.error)
+
+        vm.onTextoChange(TOKEN_DE_PRUEBA)
+        vm.buscar()
+        assertEquals("Copa Prueba 2026", vm.state.invitacion!!.torneo)
     }
 }

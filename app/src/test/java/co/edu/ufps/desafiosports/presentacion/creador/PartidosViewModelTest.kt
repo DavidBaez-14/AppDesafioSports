@@ -365,4 +365,18 @@ class PartidosViewModelTest {
         assertEquals(AppError.SinConexion().mensaje, vm.state.aviso)
         assertFalse(vm.state.refrescando)
     }
+
+    @Test
+    fun `MOV-0012 CA-5 al volver de la planilla se vuelven a pedir los partidos`() {
+        conPartidos("p1")
+        val vm = crear()
+        assertEquals(EstadoPartido.PROGRAMADO, vm.state.partidos.single().estado)
+
+        // En la planilla se cerró el partido.
+        repositorio.partidos = Result.success(listOf(partidoDeTorneoDePrueba("p1", estado = EstadoPartido.FINALIZADO)))
+        vm.alVolver()
+
+        assertEquals(EstadoPartido.FINALIZADO, vm.state.partidos.single().estado)
+        assertFalse(vm.state.cargando)
+    }
 }

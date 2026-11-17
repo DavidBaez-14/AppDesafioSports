@@ -142,6 +142,7 @@
     <string name="inicio_saludo">Hola, %1$s</string>
     <string name="inicio_saludo_generico">Hola</string>
     <string name="inicio_tus_secciones">Tus secciones</string>
+    <string name="inicio_invitaciones">Te invitaron</string>
     <string name="inicio_cerrar_sesion">Cerrar sesión</string>
     <string name="inicio_cerrando_sesion">Cerrando sesión…</string>
     <string name="inicio_diagnostico">Diagnóstico de conexión</string>
@@ -195,8 +196,14 @@
     <string name="planilla_plantel_vacio_detalle">El delegado todavía no agrega jugadores.</string>
     <string name="planilla_evento_de">%1$s de %2$s</string>
     <string name="planilla_quien">¿Quién?</string>
-    <string name="planilla_sin_candidatos">Nadie de este equipo puede jugar</string>
-    <string name="planilla_sin_candidatos_detalle">No tiene jugadores, o todos están suspendidos o con multas pendientes.</string>
+    <string name="planilla_sin_candidatos">Aún no hay nadie alineado</string>
+    <string name="planilla_sin_candidatos_detalle">Pasa lista de este equipo: solo a quien está alineado se le anota algo.</string>
+    <string name="planilla_todos_expulsados">No queda nadie en la cancha</string>
+    <string name="planilla_todos_expulsados_detalle">Los alineados de este equipo ya fueron expulsados. Si falta alguien, pasa lista.</string>
+    <string name="planilla_pasar_lista">Pasar lista</string>
+    <string name="planilla_expulsado">Expulsado en este partido</string>
+    <string name="planilla_motivo_multa">tiene una multa sin pagar</string>
+    <string name="planilla_motivo_suspension">está suspendido</string>
     <string name="planilla_eventos">Eventos en orden</string>
     <string name="planilla_evento_fila">%1$s · %2$s</string>
     <string name="planilla_sin_eventos">Aún no hay eventos. Elige el equipo y toca lo que pasó.</string>
@@ -213,6 +220,11 @@
     <string name="planilla_aviso_registrado">Registrado: %1$s · %2$s</string>
     <string name="planilla_aviso_quitado">Evento quitado.</string>
     <string name="planilla_aviso_cerrado">Partido cerrado.</string>
+    <string name="planilla_reabrir">Reabrir partido</string>
+    <string name="planilla_reabriendo">Reabriendo…</string>
+    <string name="planilla_reabrir_titulo">¿Reabrir el partido?</string>
+    <string name="planilla_reabrir_detalle">Vuelve a estar en juego para que corrijas la planilla. Cuando termines, ciérralo otra vez: las tarjetas nuevas generan su multa y las que ya la tenían no se repiten.</string>
+    <string name="planilla_aviso_reabierto">Partido reabierto. Ciérralo cuando termines de corregir.</string>
     <string name="planilla_aviso_sin_actualizar">Se guardó, pero no pudimos actualizar la planilla. Desliza hacia abajo para verla al día.</string>
 
     <!-- Torneos: textos que comparten las secciones (MOV-0007 y MOV-0008). -->
@@ -516,12 +528,16 @@
     <string name="partido_descansa">Descansa</string>
     <string name="partido_marcador">%1$d–%2$d</string>
     <string name="asignar_titulo">Árbitros del partido</string>
+    <string name="partido_hoja_titulo">Partido</string>
+    <string name="partido_abrir_planilla">Abrir planilla</string>
+    <string name="partido_abrir_planilla_detalle">Alineación, goles, tarjetas y cierre</string>
     <string name="asignar_sin_arbitros">Este torneo todavía no tiene árbitros.</string>
     <string name="asignar_invitar">Invitar árbitros</string>
 
     <string name="perfil_invitacion">Tengo una invitación</string>
     <string name="invitacion_titulo">Invitación</string>
     <string name="invitacion_explicacion">Pega el enlace que te enviaron para unirte a un torneo como árbitro u organizador.</string>
+    <string name="invitacion_explicacion_otra">¿Te pasaron otro enlace? Pégalo aquí.</string>
     <string name="invitacion_enlace">Enlace o código</string>
     <string name="invitacion_buscar">Buscar</string>
     <string name="invitacion_buscando">Buscando…</string>

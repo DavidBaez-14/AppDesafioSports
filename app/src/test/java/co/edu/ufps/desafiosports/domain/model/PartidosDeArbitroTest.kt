@@ -71,7 +71,7 @@ class PartidosDeArbitroTest {
     }
 
     @Test
-    fun `CA-4 se ofrecen los aptos con los alineados primero y luego por camiseta`() {
+    fun `CA-4 solo se ofrecen los alineados que siguen en la cancha, por camiseta (MOV-0012 CA-2 y CA-3)`() {
         val equipo = EquipoPlanilla(
             "e1", "Halcones FC",
             listOf(
@@ -80,10 +80,12 @@ class PartidosDeArbitroTest {
                 jugadorDePrueba("suspendido", "Beto", numero = 1, apto = false),
                 jugadorDePrueba("alineado-10", "Caro", numero = 10, alineado = true),
                 jugadorDePrueba("alineado-2", "Dani", numero = 2, alineado = true),
+                jugadorDePrueba("expulsado", "Eli", numero = 5, alineado = true).copy(expulsado = true),
             ),
         )
 
-        assertEquals(listOf("alineado-2", "alineado-10", "nueve", "sin-numero"), equipo.candidatos().map { it.personaId })
-        assertEquals(2, equipo.alineados)
+        // Ni quien no se alineó ni quien ya vio la roja o la azul.
+        assertEquals(listOf("alineado-2", "alineado-10"), equipo.candidatos().map { it.personaId })
+        assertEquals(3, equipo.alineados)
     }
 }

@@ -90,6 +90,8 @@ data class AccionesPartidos(
     val onAlternarArbitro: (ArbitroDeTorneo) -> Unit = {},
     val onReintentarArbitros: () -> Unit = {},
     val onInvitarArbitros: () -> Unit = {},
+    /** Quien organiza el torneo opera la planilla de cualquier partido (MOV-0012). */
+    val onAbrirPlanilla: (partidoId: String) -> Unit = {},
     val onAvisoMostrado: () -> Unit = {},
 )
 
@@ -98,13 +100,14 @@ data class AccionesPartidos(
 fun PartidosTorneoScreen(
     onVolver: () -> Unit,
     onInvitarArbitros: () -> Unit,
+    onAbrirPlanilla: (partidoId: String) -> Unit,
     viewModel: PartidosTorneoViewModel = viewModel(factory = PartidosTorneoViewModel.Factory),
 ) {
     LifecycleResumeEffect(Unit) {
         viewModel.alVolver()
         onPauseOrDispose { }
     }
-    val acciones = remember(viewModel, onInvitarArbitros) {
+    val acciones = remember(viewModel, onInvitarArbitros, onAbrirPlanilla) {
         AccionesPartidos(
             onReintentar = viewModel::cargar,
             onRefrescar = viewModel::refrescar,
@@ -118,6 +121,10 @@ fun PartidosTorneoScreen(
             onInvitarArbitros = {
                 viewModel.cerrarAsignacion()
                 onInvitarArbitros()
+            },
+            onAbrirPlanilla = { partidoId ->
+                viewModel.cerrarAsignacion()
+                onAbrirPlanilla(partidoId)
             },
             onAvisoMostrado = viewModel::onAvisoMostrado,
         )
@@ -200,7 +207,10 @@ fun PartidosTorneoContenido(
                                             modifier = Modifier.padding(horizontal = 16.dp),
                                         )
                                     }
-                                    FilaPartido(partido, hoy, sinArbitro = state.sinArbitro(partido), acciones.onAbrirPartido)
+                                    FilaPartido(
+                                        partido, hoy, sinArbitro = state.sinArbitro(partido),
+                                        onAbrir = acciones.onAbrirPartido, onPlanilla = acciones.onAbrirPlanilla,
+                                    )
                                 }
                             }
                         }
@@ -309,7 +319,13 @@ private fun cruceDe(partido: PartidoDeTorneo): String {
 }
 
 @Composable
-private fun FilaPartido(partido: PartidoDeTorneo, hoy: LocalDate, sinArbitro: Boolean, onAbrir: (PartidoDeTorneo) -> Unit) {
+private fun FilaPartido(
+    partido: PartidoDeTorneo,
+    hoy: LocalDate,
+    sinArbitro: Boolean,
+    onAbrir: (PartidoDeTorneo) -> Unit,
+    onPlanilla: (partidoId: String) -> Unit,
+) {
     val cuando = partido.fecha?.let { "${Formatos.fecha(it.toLocalDate(), hoy)} · ${Formatos.hora(it)}" }
     val detalle = listOfNotNull(
         cuando ?: stringResource(R.string.fecha_sin_fecha),
@@ -332,11 +348,16 @@ private fun FilaPartido(partido: PartidoDeTorneo, hoy: LocalDate, sinArbitro: Bo
         fin = {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 if (chip != null) ChipEstado(chip, tono = tono)
-                if (partido.admiteArbitros) FlechaFila()
+                if (partido.admiteArbitros || partido.tienePlanilla) FlechaFila()
             }
         },
-        // Un partido cerrado no se toca: ya no admite árbitros.
-        onClick = if (partido.admiteArbitros) ({ onAbrir(partido) }) else null,
+        // Abierto: la hoja con sus árbitros y su planilla. Cerrado ya no admite árbitros: va
+        // directo a la planilla, que quien organiza puede reabrir (MOV-0012).
+        onClick = when {
+            partido.admiteArbitros -> ({ onAbrir(partido) })
+            partido.tienePlanilla -> ({ onPlanilla(partido.id) })
+            else -> null
+        },
         modifier = Modifier.testTag("partido"),
     )
 }
@@ -358,7 +379,7 @@ private fun HojaDeArbitros(partido: PartidoDeTorneo, state: PartidosState, accio
             .testTag("hoja_arbitros"),
     ) {
         Text(
-            text = stringResource(R.string.asignar_titulo).uppercase(),
+            text = stringResource(R.string.partido_hoja_titulo).uppercase(),
             style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier
                 .padding(horizontal = 24.dp)
@@ -400,6 +421,29 @@ private fun HojaDeArbitros(partido: PartidoDeTorneo, state: PartidosState, accio
                 .verticalScroll(rememberScrollState())
                 .padding(bottom = 24.dp),
         ) {
+            if (partido.tienePlanilla) {
+                Fila(
+                    titulo = stringResource(R.string.partido_abrir_planilla),
+                    detalle = stringResource(R.string.partido_abrir_planilla_detalle),
+                    fin = { FlechaFila() },
+                    onClick = { acciones.onAbrirPlanilla(partido.id) },
+                    modifier = Modifier
+                        .padding(horizontal = 8.dp)
+                        .testTag("partido_planilla"),
+                )
+                HorizontalDivider(
+                    color = MaterialTheme.colorScheme.outlineVariant,
+                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp),
+                )
+            }
+            Text(
+                text = stringResource(R.string.asignar_titulo),
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier
+                    .padding(start = 24.dp, end = 24.dp, top = 8.dp, bottom = 4.dp)
+                    .semantics { heading() },
+            )
             when {
                 arbitros == null -> if (!state.cargandoArbitros) {
                     BotonContorno(

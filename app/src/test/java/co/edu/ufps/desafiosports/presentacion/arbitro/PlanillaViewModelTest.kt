@@ -10,6 +10,7 @@ import co.edu.ufps.desafiosports.domain.use_case.competicion.CerrarPartidoUseCas
 import co.edu.ufps.desafiosports.domain.use_case.competicion.ObtenerPlanillaUseCase
 import co.edu.ufps.desafiosports.domain.use_case.competicion.QuitarDeAlineacionUseCase
 import co.edu.ufps.desafiosports.domain.use_case.competicion.QuitarEventoUseCase
+import co.edu.ufps.desafiosports.domain.use_case.competicion.ReabrirPartidoUseCase
 import co.edu.ufps.desafiosports.domain.use_case.competicion.RegistrarEventoUseCase
 import co.edu.ufps.desafiosports.testutil.FakeArbitrajeRepository
 import co.edu.ufps.desafiosports.testutil.MainDispatcherRule
@@ -40,6 +41,7 @@ class PlanillaViewModelTest {
         quitarDeAlineacionUseCase = QuitarDeAlineacionUseCase(repositorio),
         alinearEquipoUseCase = AlinearEquipoUseCase(repositorio),
         cerrarPartidoUseCase = CerrarPartidoUseCase(repositorio),
+        reabrirPartidoUseCase = ReabrirPartidoUseCase(repositorio),
     )
 
     private fun acciones() = repositorio.llamadas.filter { it != "planilla" }
@@ -482,5 +484,109 @@ class PlanillaViewModelTest {
 
         assertEquals(listOf("evento:j1:eq-local:GOL"), acciones())
         assertFalse(vm.state.enAccion)
+    }
+
+    // ── MOV-0012 ────────────────────────────────────────────────────────────
+
+    @Test
+    fun `MOV-0012 CA-2 sin nadie alineado la hoja del evento lleva a pasar lista del equipo elegido`() {
+        val vm = crearViewModel()
+
+        // El visitante de la planilla de prueba no tiene a nadie alineado.
+        vm.elegirLado(Lado.VISITANTE)
+        vm.abrirSeleccion("GOL")
+        assertTrue(vm.state.planilla!!.visitante.candidatos().isEmpty())
+
+        vm.irAAlineacion()
+
+        assertNull(vm.state.tipoEnSeleccion)
+        assertTrue(vm.state.alineacionAbierta)
+        assertEquals(Lado.VISITANTE, vm.state.ladoAlineacion)
+        assertTrue(acciones().isEmpty())
+    }
+
+    @Test
+    fun `MOV-0012 CA-4 el rechazo del backend por no estar alineado se ve y la planilla se vuelve a pedir`() {
+        repositorio.resultadoEvento = Result.failure(
+            AppError.Negocio("JUGADOR_NO_ALINEADO", "Ese jugador no está en la alineación de su equipo. Alinéalo antes de anotarle algo."),
+        )
+        val vm = crearViewModel()
+        val antes = repositorio.pedidosDePlanilla
+
+        vm.abrirSeleccion("GOL")
+        vm.registrar(vm.state.planilla!!.local.jugadores.first())
+
+        val aviso = vm.state.aviso as AvisoPlanilla.Fallo
+        assertTrue(aviso.mensaje.startsWith("Ese jugador no está en la alineación"))
+        assertEquals(antes + 1, repositorio.pedidosDePlanilla)
+    }
+
+    @Test
+    fun `MOV-0012 CA-3 a un expulsado no se le cambia la alineacion`() {
+        val base = planillaDePrueba()
+        repositorio.planilla = Result.success(
+            base.copy(local = base.local.copy(jugadores = base.local.jugadores.map { if (it.personaId == "j1") it.copy(expulsado = true) else it })),
+        )
+        val vm = crearViewModel()
+
+        assertFalse(vm.state.planilla!!.local.candidatos().any { it.personaId == "j1" })
+    }
+
+    @Test
+    fun `MOV-0012 CA-6 quien organiza reabre el partido cerrado, con confirmacion`() {
+        repositorio.planilla = Result.success(planillaDePrueba(editable = false, estado = EstadoPartido.FINALIZADO).copy(puedeReabrir = true))
+        val vm = crearViewModel()
+        assertFalse(vm.state.editable)
+        assertTrue(vm.state.puedeReabrir)
+
+        vm.pedirReabrir()
+        assertTrue(vm.state.confirmandoReabrir)
+        vm.cancelarReabrir()
+        assertTrue(acciones().isEmpty())
+
+        repositorio.alActuar = {
+            repositorio.planilla = Result.success(planillaDePrueba(editable = true, estado = EstadoPartido.EN_CURSO))
+        }
+        vm.pedirReabrir()
+        vm.confirmarReabrir()
+
+        assertEquals(listOf("reabrir"), acciones())
+        assertTrue(vm.state.editable)
+        assertFalse(vm.state.puedeReabrir)
+        assertFalse(vm.state.reabriendo)
+        assertEquals(AvisoPlanilla.PartidoReabierto, vm.state.aviso)
+    }
+
+    @Test
+    fun `MOV-0012 CA-6 un arbitro no reabre, ni nadie reabre un partido abierto`() {
+        // Cerrado, visto por un árbitro: el backend no le da el permiso.
+        repositorio.planilla = Result.success(planillaDePrueba(editable = false, estado = EstadoPartido.FINALIZADO))
+        val arbitro = crearViewModel()
+        arbitro.pedirReabrir()
+        arbitro.confirmarReabrir()
+        assertFalse(arbitro.state.puedeReabrir)
+        assertFalse(arbitro.state.confirmandoReabrir)
+
+        // Abierto: no hay nada que reabrir aunque el dato llegue en true.
+        repositorio.planilla = Result.success(planillaDePrueba().copy(puedeReabrir = true))
+        val organizador = crearViewModel()
+        organizador.pedirReabrir()
+        assertFalse(organizador.state.puedeReabrir)
+        assertFalse(organizador.state.confirmandoReabrir)
+
+        assertTrue(acciones().isEmpty())
+    }
+
+    @Test
+    fun `MOV-0012 CA-6 si reabrir falla el partido sigue cerrado y se ve el mensaje`() {
+        repositorio.planilla = Result.success(planillaDePrueba(editable = false, estado = EstadoPartido.FINALIZADO).copy(puedeReabrir = true))
+        repositorio.resultadoAccion = Result.failure(AppError.AccesoDenegado("No tienes permisos para esta acción."))
+        val vm = crearViewModel()
+
+        vm.pedirReabrir()
+        vm.confirmarReabrir()
+
+        assertFalse(vm.state.editable)
+        assertEquals("No tienes permisos para esta acción.", (vm.state.aviso as AvisoPlanilla.Fallo).mensaje)
     }
 }

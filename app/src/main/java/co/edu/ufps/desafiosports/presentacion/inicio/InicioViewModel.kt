@@ -11,6 +11,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import co.edu.ufps.desafiosports.DesafioSportsApp
 import co.edu.ufps.desafiosports.domain.error.AppError
 import co.edu.ufps.desafiosports.domain.model.Cuenta
+import co.edu.ufps.desafiosports.domain.model.InvitacionRecibida
 import co.edu.ufps.desafiosports.domain.model.MiEquipo
 import co.edu.ufps.desafiosports.domain.model.PartidoArbitro
 import co.edu.ufps.desafiosports.domain.model.PartidoDeMiEquipo
@@ -23,6 +24,7 @@ import co.edu.ufps.desafiosports.domain.use_case.competicion.ObtenerMisEquiposUs
 import co.edu.ufps.desafiosports.domain.use_case.competicion.ObtenerMisTorneosUseCase
 import co.edu.ufps.desafiosports.domain.use_case.competicion.ObtenerPartidosDeArbitroUseCase
 import co.edu.ufps.desafiosports.domain.use_case.identidad.ObtenerCuentaUseCase
+import co.edu.ufps.desafiosports.domain.use_case.identidad.ObtenerMisInvitacionesUseCase
 import co.edu.ufps.desafiosports.presentacion.acceso.mensajeParaMostrar
 import co.edu.ufps.desafiosports.presentacion.comun.ErrorDePantalla
 import co.edu.ufps.desafiosports.presentacion.comun.aErrorDePantalla
@@ -63,6 +65,8 @@ data class InicioState(
     val arbitro: Seccion<ResumenArbitro> = Seccion.Cargando,
     val creador: Seccion<ResumenCreador> = Seccion.Cargando,
     val equipos: List<MiEquipo> = emptyList(),
+    /** Invitaciones que le hicieron por su correo y aún no acepta (MOV-0012). */
+    val invitaciones: List<InvitacionRecibida> = emptyList(),
     val refrescando: Boolean = false,
     /** Falló una actualización y lo que se ve se conserva: sale como aviso pasajero. */
     val aviso: String? = null,
@@ -85,6 +89,7 @@ class InicioViewModel(
     private val obtenerMisEquiposUseCase: ObtenerMisEquiposUseCase,
     private val obtenerPartidosUseCase: ObtenerPartidosDeArbitroUseCase,
     private val obtenerMisTorneosUseCase: ObtenerMisTorneosUseCase,
+    private val obtenerMisInvitacionesUseCase: ObtenerMisInvitacionesUseCase,
 ) : ViewModel() {
 
     var state by mutableStateOf(InicioState())
@@ -140,6 +145,7 @@ class InicioViewModel(
             coroutineScope {
                 val cuentaPedida = async { obtenerCuentaUseCase() }
                 val equiposPedidos = async { obtenerMisEquiposUseCase() }
+                launch { pedirInvitaciones() }
                 val cuenta = cuentaPedida.await()
                 // Los bloques de sección no esperan a los equipos: arrancan en cuanto se sabe cuáles hay.
                 cuenta.getOrNull()?.secciones?.let { secciones ->
@@ -180,6 +186,14 @@ class InicioViewModel(
             .onFailure { if (state.arbitro !is Seccion.Lista) state = state.copy(arbitro = Seccion.Fallo(it.aErrorDePantalla())) }
     }
 
+    /**
+     * Va por su lado y en silencio: si falla, Inicio se ve igual y la invitación se puede seguir
+     * aceptando con su enlace desde Perfil.
+     */
+    private suspend fun pedirInvitaciones() {
+        obtenerMisInvitacionesUseCase().onSuccess { state = state.copy(invitaciones = it) }
+    }
+
     private suspend fun pedirCreador() {
         obtenerMisTorneosUseCase()
             .onSuccess { state = state.copy(creador = Seccion.Lista(ResumenCreador(it))) }
@@ -191,7 +205,10 @@ class InicioViewModel(
             initializer {
                 val app = this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as DesafioSportsApp
                 val c = app.container
-                InicioViewModel(c.obtenerCuenta, c.obtenerMisEquipos, c.obtenerPartidosDeArbitro, c.obtenerMisTorneos)
+                InicioViewModel(
+                    c.obtenerCuenta, c.obtenerMisEquipos, c.obtenerPartidosDeArbitro, c.obtenerMisTorneos,
+                    c.obtenerMisInvitaciones,
+                )
             }
         }
     }

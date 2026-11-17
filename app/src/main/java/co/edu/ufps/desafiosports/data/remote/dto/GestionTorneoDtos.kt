@@ -81,3 +81,13 @@ data class InvitacionVistaDto(
     val invitadoPor: String? = null,
     val paraCorreo: String? = null,
 )
+
+/** `MiInvitacionDTO`: una invitación pendiente dirigida a mi correo (MOV-0012). Trae su token. */
+@Serializable
+data class MiInvitacionDto(
+    val token: String? = null,
+    val rol: String? = null,
+    val ambito: String? = null,
+    val ambitoDescripcion: String? = null,
+    val invitadoPor: String? = null,
+)

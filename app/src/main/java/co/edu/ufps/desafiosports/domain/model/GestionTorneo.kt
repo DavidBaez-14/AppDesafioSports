@@ -66,6 +66,9 @@ data class PartidoDeTorneo(
 
     /** Todavía se le pueden cambiar los árbitros. */
     val admiteArbitros: Boolean get() = !estado.cerrado && !descansa
+
+    /** Tiene planilla que abrir: se conocen los dos equipos y no es un descanso (MOV-0012). */
+    val tienePlanilla: Boolean get() = !descansa && local != null && visitante != null
 }
 
 /** Los partidos que comparten encabezado: una jornada, un grupo en una jornada o una ronda. */

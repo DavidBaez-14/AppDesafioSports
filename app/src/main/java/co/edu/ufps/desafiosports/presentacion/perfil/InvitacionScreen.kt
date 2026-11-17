@@ -17,6 +17,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -54,6 +55,7 @@ fun InvitacionScreen(
         onTexto = viewModel::onTextoChange,
         onBuscar = viewModel::buscar,
         onAceptar = viewModel::aceptar,
+        onAceptarPendiente = viewModel::aceptarPendiente,
     )
 }
 
@@ -66,6 +68,7 @@ fun InvitacionContenido(
     onBuscar: () -> Unit,
     onAceptar: () -> Unit,
     modifier: Modifier = Modifier,
+    onAceptarPendiente: (InvitacionRecibida) -> Unit = {},
 ) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -105,8 +108,37 @@ fun InvitacionContenido(
                 return@Column
             }
 
+            // Las que le hicieron por su correo: se aceptan aquí mismo, sin enlace (MOV-0012).
+            val elegida = state.invitacion
+            state.pendientes.forEach { pendiente ->
+                val esEsta = elegida?.token == pendiente.token
+                VistaPrevia(pendiente, Modifier.testTag("invitacion_pendiente"))
+                if (esEsta) {
+                    state.errorAlAceptar?.let {
+                        Text(
+                            it,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.testTag("invitacion_error"),
+                        )
+                    }
+                }
+                BotonPrimario(
+                    texto = stringResource(R.string.invitacion_aceptar),
+                    onClick = { onAceptarPendiente(pendiente) },
+                    habilitado = !state.aceptando && !state.buscando,
+                    enProceso = state.aceptando && esEsta,
+                    textoEnProceso = stringResource(R.string.invitacion_aceptando),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("invitacion_aceptar_pendiente"),
+                )
+            }
+            val hayPendientes = state.pendientes.isNotEmpty()
+            if (hayPendientes) HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+
             Text(
-                stringResource(R.string.invitacion_explicacion),
+                stringResource(if (hayPendientes) R.string.invitacion_explicacion_otra else R.string.invitacion_explicacion),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -126,13 +158,14 @@ fun InvitacionContenido(
                     .testTag("invitacion_enlace"),
             )
 
-            val invitacion = state.invitacion
+            // Una de las pendientes ya tiene su tarjeta arriba: aquí solo va la que se buscó con el enlace.
+            val invitacion = state.invitacion?.takeIf { buscada -> state.pendientes.none { it.token == buscada.token } }
             if (invitacion == null) {
                 // Mientras no hay invitación a la vista, buscar es la acción principal.
                 BotonPrimario(
                     texto = stringResource(R.string.invitacion_buscar),
                     onClick = onBuscar,
-                    habilitado = state.texto.isNotBlank(),
+                    habilitado = state.texto.isNotBlank() && !state.aceptando,
                     enProceso = state.buscando,
                     textoEnProceso = stringResource(R.string.invitacion_buscando),
                     modifier = Modifier
@@ -167,14 +200,14 @@ fun InvitacionContenido(
 
 /** Qué es la invitación: el rol, el torneo, quién invita y para quién. */
 @Composable
-private fun VistaPrevia(invitacion: InvitacionRecibida) {
+private fun VistaPrevia(invitacion: InvitacionRecibida, modifier: Modifier = Modifier) {
     val rol = when (invitacion.rol) {
         RolInvitado.ARBITRO -> stringResource(R.string.invitacion_rol_arbitro)
         RolInvitado.ADMINISTRADOR -> stringResource(R.string.invitacion_rol_admin)
         RolInvitado.DELEGADO -> stringResource(R.string.invitacion_rol_delegado)
         RolInvitado.DESCONOCIDO -> null
     }
-    Surface(color = colorDePanel(), shape = MaterialTheme.shapes.large, modifier = Modifier.fillMaxWidth()) {
+    Surface(color = colorDePanel(), shape = MaterialTheme.shapes.large, modifier = modifier.fillMaxWidth()) {
         Column(
             verticalArrangement = Arrangement.spacedBy(6.dp),
             modifier = Modifier
@@ -224,6 +257,14 @@ private val invitacionDeEjemplo = InvitacionRecibida(
 private fun InvitacionPreview() {
     DesafioSportsTheme {
         InvitacionContenido(InvitacionState(texto = "https://desafio.test/invitacion/abc", invitacion = invitacionDeEjemplo), {}, {}, {}, {})
+    }
+}
+
+@Preview(name = "Invitación · para ti", uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true, widthDp = 390, heightDp = 844)
+@Composable
+private fun InvitacionPendientePreview() {
+    DesafioSportsTheme {
+        InvitacionContenido(InvitacionState(pendientes = listOf(invitacionDeEjemplo.copy(paraCorreo = null))), {}, {}, {}, {})
     }
 }
 

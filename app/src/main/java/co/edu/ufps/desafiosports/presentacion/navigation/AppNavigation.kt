@@ -212,6 +212,7 @@ fun AppNavigation(
             PartidosTorneoScreen(
                 onVolver = { navController.popBackStack() },
                 onInvitarArbitros = { navController.navigate(ArbitrosTorneo(ruta.torneoId, ruta.nombre)) },
+                onAbrirPlanilla = { partidoId -> navController.navigate(Planilla(partidoId)) },
             )
         }
         composable<Invitacion> {

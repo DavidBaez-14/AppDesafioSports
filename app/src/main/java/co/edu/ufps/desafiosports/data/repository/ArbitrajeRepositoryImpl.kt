@@ -50,6 +50,9 @@ class ArbitrajeRepositoryImpl(
 
     override suspend fun cerrarPartido(partidoId: String): Result<Unit> =
         llamarApi(errores) { api.cerrarPartido(partidoId) }
+
+    override suspend fun reabrirPartido(partidoId: String): Result<Unit> =
+        llamarApi(errores) { api.reabrirPartido(partidoId) }
 }
 
 // ── DTO → modelo ────────────────────────────────────────────────────────────
@@ -82,6 +85,7 @@ internal fun PlanillaDto.aDominio(): Planilla = Planilla(
     visitante = visitante.aDominio(),
     eventos = eventos.orEmpty().map { it.aDominio() }.sortedBy { it.orden },
     editable = editable ?: false,
+    puedeReabrir = puedeReabrir ?: false,
 )
 
 private fun EquipoPlanillaDto?.aDominio(): EquipoPlanilla = EquipoPlanilla(
@@ -99,6 +103,7 @@ private fun EquipoPlanillaDto?.aDominio(): EquipoPlanilla = EquipoPlanilla(
             // Sin dato, se le deja jugar: el backend vuelve a comprobarlo al alinear.
             apto = j.apto ?: true,
             motivos = j.motivos.orEmpty(),
+            expulsado = j.expulsado ?: false,
         )
     },
 )

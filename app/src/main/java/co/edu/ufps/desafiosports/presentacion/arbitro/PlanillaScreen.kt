@@ -64,6 +64,7 @@ import co.edu.ufps.desafiosports.domain.model.Marcador
 import co.edu.ufps.desafiosports.domain.model.PartidoArbitro
 import co.edu.ufps.desafiosports.domain.model.Planilla
 import co.edu.ufps.desafiosports.presentacion.acceso.BotonPrincipal
+import co.edu.ufps.desafiosports.presentacion.comun.BotonContorno
 import co.edu.ufps.desafiosports.presentacion.comun.Cargando
 import co.edu.ufps.desafiosports.presentacion.comun.EstadoError
 import co.edu.ufps.desafiosports.presentacion.comun.Fila
@@ -94,6 +95,10 @@ data class AccionesPlanilla(
     val onPedirCierre: () -> Unit = {},
     val onCancelarCierre: () -> Unit = {},
     val onConfirmarCierre: () -> Unit = {},
+    val onIrAAlineacion: () -> Unit = {},
+    val onPedirReabrir: () -> Unit = {},
+    val onCancelarReabrir: () -> Unit = {},
+    val onConfirmarReabrir: () -> Unit = {},
     val onAvisoMostrado: () -> Unit = {},
 )
 
@@ -123,6 +128,10 @@ fun PlanillaScreen(
             onPedirCierre = viewModel::pedirCierre,
             onCancelarCierre = viewModel::cancelarCierre,
             onConfirmarCierre = viewModel::confirmarCierre,
+            onIrAAlineacion = viewModel::irAAlineacion,
+            onPedirReabrir = viewModel::pedirReabrir,
+            onCancelarReabrir = viewModel::cancelarReabrir,
+            onConfirmarReabrir = viewModel::confirmarReabrir,
             onAvisoMostrado = viewModel::onAvisoMostrado,
         )
     }
@@ -167,7 +176,11 @@ fun PlanillaContenido(
             )
         },
         bottomBar = {
-            if (state.editable) BarraCerrar(cerrando = state.cerrando, onCerrar = acciones.onPedirCierre)
+            when {
+                state.editable -> BarraCerrar(cerrando = state.cerrando, onCerrar = acciones.onPedirCierre)
+                // Solo quien organiza el torneo corrige un partido ya cerrado.
+                state.puedeReabrir -> BarraReabrir(reabriendo = state.reabriendo, onReabrir = acciones.onPedirReabrir)
+            }
         },
         snackbarHost = { SnackbarHost(avisos) },
         modifier = modifier
@@ -205,6 +218,7 @@ fun PlanillaContenido(
                 tipo = tipo,
                 equipo = planilla.equipo(state.lado),
                 onElegir = acciones.onJugador,
+                onAlinear = acciones.onIrAAlineacion,
                 onCerrar = acciones.onCerrarSeleccion,
             )
         }
@@ -259,6 +273,25 @@ fun PlanillaContenido(
                 },
             )
         }
+        if (state.confirmandoReabrir) {
+            AlertDialog(
+                onDismissRequest = acciones.onCancelarReabrir,
+                // El diálogo es otra ventana: sin esto sus testTag no se ven desde fuera.
+                modifier = Modifier.semantics { testTagsAsResourceId = true },
+                title = { Text(stringResource(R.string.planilla_reabrir_titulo)) },
+                text = { Text(stringResource(R.string.planilla_reabrir_detalle)) },
+                confirmButton = {
+                    TextButton(onClick = acciones.onConfirmarReabrir, modifier = Modifier.testTag("reabrir_confirmar")) {
+                        Text(stringResource(R.string.planilla_reabrir))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = acciones.onCancelarReabrir, modifier = Modifier.testTag("reabrir_cancelar")) {
+                        Text(stringResource(R.string.accion_cancelar), color = MaterialTheme.colorScheme.onSurface)
+                    }
+                },
+            )
+        }
     }
 }
 
@@ -268,6 +301,7 @@ private fun textoDeAviso(aviso: AvisoPlanilla): String = when (aviso) {
         stringResource(R.string.planilla_aviso_registrado, nombreDeEvento(aviso.evento.tipo), aviso.evento.jugadorNombre)
     AvisoPlanilla.EventoQuitado -> stringResource(R.string.planilla_aviso_quitado)
     AvisoPlanilla.PartidoCerrado -> stringResource(R.string.planilla_aviso_cerrado)
+    AvisoPlanilla.PartidoReabierto -> stringResource(R.string.planilla_aviso_reabierto)
     AvisoPlanilla.SinActualizar -> stringResource(R.string.planilla_aviso_sin_actualizar)
     is AvisoPlanilla.Fallo -> aviso.mensaje
 }
@@ -449,6 +483,28 @@ private fun BarraCerrar(cerrando: Boolean, onCerrar: () -> Unit) {
                 modifier = Modifier
                     .padding(horizontal = 16.dp, vertical = 12.dp)
                     .testTag("planilla_cerrar"),
+            )
+        }
+    }
+}
+
+/**
+ * Barra del partido cerrado, para quien organiza el torneo (MOV-0012). Va en contorno: reabrir es
+ * una corrección, no la acción del día.
+ */
+@Composable
+private fun BarraReabrir(reabriendo: Boolean, onReabrir: () -> Unit) {
+    Surface(color = MaterialTheme.colorScheme.background) {
+        Column(Modifier.windowInsetsPadding(WindowInsets.navigationBars)) {
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+            BotonContorno(
+                texto = stringResource(if (reabriendo) R.string.planilla_reabriendo else R.string.planilla_reabrir),
+                onClick = onReabrir,
+                habilitado = !reabriendo,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
+                    .testTag("planilla_reabrir"),
             )
         }
     }

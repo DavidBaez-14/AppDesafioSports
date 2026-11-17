@@ -55,3 +55,8 @@ class AlinearEquipoUseCase(private val repositorio: ArbitrajeRepository) {
 class CerrarPartidoUseCase(private val repositorio: ArbitrajeRepository) {
     suspend operator fun invoke(partidoId: String): Result<Unit> = repositorio.cerrarPartido(partidoId)
 }
+
+/** Vuelve a abrir un partido cerrado para corregir su planilla. Solo quien organiza el torneo (MOV-0012). */
+class ReabrirPartidoUseCase(private val repositorio: ArbitrajeRepository) {
+    suspend operator fun invoke(partidoId: String): Result<Unit> = repositorio.reabrirPartido(partidoId)
+}

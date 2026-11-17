@@ -11,11 +11,14 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import co.edu.ufps.desafiosports.DesafioSportsApp
 import co.edu.ufps.desafiosports.domain.model.InvitacionRecibida
 import co.edu.ufps.desafiosports.domain.use_case.identidad.AceptarInvitacionUseCase
+import co.edu.ufps.desafiosports.domain.use_case.identidad.ObtenerMisInvitacionesUseCase
 import co.edu.ufps.desafiosports.domain.use_case.identidad.VerInvitacionUseCase
 import co.edu.ufps.desafiosports.presentacion.acceso.mensajeParaMostrar
 import kotlinx.coroutines.launch
 
 data class InvitacionState(
+    /** Las invitaciones que le hicieron por su correo y aún no acepta (MOV-0012). */
+    val pendientes: List<InvitacionRecibida> = emptyList(),
     /** El enlace o el código que pega la persona. */
     val texto: String = "",
     val buscando: Boolean = false,
@@ -29,14 +32,32 @@ data class InvitacionState(
     val aceptada: Boolean = false,
 )
 
-/** Aceptar una invitación pegando su enlace (MOV-0011). */
+/**
+ * Aceptar una invitación (MOV-0011): las que le hicieron por su correo salen solas (MOV-0012) y
+ * las de enlace se pegan.
+ */
 class InvitacionViewModel(
     private val verInvitacionUseCase: VerInvitacionUseCase,
     private val aceptarInvitacionUseCase: AceptarInvitacionUseCase,
+    private val obtenerMisInvitacionesUseCase: ObtenerMisInvitacionesUseCase,
 ) : ViewModel() {
 
     var state by mutableStateOf(InvitacionState())
         private set
+
+    init {
+        // Si falla (sin conexión, backend viejo) la pantalla sigue sirviendo para pegar un enlace.
+        viewModelScope.launch {
+            obtenerMisInvitacionesUseCase().onSuccess { state = state.copy(pendientes = it) }
+        }
+    }
+
+    /** "Aceptar" en una de las invitaciones que llegaron por correo. */
+    fun aceptarPendiente(invitacion: InvitacionRecibida) {
+        if (state.buscando || state.aceptando || state.aceptada) return
+        state = state.copy(invitacion = invitacion, texto = "", error = null, errorAlAceptar = null)
+        aceptar()
+    }
 
     /** Cambiar el texto descarta la invitación que se estaba viendo. */
     fun onTextoChange(valor: String) {
@@ -71,7 +92,8 @@ class InvitacionViewModel(
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val app = this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as DesafioSportsApp
-                InvitacionViewModel(app.container.verInvitacion, app.container.aceptarInvitacion)
+                val c = app.container
+                InvitacionViewModel(c.verInvitacion, c.aceptarInvitacion, c.obtenerMisInvitaciones)
             }
         }
     }

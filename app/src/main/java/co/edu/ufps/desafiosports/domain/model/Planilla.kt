@@ -13,6 +13,8 @@ data class JugadorPlanilla(
     val apto: Boolean,
     /** Por qué no puede jugar (suspensión, multa pendiente…), en texto del backend. */
     val motivos: List<String>,
+    /** Ya tiene una tarjeta azul o roja en este partido: no se le anota nada más (MOV-0012). */
+    val expulsado: Boolean = false,
 )
 
 data class EquipoPlanilla(
@@ -23,15 +25,11 @@ data class EquipoPlanilla(
     val alineados: Int get() = jugadores.count { it.alineado }
 
     /**
-     * A quién se le puede anotar un evento: los aptos, con los alineados primero y después por
-     * número de camiseta. El backend no exige alinear antes de registrar.
+     * A quién se le puede anotar un evento (MOV-0012): solo a quien está alineado y sigue en la
+     * cancha, por número de camiseta. Primero se pasa lista; el backend rechaza lo demás.
      */
-    fun candidatos(): List<JugadorPlanilla> = jugadores.filter { it.apto }
-        .sortedWith(
-            compareByDescending<JugadorPlanilla> { it.alineado }
-                .thenBy { it.numeroCamiseta ?: Int.MAX_VALUE }
-                .thenBy { it.nombre },
-        )
+    fun candidatos(): List<JugadorPlanilla> = jugadores.filter { it.alineado && !it.expulsado }
+        .sortedWith(compareBy<JugadorPlanilla> { it.numeroCamiseta ?: Int.MAX_VALUE }.thenBy { it.nombre })
 }
 
 /** Un evento del partido. [tipo] es el código del backend (GOL, AMARILLA…); van en orden, sin minuto. */
@@ -57,6 +55,8 @@ data class Planilla(
     val eventos: List<EventoPartido>,
     /** Se pueden registrar eventos y cambiar la alineación. */
     val editable: Boolean,
+    /** Quien la ve organiza el torneo y el partido ya se cerró: puede reabrirlo (MOV-0012). */
+    val puedeReabrir: Boolean = false,
 ) {
     val marcador: Marcador get() = partido.marcador ?: Marcador(0, 0)
 

@@ -19,6 +19,9 @@ import co.edu.ufps.desafiosports.testutil.cuentaDePrueba
 import co.edu.ufps.desafiosports.testutil.equipoDePrueba
 import co.edu.ufps.desafiosports.testutil.partidoDePrueba
 import co.edu.ufps.desafiosports.testutil.torneoDeCreadorDePrueba
+import co.edu.ufps.desafiosports.domain.use_case.identidad.ObtenerMisInvitacionesUseCase
+import co.edu.ufps.desafiosports.testutil.FakeInvitacionesRepository
+import co.edu.ufps.desafiosports.testutil.invitacionRecibidaDePrueba
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -44,12 +47,14 @@ class InicioViewModelTest {
     private val equipos = FakeMisEquiposRepository()
     private val arbitraje = FakeArbitrajeRepository()
     private val creador = FakeCreadorRepository()
+    private val invitaciones = FakeInvitacionesRepository()
 
     private fun crear() = InicioViewModel(
         obtenerCuentaUseCase = ObtenerCuentaUseCase(cuentas),
         obtenerMisEquiposUseCase = ObtenerMisEquiposUseCase(equipos),
         obtenerPartidosUseCase = ObtenerPartidosDeArbitroUseCase(arbitraje) { hoy },
         obtenerMisTorneosUseCase = ObtenerMisTorneosUseCase(creador),
+        obtenerMisInvitacionesUseCase = ObtenerMisInvitacionesUseCase(invitaciones),
     )
 
     private fun InicioViewModel.resumenArbitro() = (state.arbitro as Seccion.Lista).valor
@@ -306,5 +311,30 @@ class InicioViewModelTest {
         vm.refrescar()
 
         assertEquals(3, equipos.llamadas)
+    }
+
+    @Test
+    fun `MOV-0012 CA-1 Inicio muestra las invitaciones pendientes y las actualiza al volver`() {
+        invitaciones.resultadoMias = Result.success(listOf(invitacionRecibidaDePrueba()))
+        val vm = crear()
+
+        assertEquals("Copa Prueba 2026", vm.state.invitaciones.single().torneo)
+
+        // La aceptó en la otra pantalla: al volver ya no está.
+        invitaciones.resultadoMias = Result.success(emptyList())
+        vm.alVolver()
+
+        assertTrue(vm.state.invitaciones.isEmpty())
+        assertEquals(2, invitaciones.pedidosDeMias)
+    }
+
+    @Test
+    fun `MOV-0012 CA-1 si las invitaciones fallan Inicio se ve igual y sin aviso`() {
+        invitaciones.resultadoMias = Result.failure(AppError.SinConexion())
+        val vm = crear()
+
+        assertEquals(Carga.LISTO, vm.state.carga)
+        assertTrue(vm.state.invitaciones.isEmpty())
+        assertNull(vm.state.aviso)
     }
 }

@@ -110,6 +110,7 @@ fun PrincipalScreen(
                         onAbrirInscripciones = onAbrirInscripciones,
                         onAbrirTorneo = { torneoId -> onAbrirTorneo(torneoId, "") },
                         onCrearTorneo = onCrearTorneo,
+                        onAbrirInvitacion = onAbrirInvitacion,
                         onExplorar = { pestana = Pestana.EXPLORAR },
                         onCompletarRegistro = onCompletarRegistro,
                     )

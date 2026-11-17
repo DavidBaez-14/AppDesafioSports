@@ -47,6 +47,7 @@ import co.edu.ufps.desafiosports.domain.model.EquipoPlanilla
 import co.edu.ufps.desafiosports.domain.model.JugadorPlanilla
 import co.edu.ufps.desafiosports.domain.model.Lado
 import co.edu.ufps.desafiosports.domain.model.Planilla
+import co.edu.ufps.desafiosports.presentacion.comun.BotonContorno
 import co.edu.ufps.desafiosports.presentacion.comun.EstadoVacio
 import co.edu.ufps.desafiosports.presentacion.comun.Fila
 import co.edu.ufps.desafiosports.ui.deporte.nombreDeEvento
@@ -212,10 +213,14 @@ internal fun AlineacionHoja(
 @Composable
 private fun FilaAlineacion(jugador: JugadorPlanilla, editable: Boolean, enAccion: Boolean, onCambiar: () -> Unit) {
     // A quien no es apto solo se le puede quitar (si ya estaba alineado), nunca agregar.
-    val sePuedeCambiar = editable && !enAccion && (jugador.apto || jugador.alineado)
+    // El expulsado se queda como está: ya tiene su tarjeta anotada en este partido.
+    val sePuedeCambiar = editable && !enAccion && !jugador.expulsado && (jugador.apto || jugador.alineado)
     val noApto = stringResource(R.string.planilla_no_apto)
+    val motivos = jugador.motivos.map { textoDeMotivo(it) }
+    val enRojo = jugador.expulsado || !jugador.apto
     val detalle = when {
-        !jugador.apto -> if (jugador.motivos.isEmpty()) noApto else stringResource(R.string.planilla_no_apto_motivo, jugador.motivos.joinToString(", "))
+        jugador.expulsado -> stringResource(R.string.planilla_expulsado)
+        !jugador.apto -> if (motivos.isEmpty()) noApto else stringResource(R.string.planilla_no_apto_motivo, motivos.joinToString(" · "))
         else -> listOfNotNull(
             jugador.numeroDocumento?.let { stringResource(R.string.planilla_documento, it) },
             if (jugador.esDelegado) stringResource(R.string.planilla_delegado) else null,
@@ -244,7 +249,7 @@ private fun FilaAlineacion(jugador: JugadorPlanilla, editable: Boolean, enAccion
                 Text(
                     text = detalle,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = if (jugador.apto) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.error,
+                    color = if (enRojo) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }
@@ -261,13 +266,25 @@ private fun FilaAlineacion(jugador: JugadorPlanilla, editable: Boolean, enAccion
     }
 }
 
-/** Hoja para elegir a quién se le anota el evento (MOV-0009 · CA-4). */
-@OptIn(ExperimentalMaterial3Api::class)
+/** El motivo que manda el backend, en palabras. Uno que la app no conoce se muestra tal cual. */
+@Composable
+private fun textoDeMotivo(codigo: String): String = when (codigo) {
+    "MULTA_PENDIENTE" -> stringResource(R.string.planilla_motivo_multa)
+    "SUSPENSION_ACTIVA" -> stringResource(R.string.planilla_motivo_suspension)
+    else -> codigo
+}
+
+/**
+ * Hoja para elegir a quién se le anota el evento (MOV-0009 · CA-4). Solo salen los alineados que
+ * siguen en la cancha (MOV-0012): si no hay ninguno, ofrece pasar lista.
+ */
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 internal fun JugadorDelEventoHoja(
     tipo: String,
     equipo: EquipoPlanilla,
     onElegir: (JugadorPlanilla) -> Unit,
+    onAlinear: () -> Unit,
     onCerrar: () -> Unit,
 ) {
     val candidatos = equipo.candidatos()
@@ -275,7 +292,10 @@ internal fun JugadorDelEventoHoja(
         onDismissRequest = onCerrar,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-        modifier = Modifier.testTag("hoja_jugador"),
+        // La hoja es otra ventana: sin esto sus testTag no se ven desde fuera.
+        modifier = Modifier
+            .semantics { testTagsAsResourceId = true }
+            .testTag("hoja_jugador"),
     ) {
         Text(
             text = stringResource(R.string.planilla_evento_de, nombreDeEvento(tipo), equipo.nombre).uppercase(),
@@ -291,17 +311,27 @@ internal fun JugadorDelEventoHoja(
             modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 4.dp, bottom = 4.dp),
         )
         if (candidatos.isEmpty()) {
+            // Nadie alineado, o todos los alineados ya fueron expulsados.
+            val sinLista = equipo.alineados == 0
             EstadoVacio(
                 icono = R.drawable.ic_groups,
-                titulo = stringResource(R.string.planilla_sin_candidatos),
-                detalle = stringResource(R.string.planilla_sin_candidatos_detalle),
+                titulo = stringResource(if (sinLista) R.string.planilla_sin_candidatos else R.string.planilla_todos_expulsados),
+                detalle = stringResource(
+                    if (sinLista) R.string.planilla_sin_candidatos_detalle else R.string.planilla_todos_expulsados_detalle,
+                ),
+                accion = {
+                    BotonContorno(
+                        stringResource(R.string.planilla_pasar_lista), onAlinear,
+                        Modifier.testTag("jugador_pasar_lista"),
+                    )
+                },
+                modifier = Modifier.testTag("jugador_vacio"),
             )
         } else {
             LazyColumn(modifier = Modifier.testTag("jugador_lista")) {
                 items(candidatos, key = { it.personaId }) { jugador ->
                     Fila(
                         titulo = jugador.nombre,
-                        detalle = if (jugador.alineado) null else stringResource(R.string.planilla_sin_alinear),
                         inicio = { NumeroCamiseta(jugador.numeroCamiseta) },
                         onClick = { onElegir(jugador) },
                         modifier = Modifier

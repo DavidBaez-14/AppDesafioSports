@@ -47,6 +47,7 @@ data class JugadorPlanillaDto(
     val goles: Int? = null,
     val apto: Boolean? = null,
     val motivos: List<String>? = null,
+    val expulsado: Boolean? = null,
 )
 
 @Serializable
@@ -77,6 +78,7 @@ data class PlanillaDto(
     val visitante: EquipoPlanillaDto? = null,
     val eventos: List<EventoDto>? = null,
     val editable: Boolean? = null,
+    val puedeReabrir: Boolean? = null,
 )
 
 /** Cuerpo de `POST …/eventos`. */

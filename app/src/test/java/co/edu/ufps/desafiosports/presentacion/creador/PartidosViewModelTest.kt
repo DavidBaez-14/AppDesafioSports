@@ -1,5 +1,11 @@
 package co.edu.ufps.desafiosports.presentacion.creador
 
+import java.time.LocalTime
+import java.time.LocalDateTime
+import java.time.LocalDate
+import co.edu.ufps.desafiosports.domain.model.Programacion
+import co.edu.ufps.desafiosports.domain.use_case.competicion.VolverAGenerarPartidosUseCase
+import co.edu.ufps.desafiosports.domain.use_case.competicion.ProgramarPartidoUseCase
 import co.edu.ufps.desafiosports.domain.error.AppError
 import co.edu.ufps.desafiosports.domain.model.ArbitroAsignado
 import co.edu.ufps.desafiosports.domain.model.EstadoDePartidos
@@ -38,6 +44,8 @@ class PartidosViewModelTest {
         obtenerPersonalUseCase = ObtenerPersonalDeArbitrajeUseCase(repositorio),
         asignarArbitroUseCase = AsignarArbitroUseCase(repositorio),
         quitarArbitroDePartidoUseCase = QuitarArbitroDePartidoUseCase(repositorio),
+        programarPartidoUseCase = ProgramarPartidoUseCase(repositorio),
+        volverAGenerarPartidosUseCase = VolverAGenerarPartidosUseCase(repositorio),
     )
 
     private fun sinPartidos(estado: EstadoTorneo = EstadoTorneo.PUBLICADO, aprobados: Int = 4) {
@@ -378,5 +386,202 @@ class PartidosViewModelTest {
 
         assertEquals(EstadoPartido.FINALIZADO, vm.state.partidos.single().estado)
         assertFalse(vm.state.cargando)
+    }
+
+    // ── MOV-0013: programar ─────────────────────────────────────────────────
+
+    @Test
+    fun `MOV-0013 CA-1 la fila de fecha y lugar cierra la hoja y abre el dialogo con lo que tiene el partido`() {
+        repositorio.estado = Result.success(EstadoDePartidos(EstadoTorneo.EN_CURSO, 4, generados = true))
+        repositorio.partidos = Result.success(
+            listOf(partidoDeTorneoDePrueba("p1", fecha = LocalDateTime.of(2026, 11, 21, 15, 30)).copy(lugar = "Cancha 2")),
+        )
+        val vm = crear()
+        val partido = vm.state.partidos.single()
+
+        vm.abrirAsignacion(partido)
+        vm.abrirProgramacion(partido)
+
+        assertNull(vm.state.asignando)
+        assertEquals("p1", vm.state.programando)
+        assertEquals(LocalDate.of(2026, 11, 21), vm.state.borradorProgramacion.fecha)
+        assertEquals(LocalTime.of(15, 30), vm.state.borradorProgramacion.hora)
+        assertEquals("Cancha 2", vm.state.borradorProgramacion.lugar)
+    }
+
+    @Test
+    fun `MOV-0013 CA-2 guardar envia los cambios y la fila queda con lo que responde el backend`() {
+        conPartidos("p1", "p2")
+        val vm = crear()
+
+        vm.abrirProgramacion(vm.state.partidos.first { it.id == "p1" })
+        vm.onFechaProgramacion(LocalDate.of(2026, 11, 28))
+        vm.onHoraProgramacion(LocalTime.of(18, 0))
+        vm.onLugarProgramacion("Coliseo UFPS")
+        repositorio.resultadoProgramar = Result.success(Programacion(LocalDateTime.of(2026, 11, 28, 18, 0), "Coliseo UFPS, cancha 1"))
+        vm.guardarProgramacion()
+
+        assertEquals(listOf("programar:p1:2026-11-28T18:00:Coliseo UFPS"), llamadas("programar"))
+        assertNull(vm.state.programando)
+        val p1 = vm.state.partidos.first { it.id == "p1" }
+        assertEquals(LocalDateTime.of(2026, 11, 28, 18, 0), p1.fecha)
+        assertEquals("Coliseo UFPS, cancha 1", p1.lugar)
+        // Ahora va después del otro partido de la misma jornada, que es más temprano.
+        assertEquals(listOf("p2", "p1"), vm.state.grupos.single().partidos.map { it.id })
+    }
+
+    @Test
+    fun `MOV-0013 CA-3 si el backend rechaza, el dialogo sigue abierto con el mensaje y la fila no cambia`() {
+        conPartidos("p1")
+        repositorio.resultadoProgramar = Result.failure(AppError.Negocio("PARTIDO_CERRADO", "El partido ya terminó: no se puede cambiar."))
+        val vm = crear()
+
+        vm.abrirProgramacion(vm.state.partidos.single())
+        vm.onLugarProgramacion("Cancha 9")
+        vm.guardarProgramacion()
+
+        assertEquals("p1", vm.state.programando)
+        assertEquals("El partido ya terminó: no se puede cambiar.", vm.state.errorProgramacion)
+        assertNull(vm.state.partidos.single().lugar)
+        assertFalse(vm.state.guardandoProgramacion)
+
+        // Escribir otra vez borra el error.
+        vm.onLugarProgramacion("Cancha 1")
+        assertNull(vm.state.errorProgramacion)
+    }
+
+    @Test
+    fun `MOV-0013 CA-3 sin la hora no se envia y el motivo sale en el dialogo`() {
+        repositorio.estado = Result.success(EstadoDePartidos(EstadoTorneo.EN_CURSO, 4, generados = true))
+        repositorio.partidos = Result.success(listOf(partidoDeTorneoDePrueba("p1", fecha = null)))
+        val vm = crear()
+
+        vm.abrirProgramacion(vm.state.partidos.single())
+        vm.onFechaProgramacion(LocalDate.of(2026, 11, 28))
+        vm.guardarProgramacion()
+
+        assertTrue(llamadas("programar").isEmpty())
+        assertEquals(ProgramarPartidoUseCase.MENSAJE_FECHA_INCOMPLETA, vm.state.errorProgramacion)
+    }
+
+    @Test
+    fun `MOV-0013 CA-3 el doble toque no guarda dos veces y mientras guarda no se cierra ni se edita`() {
+        conPartidos("p1")
+        repositorio.bloqueo = CompletableDeferred()
+        val vm = crear()
+
+        vm.abrirProgramacion(vm.state.partidos.single())
+        vm.guardarProgramacion()
+        vm.guardarProgramacion()
+        vm.cancelarProgramacion()
+        vm.onLugarProgramacion("Otra")
+
+        assertTrue(vm.state.guardandoProgramacion)
+        assertEquals("p1", vm.state.programando)
+        assertEquals("", vm.state.borradorProgramacion.lugar)
+        repositorio.bloqueo!!.complete(Unit)
+
+        assertEquals(1, llamadas("programar").size)
+        assertNull(vm.state.programando)
+    }
+
+    @Test
+    fun `MOV-0013 CA-4 un partido cerrado no se programa`() {
+        repositorio.estado = Result.success(EstadoDePartidos(EstadoTorneo.EN_CURSO, 4, generados = true))
+        repositorio.partidos = Result.success(listOf(partidoDeTorneoDePrueba("p1", estado = EstadoPartido.FINALIZADO)))
+        val vm = crear()
+
+        vm.abrirProgramacion(vm.state.partidos.single())
+
+        assertNull(vm.state.programando)
+    }
+
+    @Test
+    fun `MOV-0013 CA-4 cancelar cierra sin enviar nada`() {
+        conPartidos("p1")
+        val vm = crear()
+
+        vm.abrirProgramacion(vm.state.partidos.single())
+        vm.onLugarProgramacion("Cancha 3")
+        vm.cancelarProgramacion()
+
+        assertNull(vm.state.programando)
+        assertTrue(llamadas("programar").isEmpty())
+    }
+
+    // ── MOV-0013: volver a generar ──────────────────────────────────────────
+
+    @Test
+    fun `MOV-0013 CA-6 volver a generar pide confirmar, borra, genera y muestra los partidos nuevos`() {
+        conPartidos("p1", "p2")
+        repositorio.alBorrar = { repositorio.estado = Result.success(EstadoDePartidos(EstadoTorneo.EN_CURSO, 3, generados = false)) }
+        repositorio.alGenerar = {
+            repositorio.estado = Result.success(EstadoDePartidos(EstadoTorneo.EN_CURSO, 3, generados = true))
+            repositorio.partidos = Result.success(listOf(partidoDeTorneoDePrueba("n1"), partidoDeTorneoDePrueba("n2"), partidoDeTorneoDePrueba("n3")))
+        }
+        val vm = crear()
+        assertTrue(vm.state.sePuedenRegenerar)
+
+        vm.pedirRegenerar()
+        assertTrue(vm.state.confirmandoRegenerar)
+        vm.cancelarRegenerar()
+        assertTrue(llamadas("borrar").isEmpty())
+
+        vm.pedirRegenerar()
+        vm.confirmarRegenerar()
+
+        assertEquals(listOf("borrar:t1"), llamadas("borrar"))
+        assertEquals(listOf("generar:t1"), llamadas("generar"))
+        assertEquals(listOf("n1", "n2", "n3"), vm.state.partidos.map { it.id })
+        assertFalse(vm.state.generando)
+        assertNull(vm.state.aviso)
+    }
+
+    @Test
+    fun `MOV-0013 CA-5 con un partido en juego no se ofrece volver a generar`() {
+        repositorio.estado = Result.success(EstadoDePartidos(EstadoTorneo.EN_CURSO, 4, generados = true))
+        repositorio.partidos = Result.success(listOf(partidoDeTorneoDePrueba("p1", estado = EstadoPartido.EN_CURSO), partidoDeTorneoDePrueba("p2")))
+        val vm = crear()
+
+        assertFalse(vm.state.sePuedenRegenerar)
+        vm.pedirRegenerar()
+        vm.confirmarRegenerar()
+
+        assertFalse(vm.state.confirmandoRegenerar)
+        assertTrue(llamadas("borrar").isEmpty())
+    }
+
+    @Test
+    fun `MOV-0013 CA-6 si el backend no deja borrar, los partidos siguen y se ve el mensaje`() {
+        conPartidos("p1")
+        repositorio.resultadoBorrar = Result.failure(
+            AppError.Negocio("REGLA_NEGOCIO", "No se puede borrar el fixture: ya hay partidos jugados o en curso."),
+        )
+        val vm = crear()
+
+        vm.pedirRegenerar()
+        vm.confirmarRegenerar()
+
+        assertEquals(listOf("p1"), vm.state.partidos.map { it.id })
+        assertEquals("No se puede borrar el fixture: ya hay partidos jugados o en curso.", vm.state.aviso)
+        assertTrue(llamadas("generar").isEmpty())
+    }
+
+    @Test
+    fun `MOV-0013 CA-6 si se borran pero no se generan, la pantalla queda sin partidos y ofrece generar`() {
+        conPartidos("p1")
+        repositorio.alBorrar = {
+            repositorio.estado = Result.success(EstadoDePartidos(EstadoTorneo.EN_CURSO, 4, generados = false))
+            repositorio.partidos = Result.success(emptyList())
+        }
+        repositorio.resultadoGenerar = Result.failure(AppError.Negocio("REGLA_NEGOCIO", "La primera ronda no tiene cupos para tantos equipos."))
+        val vm = crear()
+
+        vm.pedirRegenerar()
+        vm.confirmarRegenerar()
+
+        assertTrue(vm.state.partidos.isEmpty())
+        assertTrue(vm.state.estado!!.puedeGenerar)
+        assertEquals("La primera ronda no tiene cupos para tantos equipos.", vm.state.aviso)
     }
 }

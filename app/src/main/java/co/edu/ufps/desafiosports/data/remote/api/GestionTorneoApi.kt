@@ -1,5 +1,7 @@
 package co.edu.ufps.desafiosports.data.remote.api
 
+import co.edu.ufps.desafiosports.data.remote.dto.ProgramarPartidoRequestDto
+import co.edu.ufps.desafiosports.data.remote.dto.ArbitroPartidoDto
 import co.edu.ufps.desafiosports.data.remote.dto.ArbitroAsignadoDto
 import co.edu.ufps.desafiosports.data.remote.dto.AsignarArbitroRequestDto
 import co.edu.ufps.desafiosports.data.remote.dto.InvitacionDto
@@ -67,4 +69,12 @@ interface GestionTorneoApi {
 
     @DELETE("api/supercopa/admin/partidos/{partidoId}/arbitros/{cuentaId}")
     suspend fun quitarArbitro(@Path("partidoId") partidoId: String, @Path("cuentaId") cuentaId: String): List<ArbitroAsignadoDto>
+
+    /** Cuándo y dónde se juega (MOV-0013). 409 `PARTIDO_CERRADO` si ya terminó. */
+    @PUT("api/supercopa/admin/partidos/{partidoId}/programacion")
+    suspend fun programar(@Path("partidoId") partidoId: String, @Body cuerpo: ProgramarPartidoRequestDto): ArbitroPartidoDto
+
+    /** Borra los partidos (MOV-0013). 400 `REGLA_NEGOCIO` si alguno ya se jugó o está en juego. */
+    @DELETE("api/supercopa/admin/torneos/{torneoId}/fixture")
+    suspend fun borrarFixture(@Path("torneoId") torneoId: String)
 }

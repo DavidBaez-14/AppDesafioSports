@@ -1,5 +1,11 @@
 package co.edu.ufps.desafiosports.presentacion.creador
 
+import java.time.LocalTime
+import java.time.LocalDate
+import co.edu.ufps.desafiosports.domain.use_case.competicion.VolverAGenerarPartidosUseCase
+import co.edu.ufps.desafiosports.domain.use_case.competicion.ProgramarPartidoUseCase
+import co.edu.ufps.desafiosports.domain.model.sePuedenRegenerar
+import co.edu.ufps.desafiosports.domain.model.BorradorProgramacion
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -52,10 +58,23 @@ data class PartidosState(
     val enviando: Set<String> = emptySet(),
     /** Error dentro de la hoja: un aviso normal quedaría tapado por ella. */
     val errorAsignacion: String? = null,
+    // Programar (MOV-0013)
+    /** Id del partido con el diálogo de fecha y lugar abierto. */
+    val programando: String? = null,
+    val borradorProgramacion: BorradorProgramacion = BorradorProgramacion(),
+    val guardandoProgramacion: Boolean = false,
+    /** Va dentro del diálogo: un aviso normal quedaría tapado por él. */
+    val errorProgramacion: String? = null,
+    // Volver a generar (MOV-0013)
+    val confirmandoRegenerar: Boolean = false,
     val aviso: String? = null,
 ) {
     val grupos: List<GrupoDePartidos> get() = partidos.porFaseYJornada()
     val partidoAsignando: PartidoDeTorneo? get() = partidos.firstOrNull { it.id == asignando }
+    val partidoProgramando: PartidoDeTorneo? get() = partidos.firstOrNull { it.id == programando }
+
+    /** Ninguno se ha jugado ni está en juego: se pueden borrar y armar de nuevo. */
+    val sePuedenRegenerar: Boolean get() = partidos.sePuedenRegenerar
 
     /** Alguien arbitra todos los partidos: ninguno está "sin árbitro". */
     val hayArbitroGeneral: Boolean get() = arbitros.orEmpty().any { it.todosLosPartidos }
@@ -74,6 +93,8 @@ class PartidosTorneoViewModel(
     private val obtenerPersonalUseCase: ObtenerPersonalDeArbitrajeUseCase,
     private val asignarArbitroUseCase: AsignarArbitroUseCase,
     private val quitarArbitroDePartidoUseCase: QuitarArbitroDePartidoUseCase,
+    private val programarPartidoUseCase: ProgramarPartidoUseCase,
+    private val volverAGenerarPartidosUseCase: VolverAGenerarPartidosUseCase,
 ) : ViewModel() {
 
     var state by mutableStateOf(PartidosState(torneo = torneoNombre))
@@ -241,6 +262,87 @@ class PartidosTorneoViewModel(
         }
     }
 
+    // ── Programar (MOV-0013) ────────────────────────────────────────────────
+
+    /** Desde la hoja del partido: la cierra y abre el diálogo con lo que el partido ya tiene. */
+    fun abrirProgramacion(partido: PartidoDeTorneo) {
+        // Un partido cerrado ya no se programa: el backend responde PARTIDO_CERRADO.
+        if (!partido.admiteArbitros) return
+        state = state.copy(
+            asignando = null,
+            errorAsignacion = null,
+            programando = partido.id,
+            borradorProgramacion = BorradorProgramacion.de(partido),
+            errorProgramacion = null,
+        )
+    }
+
+    fun onFechaProgramacion(fecha: LocalDate) = cambiarBorrador { it.copy(fecha = fecha) }
+
+    fun onHoraProgramacion(hora: LocalTime) = cambiarBorrador { it.copy(hora = hora) }
+
+    fun onLugarProgramacion(lugar: String) = cambiarBorrador { it.copy(lugar = lugar.take(BorradorProgramacion.LUGAR_MAXIMO)) }
+
+    private fun cambiarBorrador(cambio: (BorradorProgramacion) -> BorradorProgramacion) {
+        if (state.programando == null || state.guardandoProgramacion) return
+        state = state.copy(borradorProgramacion = cambio(state.borradorProgramacion), errorProgramacion = null)
+    }
+
+    fun cancelarProgramacion() {
+        // Mientras guarda no se cierra: el resultado tiene que verse.
+        if (state.guardandoProgramacion) return
+        state = state.copy(programando = null, errorProgramacion = null)
+    }
+
+    /** Guarda y deja el partido con lo que responde el backend. Si falla, el diálogo sigue abierto. */
+    fun guardarProgramacion() {
+        val partidoId = state.programando ?: return
+        if (state.guardandoProgramacion) return
+        state = state.copy(guardandoProgramacion = true, errorProgramacion = null)
+        viewModelScope.launch {
+            programarPartidoUseCase(partidoId, state.borradorProgramacion)
+                .onSuccess { programacion ->
+                    state = state.copy(
+                        guardandoProgramacion = false,
+                        programando = null,
+                        partidos = state.partidos.map {
+                            if (it.id == partidoId) it.copy(fecha = programacion.fecha ?: it.fecha, lugar = programacion.lugar) else it
+                        },
+                    )
+                }
+                .onFailure { state = state.copy(guardandoProgramacion = false, errorProgramacion = it.mensajeParaMostrar()) }
+        }
+    }
+
+    // ── Volver a generar (MOV-0013) ─────────────────────────────────────────
+
+    fun pedirRegenerar() {
+        if (state.generando || !state.sePuedenRegenerar) return
+        state = state.copy(confirmandoRegenerar = true)
+    }
+
+    fun cancelarRegenerar() {
+        state = state.copy(confirmandoRegenerar = false)
+    }
+
+    /** Borra y genera, y vuelve a pedir todo: aunque falle, la pantalla muestra lo que hay. */
+    fun confirmarRegenerar() {
+        if (!state.confirmandoRegenerar) return
+        state = state.copy(confirmandoRegenerar = false)
+        if (state.generando) return
+        state = state.copy(generando = true)
+        viewModelScope.launch {
+            val fallo = volverAGenerarPartidosUseCase(torneoId).exceptionOrNull()
+            val recarga = obtenerPartidosUseCase(torneoId).getOrNull()
+            state = state.copy(
+                generando = false,
+                estado = recarga?.estado ?: state.estado,
+                partidos = recarga?.partidos ?: state.partidos,
+                aviso = fallo?.mensajeParaMostrar(),
+            )
+        }
+    }
+
     fun onAvisoMostrado() {
         state = state.copy(aviso = null)
     }
@@ -263,6 +365,8 @@ class PartidosTorneoViewModel(
                     obtenerPersonalUseCase = c.obtenerPersonalDeArbitraje,
                     asignarArbitroUseCase = c.asignarArbitro,
                     quitarArbitroDePartidoUseCase = c.quitarArbitroDePartido,
+                    programarPartidoUseCase = c.programarPartido,
+                    volverAGenerarPartidosUseCase = c.volverAGenerarPartidos,
                 )
             }
         }

@@ -1,5 +1,6 @@
 package co.edu.ufps.desafiosports.testutil
 
+import co.edu.ufps.desafiosports.domain.model.Programacion
 import co.edu.ufps.desafiosports.domain.model.ArbitroAsignado
 import co.edu.ufps.desafiosports.domain.model.ArbitroDeTorneo
 import co.edu.ufps.desafiosports.domain.model.EstadoDePartidos
@@ -107,6 +108,26 @@ class FakeGestionTorneoRepository : GestionTorneoRepository {
         llamadas += "desasignar:$partidoId:$cuentaId"
         bloqueo?.await()
         return resultadoAsignacion ?: Result.success(emptyList())
+    }
+
+    /** Lo que responde programar; null = devuelve lo que se envió (MOV-0013). */
+    var resultadoProgramar: Result<Programacion>? = null
+    var resultadoBorrar: Result<Unit> = Result.success(Unit)
+
+    /** Se ejecuta al borrar con éxito: deja listo lo que responderá la recarga. */
+    var alBorrar: (() -> Unit)? = null
+
+    override suspend fun programarPartido(partidoId: String, fecha: LocalDateTime?, lugar: String): Result<Programacion> {
+        llamadas += "programar:$partidoId:$fecha:$lugar"
+        bloqueo?.await()
+        return resultadoProgramar ?: Result.success(Programacion(fecha, lugar.ifEmpty { null }))
+    }
+
+    override suspend fun borrarPartidos(torneoId: String): Result<Unit> {
+        llamadas += "borrar:$torneoId"
+        bloqueo?.await()
+        if (resultadoBorrar.isSuccess) alBorrar?.invoke()
+        return resultadoBorrar
     }
 }
 

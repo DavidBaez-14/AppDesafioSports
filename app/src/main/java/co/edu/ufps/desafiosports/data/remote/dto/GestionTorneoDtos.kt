@@ -91,3 +91,13 @@ data class MiInvitacionDto(
     val ambitoDescripcion: String? = null,
     val invitadoPor: String? = null,
 )
+
+/**
+ * Cuerpo de `PUT …/programacion` (MOV-0013). [fecha] sin zona (`2026-11-21T15:30:00`); null no la
+ * cambia. [lugar] vacío lo borra.
+ */
+@Serializable
+data class ProgramarPartidoRequestDto(
+    val fecha: String? = null,
+    val lugar: String,
+)

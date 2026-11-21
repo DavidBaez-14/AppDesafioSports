@@ -1,5 +1,9 @@
 package co.edu.ufps.desafiosports.data.repository
 
+import java.time.format.DateTimeFormatter
+import java.time.LocalDateTime
+import co.edu.ufps.desafiosports.domain.model.Programacion
+import co.edu.ufps.desafiosports.data.remote.dto.ProgramarPartidoRequestDto
 import co.edu.ufps.desafiosports.data.remote.api.GestionTorneoApi
 import co.edu.ufps.desafiosports.data.remote.dto.ArbitroAsignadoDto
 import co.edu.ufps.desafiosports.data.remote.dto.AsignarArbitroRequestDto
@@ -64,8 +68,18 @@ class GestionTorneoRepositoryImpl(
     override suspend fun quitarArbitroDePartido(partidoId: String, cuentaId: String): Result<List<ArbitroAsignado>> =
         llamarApi(errores) { api.quitarArbitro(partidoId, cuentaId) }.map { lista -> lista.mapNotNull { it.aDominio() } }
 
+    override suspend fun programarPartido(partidoId: String, fecha: LocalDateTime?, lugar: String): Result<Programacion> =
+        llamarApi(errores) { api.programar(partidoId, ProgramarPartidoRequestDto(fecha?.format(FORMATO_FECHA), lugar)) }
+            .map { Programacion(fecha = it.fechaHora.aFechaHora(), lugar = it.lugar?.takeIf { l -> l.isNotBlank() }) }
+
+    override suspend fun borrarPartidos(torneoId: String): Result<Unit> =
+        llamarApi(errores) { api.borrarFixture(torneoId) }
+
     private companion object {
         const val ROL_ARBITRO = "ARBITRO"
+
+        /** El backend recibe la fecha sin zona, en hora de Colombia. */
+        val FORMATO_FECHA: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
     }
 }
 

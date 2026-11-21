@@ -1,5 +1,7 @@
 package co.edu.ufps.desafiosports.di
 
+import co.edu.ufps.desafiosports.domain.use_case.competicion.VolverAGenerarPartidosUseCase
+import co.edu.ufps.desafiosports.domain.use_case.competicion.ProgramarPartidoUseCase
 import co.edu.ufps.desafiosports.BuildConfig
 import co.edu.ufps.desafiosports.data.auth.ProveedorTokenSupabase
 import co.edu.ufps.desafiosports.data.remote.api.ArbitrajeApi
@@ -193,6 +195,8 @@ class AppContainer(val configuracion: Configuracion) {
     val generarPartidos by lazy { GenerarPartidosUseCase(gestionTorneoRepository) }
     val asignarArbitro by lazy { AsignarArbitroUseCase(gestionTorneoRepository) }
     val quitarArbitroDePartido by lazy { QuitarArbitroDePartidoUseCase(gestionTorneoRepository) }
+    val programarPartido by lazy { ProgramarPartidoUseCase(gestionTorneoRepository) }
+    val volverAGenerarPartidos by lazy { VolverAGenerarPartidosUseCase(gestionTorneoRepository, generarPartidos) }
     val verInvitacion by lazy { VerInvitacionUseCase(invitacionesRepository) }
     val aceptarInvitacion by lazy { AceptarInvitacionUseCase(invitacionesRepository) }
     val obtenerMisInvitaciones by lazy { ObtenerMisInvitacionesUseCase(invitacionesRepository) }

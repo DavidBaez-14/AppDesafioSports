@@ -1,5 +1,22 @@
 package co.edu.ufps.desafiosports.presentacion.creador
 
+import java.time.ZoneOffset
+import java.time.LocalTime
+import java.time.Instant
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.graphics.Color
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.material3.rememberTimePickerState
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.TimePicker
+import androidx.compose.material3.Surface
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DatePicker
+import androidx.compose.foundation.BorderStroke
+import androidx.annotation.DrawableRes
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -92,6 +109,16 @@ data class AccionesPartidos(
     val onInvitarArbitros: () -> Unit = {},
     /** Quien organiza el torneo opera la planilla de cualquier partido (MOV-0012). */
     val onAbrirPlanilla: (partidoId: String) -> Unit = {},
+    // Programar y volver a generar (MOV-0013)
+    val onProgramar: (PartidoDeTorneo) -> Unit = {},
+    val onFechaProgramacion: (LocalDate) -> Unit = {},
+    val onHoraProgramacion: (LocalTime) -> Unit = {},
+    val onLugarProgramacion: (String) -> Unit = {},
+    val onGuardarProgramacion: () -> Unit = {},
+    val onCancelarProgramacion: () -> Unit = {},
+    val onRegenerar: () -> Unit = {},
+    val onCancelarRegenerar: () -> Unit = {},
+    val onConfirmarRegenerar: () -> Unit = {},
     val onAvisoMostrado: () -> Unit = {},
 )
 
@@ -126,6 +153,15 @@ fun PartidosTorneoScreen(
                 viewModel.cerrarAsignacion()
                 onAbrirPlanilla(partidoId)
             },
+            onProgramar = viewModel::abrirProgramacion,
+            onFechaProgramacion = viewModel::onFechaProgramacion,
+            onHoraProgramacion = viewModel::onHoraProgramacion,
+            onLugarProgramacion = viewModel::onLugarProgramacion,
+            onGuardarProgramacion = viewModel::guardarProgramacion,
+            onCancelarProgramacion = viewModel::cancelarProgramacion,
+            onRegenerar = viewModel::pedirRegenerar,
+            onCancelarRegenerar = viewModel::cancelarRegenerar,
+            onConfirmarRegenerar = viewModel::confirmarRegenerar,
             onAvisoMostrado = viewModel::onAvisoMostrado,
         )
     }
@@ -214,6 +250,9 @@ fun PartidosTorneoContenido(
                                 }
                             }
                         }
+                        item(key = "regenerar") {
+                            PieRegenerar(sePuede = state.sePuedenRegenerar, generando = state.generando, onRegenerar = acciones.onRegenerar)
+                        }
                     }
                 }
             }
@@ -240,8 +279,232 @@ fun PartidosTorneoContenido(
         )
     }
 
+    if (state.confirmandoRegenerar) {
+        AlertDialog(
+            onDismissRequest = acciones.onCancelarRegenerar,
+            modifier = Modifier.semantics { testTagsAsResourceId = true },
+            title = { Text(stringResource(R.string.partidos_regenerar_titulo)) },
+            text = { Text(stringResource(R.string.partidos_regenerar_aviso)) },
+            confirmButton = {
+                TextButton(onClick = acciones.onConfirmarRegenerar, modifier = Modifier.testTag("partidos_regenerar_confirmar")) {
+                    // Borra lo que hay: va en el color de error, no en naranja.
+                    Text(stringResource(R.string.partidos_regenerar_confirmar), color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = acciones.onCancelarRegenerar, modifier = Modifier.testTag("partidos_regenerar_cancelar")) {
+                    Text(stringResource(R.string.accion_cancelar), color = MaterialTheme.colorScheme.onSurface)
+                }
+            },
+        )
+    }
+
     state.partidoAsignando?.let { partido -> HojaDeArbitros(partido, state, acciones) }
+    state.partidoProgramando?.let { partido -> DialogoProgramacion(partido, state, hoy, acciones) }
 }
+
+/**
+ * Al final de la lista (MOV-0013): volver a generar los partidos mientras ninguno se haya jugado.
+ * Cuando ya no se puede, se dice por qué.
+ */
+@Composable
+private fun PieRegenerar(sePuede: Boolean, generando: Boolean, onRegenerar: () -> Unit) {
+    HorizontalDivider(
+        color = MaterialTheme.colorScheme.outlineVariant,
+        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp),
+    )
+    if (sePuede) {
+        Fila(
+            titulo = stringResource(if (generando) R.string.partidos_regenerando else R.string.partidos_regenerar),
+            detalle = stringResource(R.string.partidos_regenerar_detalle),
+            onClick = if (generando) null else onRegenerar,
+            modifier = Modifier.testTag("partidos_regenerar"),
+        )
+    } else {
+        Text(
+            text = stringResource(R.string.partidos_regenerar_bloqueado),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier
+                .padding(16.dp)
+                .testTag("partidos_regenerar_bloqueado"),
+        )
+    }
+}
+
+/** "Sáb 21 · 3:30 p. m. · Cancha 2", con "Sin fecha" y "Sin lugar" cuando falta algo. */
+@Composable
+private fun textoDeProgramacion(partido: PartidoDeTorneo, hoy: LocalDate): String = listOf(
+    partido.fecha?.let { "${Formatos.fecha(it.toLocalDate(), hoy)} · ${Formatos.hora(it)}" } ?: stringResource(R.string.fecha_sin_fecha),
+    partido.lugar ?: stringResource(R.string.programar_sin_lugar),
+).joinToString(" · ")
+
+/**
+ * Fecha, hora y lugar de un partido (MOV-0013). El día y la hora se eligen con los selectores de
+ * Material; el lugar se escribe. El error va dentro del diálogo.
+ */
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@Composable
+private fun DialogoProgramacion(partido: PartidoDeTorneo, state: PartidosState, hoy: LocalDate, acciones: AccionesPartidos) {
+    val borrador = state.borradorProgramacion
+    val guardando = state.guardandoProgramacion
+    var eligiendoFecha by remember { mutableStateOf(false) }
+    var eligiendoHora by remember { mutableStateOf(false) }
+    AlertDialog(
+        onDismissRequest = acciones.onCancelarProgramacion,
+        modifier = Modifier
+            .semantics { testTagsAsResourceId = true }
+            .testTag("dialogo_programar"),
+        title = { Text(stringResource(R.string.programar_titulo)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(
+                    text = cruceDe(partido),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                CampoQueAbre(
+                    etiqueta = stringResource(R.string.programar_dia),
+                    valor = borrador.fecha?.let { Formatos.fecha(it, hoy) } ?: stringResource(R.string.programar_elegir_dia),
+                    icono = R.drawable.ic_event,
+                    habilitado = !guardando,
+                    onClick = { eligiendoFecha = true },
+                    modifier = Modifier.testTag("programar_fecha"),
+                )
+                CampoQueAbre(
+                    etiqueta = stringResource(R.string.programar_hora),
+                    valor = borrador.hora?.let { Formatos.hora(it) } ?: stringResource(R.string.programar_elegir_hora),
+                    icono = R.drawable.ic_schedule,
+                    habilitado = !guardando,
+                    onClick = { eligiendoHora = true },
+                    modifier = Modifier.testTag("programar_hora"),
+                )
+                OutlinedTextField(
+                    value = borrador.lugar,
+                    onValueChange = acciones.onLugarProgramacion,
+                    label = { Text(stringResource(R.string.programar_lugar)) },
+                    placeholder = { Text(stringResource(R.string.programar_lugar_ejemplo)) },
+                    singleLine = true,
+                    enabled = !guardando,
+                    shape = MaterialTheme.shapes.small,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("programar_lugar"),
+                )
+                state.errorProgramacion?.let {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.testTag("programar_error"),
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = acciones.onGuardarProgramacion, enabled = !guardando, modifier = Modifier.testTag("programar_guardar")) {
+                Text(stringResource(if (guardando) R.string.programar_guardando else R.string.programar_guardar))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = acciones.onCancelarProgramacion, enabled = !guardando) {
+                Text(stringResource(R.string.accion_cancelar), color = MaterialTheme.colorScheme.onSurface)
+            }
+        },
+    )
+
+    if (eligiendoFecha) {
+        val estado = rememberDatePickerState(initialSelectedDateMillis = (borrador.fecha ?: hoy).aMillisUtc())
+        DatePickerDialog(
+            onDismissRequest = { eligiendoFecha = false },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        estado.selectedDateMillis?.let { acciones.onFechaProgramacion(it.aFechaUtc()) }
+                        eligiendoFecha = false
+                    },
+                    enabled = estado.selectedDateMillis != null,
+                    modifier = Modifier.testTag("programar_fecha_aceptar"),
+                ) { Text(stringResource(R.string.accion_aceptar)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { eligiendoFecha = false }) {
+                    Text(stringResource(R.string.accion_cancelar), color = MaterialTheme.colorScheme.onSurface)
+                }
+            },
+        ) {
+            DatePicker(state = estado)
+        }
+    }
+
+    if (eligiendoHora) {
+        val inicial = borrador.hora ?: LocalTime.of(HORA_POR_DEFECTO, 0)
+        val estado = rememberTimePickerState(initialHour = inicial.hour, initialMinute = inicial.minute, is24Hour = false)
+        AlertDialog(
+            onDismissRequest = { eligiendoHora = false },
+            modifier = Modifier.semantics { testTagsAsResourceId = true },
+            title = { Text(stringResource(R.string.programar_hora)) },
+            text = { TimePicker(state = estado) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        acciones.onHoraProgramacion(LocalTime.of(estado.hour, estado.minute))
+                        eligiendoHora = false
+                    },
+                    modifier = Modifier.testTag("programar_hora_aceptar"),
+                ) { Text(stringResource(R.string.accion_aceptar)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { eligiendoHora = false }) {
+                    Text(stringResource(R.string.accion_cancelar), color = MaterialTheme.colorScheme.onSurface)
+                }
+            },
+        )
+    }
+}
+
+/** Un campo que no se escribe: tocarlo abre un selector. */
+@Composable
+private fun CampoQueAbre(
+    etiqueta: String,
+    valor: String,
+    @DrawableRes icono: Int,
+    habilitado: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp), modifier = modifier) {
+        Text(etiqueta, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Surface(
+            onClick = onClick,
+            enabled = habilitado,
+            shape = MaterialTheme.shapes.small,
+            color = Color.Transparent,
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+            modifier = Modifier
+                .fillMaxWidth()
+                .semantics { contentDescription = "$etiqueta: $valor" },
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .heightIn(min = 56.dp)
+                    .padding(horizontal = 16.dp),
+            ) {
+                Text(valor, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
+                Icon(painterResource(icono), contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
+    }
+}
+
+/** La hora que propone el selector cuando el partido aún no tiene una. */
+private const val HORA_POR_DEFECTO = 8
+
+/** El selector de fechas de Material trabaja en milisegundos UTC. */
+private fun LocalDate.aMillisUtc(): Long = atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()
+
+private fun Long.aFechaUtc(): LocalDate = Instant.ofEpochMilli(this).atZone(ZoneOffset.UTC).toLocalDate()
 
 /** El torneo aún no tiene partidos: cuántos equipos hay y el botón para generarlos. */
 @Composable
@@ -436,6 +699,19 @@ private fun HojaDeArbitros(partido: PartidoDeTorneo, state: PartidosState, accio
                     modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp),
                 )
             }
+            Fila(
+                titulo = stringResource(R.string.programar_fila),
+                detalle = textoDeProgramacion(partido, LocalDate.now()),
+                fin = { FlechaFila() },
+                onClick = { acciones.onProgramar(partido) },
+                modifier = Modifier
+                    .padding(horizontal = 8.dp)
+                    .testTag("partido_programar"),
+            )
+            HorizontalDivider(
+                color = MaterialTheme.colorScheme.outlineVariant,
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp),
+            )
             Text(
                 text = stringResource(R.string.asignar_titulo),
                 style = MaterialTheme.typography.titleSmall,

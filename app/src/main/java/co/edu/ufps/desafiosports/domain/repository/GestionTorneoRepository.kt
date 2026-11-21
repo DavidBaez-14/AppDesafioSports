@@ -1,5 +1,7 @@
 package co.edu.ufps.desafiosports.domain.repository
 
+import java.time.LocalDateTime
+import co.edu.ufps.desafiosports.domain.model.Programacion
 import co.edu.ufps.desafiosports.domain.model.ArbitroAsignado
 import co.edu.ufps.desafiosports.domain.model.ArbitroDeTorneo
 import co.edu.ufps.desafiosports.domain.model.EstadoDePartidos
@@ -28,4 +30,13 @@ interface GestionTorneoRepository {
     /** Responden los árbitros con que queda el partido. */
     suspend fun asignarArbitro(partidoId: String, cuentaId: String): Result<List<ArbitroAsignado>>
     suspend fun quitarArbitroDePartido(partidoId: String, cuentaId: String): Result<List<ArbitroAsignado>>
+
+    /**
+     * Cambia cuándo y dónde se juega (MOV-0013). [fecha] null no la cambia; [lugar] vacío lo borra.
+     * Responde cómo quedó.
+     */
+    suspend fun programarPartido(partidoId: String, fecha: LocalDateTime?, lugar: String): Result<Programacion>
+
+    /** Borra todos los partidos del torneo, con sus árbitros asignados (MOV-0013). */
+    suspend fun borrarPartidos(torneoId: String): Result<Unit>
 }

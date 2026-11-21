@@ -1,5 +1,7 @@
 package co.edu.ufps.desafiosports.domain.model
 
+import java.time.LocalTime
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 // Gestión de un torneo que la persona administra (MOV-0011): sus árbitros, las invitaciones
@@ -184,3 +186,37 @@ fun correoDeInvitacionValido(correo: String): Boolean {
     val limpio = correo.trim()
     return limpio.isEmpty() || CORREO.matches(limpio)
 }
+
+// ── Programar y volver a generar (MOV-0013) ─────────────────────────────────
+
+/** Lo que se edita al programar un partido: el día, la hora y el lugar. */
+data class BorradorProgramacion(
+    val fecha: LocalDate? = null,
+    val hora: LocalTime? = null,
+    val lugar: String = "",
+) {
+    /** Null mientras falte el día o la hora. */
+    val fechaHora: LocalDateTime? get() = if (fecha != null && hora != null) fecha.atTime(hora) else null
+
+    companion object {
+        /** El backend guarda hasta 120 caracteres. */
+        const val LUGAR_MAXIMO = 120
+
+        /** Arranca con lo que el partido ya tiene. */
+        fun de(partido: PartidoDeTorneo) = BorradorProgramacion(
+            fecha = partido.fecha?.toLocalDate(),
+            hora = partido.fecha?.toLocalTime(),
+            lugar = partido.lugar.orEmpty(),
+        )
+    }
+}
+
+/** Cuándo y dónde quedó el partido, según lo que respondió el backend. */
+data class Programacion(val fecha: LocalDateTime?, val lugar: String?)
+
+/**
+ * Los partidos se pueden volver a generar mientras ninguno se haya jugado ni esté en juego: el
+ * backend se niega a borrarlos en cuanto uno tiene resultado.
+ */
+val List<PartidoDeTorneo>.sePuedenRegenerar: Boolean
+    get() = isNotEmpty() && none { it.estado.cerrado || it.estado == EstadoPartido.EN_CURSO }

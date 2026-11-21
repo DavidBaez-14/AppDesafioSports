@@ -1,5 +1,7 @@
 package co.edu.ufps.desafiosports.domain.use_case.competicion
 
+import co.edu.ufps.desafiosports.domain.model.Programacion
+import co.edu.ufps.desafiosports.domain.model.BorradorProgramacion
 import co.edu.ufps.desafiosports.domain.error.AppError
 import co.edu.ufps.desafiosports.domain.model.ArbitroAsignado
 import co.edu.ufps.desafiosports.domain.model.EstadoTorneo
@@ -93,4 +95,40 @@ class AsignarArbitroUseCase(private val repositorio: GestionTorneoRepository) {
 class QuitarArbitroDePartidoUseCase(private val repositorio: GestionTorneoRepository) {
     suspend operator fun invoke(partidoId: String, cuentaId: String): Result<List<ArbitroAsignado>> =
         repositorio.quitarArbitroDePartido(partidoId, cuentaId)
+}
+
+/**
+ * Programa un partido (MOV-0013): el día y la hora van juntos, y el lugar es opcional. Lo que no
+ * cumple no viaja.
+ */
+class ProgramarPartidoUseCase(private val repositorio: GestionTorneoRepository) {
+    suspend operator fun invoke(partidoId: String, borrador: BorradorProgramacion): Result<Programacion> {
+        if ((borrador.fecha == null) != (borrador.hora == null)) {
+            return Result.failure(AppError.Validacion(MENSAJE_FECHA_INCOMPLETA))
+        }
+        val lugar = borrador.lugar.trim()
+        if (lugar.length > BorradorProgramacion.LUGAR_MAXIMO) {
+            return Result.failure(AppError.Validacion(MENSAJE_LUGAR))
+        }
+        return repositorio.programarPartido(partidoId, borrador.fechaHora, lugar)
+    }
+
+    companion object {
+        const val MENSAJE_FECHA_INCOMPLETA = "Elige el día y también la hora."
+        const val MENSAJE_LUGAR = "El lugar puede tener hasta 120 caracteres."
+    }
+}
+
+/**
+ * Borra los partidos y los vuelve a generar con los equipos aprobados de hoy (MOV-0013). Si se
+ * borran pero no se pueden generar, el torneo queda sin partidos y basta tocar "Generar partidos".
+ */
+class VolverAGenerarPartidosUseCase(
+    private val repositorio: GestionTorneoRepository,
+    private val generarPartidosUseCase: GenerarPartidosUseCase = GenerarPartidosUseCase(repositorio),
+) {
+    suspend operator fun invoke(torneoId: String): Result<Unit> {
+        repositorio.borrarPartidos(torneoId).onFailure { return Result.failure(it) }
+        return generarPartidosUseCase(torneoId)
+    }
 }

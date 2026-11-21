@@ -372,8 +372,9 @@
     <string name="torneo_franja_entrar">Las inscripciones están abiertas. Entra o crea tu cuenta para participar.</string>
     <string name="torneo_entrar">Entrar</string>
     <string name="torneo_franja_juegas">¿Juegas este torneo?</string>
-    <string name="torneo_franja_abiertas">Las inscripciones están abiertas. Inscribir tu equipo o unirte a uno desde la app llega en la próxima versión.</string>
-    <string name="torneo_franja_abiertas_cobro">Las inscripciones están abiertas (%1$s por equipo). Inscribir tu equipo o unirte a uno desde la app llega en la próxima versión.</string>
+    <string name="torneo_franja_abiertas">Las inscripciones están abiertas. Si diriges un equipo, inscríbelo aquí. Si juegas en uno que ya se inscribió, pídele a su delegado que te agregue.</string>
+    <string name="torneo_franja_abiertas_cobro">Las inscripciones están abiertas (%1$s por equipo). Si diriges un equipo, inscríbelo aquí. Si juegas en uno que ya se inscribió, pídele a su delegado que te agregue.</string>
+    <string name="torneo_inscribir">Inscribir mi equipo</string>
     <string name="torneo_franja_delegas">Inscribiste a %1$s</string>
     <string name="torneo_franja_pendiente">El organizador revisa tu inscripción. Si el torneo cobra, págale y él la aprueba.</string>
     <string name="torneo_franja_juegas_en">Juegas en %1$s</string>
@@ -571,4 +572,21 @@
     <string name="invitacion_aceptando">Aceptando…</string>
     <string name="invitacion_aceptada_titulo">Invitación aceptada</string>
     <string name="invitacion_aceptada_detalle">Vuelve a Inicio para ver tu sección nueva.</string>
+
+    <!-- Inscribir un equipo (MOV-0014). -->
+    <string name="inscribir_titulo">Inscribir equipo</string>
+    <string name="inscribir_explicacion">Quedas como delegado del equipo en este torneo y entras a su plantel. Después agregas a tus jugadores.</string>
+    <string name="inscribir_que_equipo">¿Qué equipo?</string>
+    <string name="inscribir_nuevo">Crear un equipo nuevo</string>
+    <string name="inscribir_nombre">Nombre del equipo</string>
+    <string name="inscribir_nombre_ayuda">Así lo verán los demás equipos y el organizador.</string>
+    <string name="inscribir_cuota">Cuota de inscripción: %1$s por equipo</string>
+    <string name="inscribir_cuota_detalle">Se la pagas al organizador. Tu inscripción queda pendiente hasta que él la apruebe.</string>
+    <string name="inscribir_documento">Este torneo exige documento: el tuyo debe estar en tu perfil, y el de cada jugador que agregues.</string>
+    <string name="inscribir_confirmar">Inscribir equipo</string>
+    <string name="inscribir_inscribiendo">Inscribiendo…</string>
+    <string name="inscribir_hecha_titulo">%1$s quedó inscrito</string>
+    <string name="inscribir_hecha_cuota">Paga la cuota de %1$s al organizador. Cuando la confirme, tu inscripción queda aprobada. Mientras tanto, la ves en Inicio, en Mis equipos.</string>
+    <string name="inscribir_hecha_revision">El organizador revisa tu inscripción y la aprueba. Mientras tanto, la ves en Inicio, en Mis equipos.</string>
+    <string name="inscribir_hecha_aprobada">Tu inscripción ya está aprobada.</string>
 </resources>

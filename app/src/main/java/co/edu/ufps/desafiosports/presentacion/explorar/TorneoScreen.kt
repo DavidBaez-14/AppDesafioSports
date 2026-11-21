@@ -108,6 +108,8 @@ data class AccionesTorneo(
     val onEntrar: () -> Unit = {},
     val onAbrirCreador: () -> Unit = {},
     val onAbrirArbitro: () -> Unit = {},
+    /** "Inscribir mi equipo" (MOV-0014). */
+    val onInscribir: () -> Unit = {},
 )
 
 /** Detalle del torneo (MOV-0005). */
@@ -117,6 +119,7 @@ fun TorneoScreen(
     onEntrar: () -> Unit,
     onAbrirCreador: (TorneoDetalle) -> Unit,
     onAbrirArbitro: () -> Unit,
+    onInscribir: (TorneoDetalle, enlaceToken: String?) -> Unit,
     viewModel: TorneoViewModel = viewModel(factory = TorneoViewModel.Factory),
 ) {
     LifecycleResumeEffect(Unit) {
@@ -132,6 +135,7 @@ fun TorneoScreen(
         onEntrar = onEntrar,
         onAbrirCreador = { torneo?.let(onAbrirCreador) },
         onAbrirArbitro = onAbrirArbitro,
+        onInscribir = { torneo?.let { onInscribir(it, state.enlaceToken) } },
     )
     TorneoContenido(state = state, hoy = LocalDate.now(), acciones = acciones, onVolver = onVolver)
 }
@@ -361,8 +365,8 @@ internal fun ChipDeInscripcion(estado: EstadoInscripcion, modifier: Modifier = M
 
 /**
  * La franja de acciones (MOV-0005 · CA-4): lo que la persona es o puede hacer en este torneo.
- * Los botones "Inscribir mi equipo" y "Unirme a un equipo" llegan con MOV-0011 y MOV-0012: hasta
- * entonces la franja informa, sin botones que no lleven a ningún lado.
+ * "Inscribir mi equipo" llegó con MOV-0014. Unirse a un equipo ya inscrito lo hace su delegado
+ * agregándolo al plantel, así que la franja solo lo explica.
  */
 @Composable
 private fun FranjaDeAccion(torneo: TorneoDetalle, accion: AccionDelTorneo, acciones: AccionesTorneo, modifier: Modifier = Modifier) {
@@ -387,6 +391,13 @@ private fun FranjaDeAccion(torneo: TorneoDetalle, accion: AccionDelTorneo, accio
                         } else {
                             stringResource(R.string.torneo_franja_abiertas)
                         },
+                    )
+                    BotonPrimario(
+                        stringResource(R.string.torneo_inscribir),
+                        acciones.onInscribir,
+                        Modifier
+                            .fillMaxWidth()
+                            .testTag("torneo_inscribir"),
                     )
                 }
                 is AccionDelTorneo.Delegado -> {

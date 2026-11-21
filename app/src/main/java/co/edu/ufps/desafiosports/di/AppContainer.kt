@@ -1,5 +1,10 @@
 package co.edu.ufps.desafiosports.di
 
+import co.edu.ufps.desafiosports.domain.use_case.competicion.InscribirEquipoUseCase
+import co.edu.ufps.desafiosports.domain.use_case.competicion.ObtenerMisEquiposBaseUseCase
+import co.edu.ufps.desafiosports.domain.repository.DelegadoRepository
+import co.edu.ufps.desafiosports.data.repository.DelegadoRepositoryImpl
+import co.edu.ufps.desafiosports.data.remote.api.DelegadoApi
 import co.edu.ufps.desafiosports.domain.use_case.competicion.VolverAGenerarPartidosUseCase
 import co.edu.ufps.desafiosports.domain.use_case.competicion.ProgramarPartidoUseCase
 import co.edu.ufps.desafiosports.BuildConfig
@@ -125,6 +130,7 @@ class AppContainer(val configuracion: Configuracion) {
     private val arbitrajeApi: ArbitrajeApi by lazy { retrofit.create() }
     private val creadorApi: CreadorApi by lazy { retrofit.create() }
     private val torneosApi: TorneosApi by lazy { retrofit.create() }
+    private val delegadoApi: DelegadoApi by lazy { retrofit.create() }
     private val competicionApi: CompeticionApi by lazy { retrofit.create() }
     private val finanzasApi: FinanzasApi by lazy { retrofit.create() }
     private val gestionTorneoApi: GestionTorneoApi by lazy { retrofit.create() }
@@ -173,6 +179,11 @@ class AppContainer(val configuracion: Configuracion) {
     val torneosRepository: TorneosRepository by lazy { TorneosRepositoryImpl(torneosApi, erroresHttp) }
     val explorarTorneos by lazy { ExplorarTorneosUseCase(torneosRepository) }
     val obtenerTorneo by lazy { ObtenerTorneoUseCase(torneosRepository) }
+
+    // Inscribir un equipo (MOV-0014)
+    val delegadoRepository: DelegadoRepository by lazy { DelegadoRepositoryImpl(delegadoApi, erroresHttp) }
+    val obtenerMisEquiposBase by lazy { ObtenerMisEquiposBaseUseCase(delegadoRepository) }
+    val inscribirEquipo by lazy { InscribirEquipoUseCase(delegadoRepository) }
     val abrirTorneoPorEnlace by lazy { AbrirTorneoPorEnlaceUseCase(torneosRepository) }
 
     // Inicio y Perfil (MOV-0004)

@@ -130,7 +130,7 @@ sealed interface AccionDelTorneo {
     data class Delegado(val relacion: RelacionConEquipo) : AccionDelTorneo
     data class Juega(val relacion: RelacionConEquipo) : AccionDelTorneo
     data object Arbitra : AccionDelTorneo
-    /** Inscripciones abiertas en un deporte de equipo. Inscribir y unirse llegan con MOV-0011 y MOV-0012. */
+    /** Inscripciones abiertas en un deporte de equipo: "Inscribir mi equipo" (MOV-0014). */
     data object Inscribirse : AccionDelTorneo
     /** Deporte individual: la inscripción individual todavía no existe. */
     data object IndividualPendiente : AccionDelTorneo

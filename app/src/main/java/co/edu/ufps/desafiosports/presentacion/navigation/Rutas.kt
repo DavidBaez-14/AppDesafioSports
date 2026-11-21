@@ -90,3 +90,17 @@ data class Explorar(val visitante: Boolean = false)
 /** Detalle de un torneo, por su id o por el token de su enlace (los NO_LISTADO solo abren así). */
 @Serializable
 data class Torneo(val torneoId: String = "", val enlaceToken: String = "")
+
+/**
+ * Inscribir un equipo en un torneo (MOV-0014). Lleva lo que la pantalla muestra antes de pedir
+ * nada: el nombre, la cuota (en pesos, 0 si no cobra) y si exige documento. [enlaceToken] hace
+ * falta para inscribirse en un torneo que solo se abre con su enlace.
+ */
+@Serializable
+data class InscribirEquipo(
+    val torneoId: String,
+    val nombre: String = "",
+    val enlaceToken: String = "",
+    val cuota: Long = 0,
+    val exigeDocumento: Boolean = false,
+)

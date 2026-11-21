@@ -1,5 +1,6 @@
 package co.edu.ufps.desafiosports.presentacion.navigation
 
+import co.edu.ufps.desafiosports.presentacion.delegado.InscribirEquipoScreen
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -167,7 +168,16 @@ fun AppNavigation(
                 },
                 onAbrirCreador = { torneo -> navController.navigate(GestionTorneo(torneo.id, torneo.nombre)) },
                 onAbrirArbitro = { navController.navigate(SeccionArbitro) },
+                onInscribir = { torneo, enlaceToken ->
+                    val cuota = if (torneo.cobraInscripcion) torneo.valorInscripcion?.toLong() ?: 0 else 0
+                    navController.navigate(
+                        InscribirEquipo(torneo.id, torneo.nombre, enlaceToken.orEmpty(), cuota, torneo.exigeDocumento),
+                    )
+                },
             )
+        }
+        composable<InscribirEquipo> {
+            InscribirEquipoScreen(onVolver = { navController.popBackStack() })
         }
         composable<Diagnostico> {
             // Accesos directos a las secciones, útiles para probar sin pasar por Inicio.

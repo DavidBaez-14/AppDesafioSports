@@ -1,5 +1,7 @@
 package co.edu.ufps.desafiosports.presentacion.navigation
 
+import co.edu.ufps.desafiosports.presentacion.delegado.AgregarJugadorScreen
+import co.edu.ufps.desafiosports.presentacion.delegado.PlantelScreen
 import co.edu.ufps.desafiosports.presentacion.delegado.InscribirEquipoScreen
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -168,6 +170,9 @@ fun AppNavigation(
                 },
                 onAbrirCreador = { torneo -> navController.navigate(GestionTorneo(torneo.id, torneo.nombre)) },
                 onAbrirArbitro = { navController.navigate(SeccionArbitro) },
+                onAbrirPlantel = { torneo, relacion ->
+                    navController.navigate(PlantelEquipo(relacion.equipoTorneoId, relacion.equipo, torneo.nombre, torneo.exigeDocumento))
+                },
                 onInscribir = { torneo, enlaceToken ->
                     val cuota = if (torneo.cobraInscripcion) torneo.valorInscripcion?.toLong() ?: 0 else 0
                     navController.navigate(
@@ -176,8 +181,27 @@ fun AppNavigation(
                 },
             )
         }
-        composable<InscribirEquipo> {
-            InscribirEquipoScreen(onVolver = { navController.popBackStack() })
+        composable<InscribirEquipo> { entrada ->
+            val ruta = entrada.toRoute<InscribirEquipo>()
+            InscribirEquipoScreen(
+                onVolver = { navController.popBackStack() },
+                // Desde la confirmación, el plantel reemplaza a la inscripción: atrás vuelve al torneo.
+                onAgregarJugadores = { hecha ->
+                    navController.navigate(PlantelEquipo(hecha.equipoTorneoId, hecha.equipo, ruta.nombre, ruta.exigeDocumento)) {
+                        popUpTo<InscribirEquipo> { inclusive = true }
+                    }
+                },
+            )
+        }
+        composable<PlantelEquipo> { entrada ->
+            val ruta = entrada.toRoute<PlantelEquipo>()
+            PlantelScreen(
+                onVolver = { navController.popBackStack() },
+                onAgregar = { navController.navigate(AgregarJugador(ruta.equipoTorneoId, ruta.equipo, ruta.exigeDocumento)) },
+            )
+        }
+        composable<AgregarJugador> {
+            AgregarJugadorScreen(onVolver = { navController.popBackStack() })
         }
         composable<Diagnostico> {
             // Accesos directos a las secciones, útiles para probar sin pasar por Inicio.

@@ -30,3 +30,32 @@ data class InscripcionDelegadoDto(
     val equipoNombre: String? = null,
     val estadoInscripcion: String? = null,
 )
+
+// ── Plantel (MOV-0015) ──
+
+/** `MiembroEquipoDTO` (solo los campos que se usan). */
+@Serializable
+data class MiembroEquipoDto(
+    val personaId: String? = null,
+    val numeroDocumento: String? = null,
+    val nombre: String? = null,
+    val numeroCamiseta: Int? = null,
+    /** ACTIVO o RETIRADO. */
+    val estado: String? = null,
+    val esDelegado: Boolean? = null,
+    val torneoEstado: String? = null,
+    val tieneCuenta: Boolean? = null,
+)
+
+/** Cuerpo de `POST …/miembros`. Los null no viajan. */
+@Serializable
+data class AgregarMiembroRequestDto(
+    val numeroDocumento: String? = null,
+    val tipoDocumento: String? = null,
+    val nombre: String? = null,
+    val numeroCamiseta: Int? = null,
+)
+
+/** Cuerpo de `PATCH …/camiseta`. Sin número viaja `{}` y el backend se lo quita. */
+@Serializable
+data class CamisetaRequestDto(val numeroCamiseta: Int? = null)

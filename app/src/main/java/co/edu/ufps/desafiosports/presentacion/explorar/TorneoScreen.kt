@@ -110,6 +110,8 @@ data class AccionesTorneo(
     val onAbrirArbitro: () -> Unit = {},
     /** "Inscribir mi equipo" (MOV-0014). */
     val onInscribir: () -> Unit = {},
+    /** "Ver plantel", para el delegado (MOV-0015). */
+    val onAbrirPlantel: () -> Unit = {},
 )
 
 /** Detalle del torneo (MOV-0005). */
@@ -120,6 +122,7 @@ fun TorneoScreen(
     onAbrirCreador: (TorneoDetalle) -> Unit,
     onAbrirArbitro: () -> Unit,
     onInscribir: (TorneoDetalle, enlaceToken: String?) -> Unit,
+    onAbrirPlantel: (TorneoDetalle, RelacionConEquipo) -> Unit,
     viewModel: TorneoViewModel = viewModel(factory = TorneoViewModel.Factory),
 ) {
     LifecycleResumeEffect(Unit) {
@@ -136,6 +139,10 @@ fun TorneoScreen(
         onAbrirCreador = { torneo?.let(onAbrirCreador) },
         onAbrirArbitro = onAbrirArbitro,
         onInscribir = { torneo?.let { onInscribir(it, state.enlaceToken) } },
+        onAbrirPlantel = {
+            val relacion = torneo?.miRelacion?.delegadoDe
+            if (torneo != null && relacion != null) onAbrirPlantel(torneo, relacion)
+        },
     )
     TorneoContenido(state = state, hoy = LocalDate.now(), acciones = acciones, onVolver = onVolver)
 }
@@ -405,6 +412,13 @@ private fun FranjaDeAccion(torneo: TorneoDetalle, accion: AccionDelTorneo, accio
                     if (accion.relacion.estadoInscripcion == EstadoInscripcion.PENDIENTE_PAGO) {
                         TextoDeFranja(stringResource(R.string.torneo_franja_pendiente))
                     }
+                    BotonContorno(
+                        stringResource(R.string.torneo_ver_plantel),
+                        acciones.onAbrirPlantel,
+                        Modifier
+                            .fillMaxWidth()
+                            .testTag("torneo_plantel"),
+                    )
                 }
                 is AccionDelTorneo.Juega -> {
                     FilaDeRelacion(stringResource(R.string.torneo_franja_juegas_en, accion.relacion.equipo), accion.relacion.estadoInscripcion)

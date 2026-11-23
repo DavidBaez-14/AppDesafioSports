@@ -60,6 +60,12 @@
     <string name="tipo_documento_ce">Cédula de extranjería</string>
     <string name="tipo_documento_ppt">Permiso por protección temporal</string>
     <string name="tipo_documento_pasaporte">Pasaporte</string>
+    <!-- Siglas, para los campos angostos (MOV-0015). -->
+    <string name="tipo_documento_sigla_cc">CC</string>
+    <string name="tipo_documento_sigla_ti">TI</string>
+    <string name="tipo_documento_sigla_ce">CE</string>
+    <string name="tipo_documento_sigla_ppt">PPT</string>
+    <string name="tipo_documento_sigla_pasaporte">PA</string>
 
     <!-- Diagnóstico de conexión (MOV-0001). Pantalla temporal, sin diseño. -->
     <string name="diagnostico_titulo">Diagnóstico de conexión</string>
@@ -375,6 +381,7 @@
     <string name="torneo_franja_abiertas">Las inscripciones están abiertas. Si diriges un equipo, inscríbelo aquí. Si juegas en uno que ya se inscribió, pídele a su delegado que te agregue.</string>
     <string name="torneo_franja_abiertas_cobro">Las inscripciones están abiertas (%1$s por equipo). Si diriges un equipo, inscríbelo aquí. Si juegas en uno que ya se inscribió, pídele a su delegado que te agregue.</string>
     <string name="torneo_inscribir">Inscribir mi equipo</string>
+    <string name="torneo_ver_plantel">Ver plantel</string>
     <string name="torneo_franja_delegas">Inscribiste a %1$s</string>
     <string name="torneo_franja_pendiente">El organizador revisa tu inscripción. Si el torneo cobra, págale y él la aprueba.</string>
     <string name="torneo_franja_juegas_en">Juegas en %1$s</string>
@@ -588,5 +595,45 @@
     <string name="inscribir_hecha_titulo">%1$s quedó inscrito</string>
     <string name="inscribir_hecha_cuota">Paga la cuota de %1$s al organizador. Cuando la confirme, tu inscripción queda aprobada. Mientras tanto, la ves en Inicio, en Mis equipos.</string>
     <string name="inscribir_hecha_revision">El organizador revisa tu inscripción y la aprueba. Mientras tanto, la ves en Inicio, en Mis equipos.</string>
+    <string name="inscribir_agregar_jugadores">Agregar jugadores</string>
     <string name="inscribir_hecha_aprobada">Tu inscripción ya está aprobada.</string>
+
+    <!-- Plantel del delegado (MOV-0015). -->
+    <string name="plantel_titulo">Plantel</string>
+    <plurals name="plantel_jugadores">
+        <item quantity="one">%1$d jugador</item>
+        <item quantity="other">%1$d jugadores</item>
+    </plurals>
+    <string name="plantel_ayuda">Toca a un jugador para cambiar su número o quitarlo.</string>
+    <string name="plantel_cerrado">El torneo terminó: el plantel ya no cambia.</string>
+    <string name="plantel_vacio">Aún no hay jugadores</string>
+    <string name="plantel_vacio_detalle">Agrégalos con su documento o su nombre.</string>
+    <string name="plantel_agregar">Agregar jugador</string>
+    <string name="plantel_sin_cuenta">Sin cuenta</string>
+    <string name="plantel_retirados">Ya no están</string>
+    <string name="plantel_retirado">Retirado del plantel</string>
+    <string name="plantel_camiseta">Número de camiseta</string>
+    <string name="plantel_camiseta_ayuda">Del 0 al 99. Déjalo vacío para quitarle el número.</string>
+    <string name="plantel_guardar">Guardar</string>
+    <string name="plantel_guardando">Guardando…</string>
+    <string name="plantel_quitar">Quitar del plantel</string>
+    <string name="plantel_delegado_fijo">Eres el delegado: sigues en el plantel.</string>
+    <string name="plantel_quitar_titulo">¿Quitar a %1$s del plantel?</string>
+    <string name="plantel_quitar_detalle">Deja de jugar con el equipo en los partidos que faltan. Lo que ya jugó se conserva.</string>
+    <string name="plantel_quitar_si">Quitar</string>
+    <string name="plantel_quitando">Quitando…</string>
+    <string name="plantel_aviso_quitado">%1$s ya no está en el plantel.</string>
+    <string name="agregar_titulo">Agregar jugador</string>
+    <string name="agregar_explicacion">Si ya tiene cuenta en Desafío Sports, basta con su documento: se usa el nombre de su cuenta.</string>
+    <string name="agregar_tipo">Tipo</string>
+    <string name="agregar_documento">Documento (opcional)</string>
+    <string name="agregar_documento_exigido">Documento</string>
+    <string name="agregar_nombre">Nombre completo</string>
+    <string name="agregar_nombre_ayuda">Si no tiene cuenta, escríbelo como quiere que aparezca.</string>
+    <string name="agregar_camiseta">Camiseta</string>
+    <string name="agregar_camiseta_ayuda">Opcional, del 0 al 99.</string>
+    <string name="agregar_confirmar">Agregar al plantel</string>
+    <string name="agregar_agregando">Agregando…</string>
+    <string name="agregar_aviso">%1$s quedó en el plantel.</string>
+    <string name="agregar_agregados">Agregaste: %1$s</string>
 </resources>

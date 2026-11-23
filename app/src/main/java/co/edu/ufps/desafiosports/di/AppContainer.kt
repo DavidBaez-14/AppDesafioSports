@@ -1,5 +1,9 @@
 package co.edu.ufps.desafiosports.di
 
+import co.edu.ufps.desafiosports.domain.use_case.competicion.QuitarDelPlantelUseCase
+import co.edu.ufps.desafiosports.domain.use_case.competicion.CambiarCamisetaUseCase
+import co.edu.ufps.desafiosports.domain.use_case.competicion.AgregarJugadorUseCase
+import co.edu.ufps.desafiosports.domain.use_case.competicion.ObtenerPlantelUseCase
 import co.edu.ufps.desafiosports.domain.use_case.competicion.InscribirEquipoUseCase
 import co.edu.ufps.desafiosports.domain.use_case.competicion.ObtenerMisEquiposBaseUseCase
 import co.edu.ufps.desafiosports.domain.repository.DelegadoRepository
@@ -184,6 +188,12 @@ class AppContainer(val configuracion: Configuracion) {
     val delegadoRepository: DelegadoRepository by lazy { DelegadoRepositoryImpl(delegadoApi, erroresHttp) }
     val obtenerMisEquiposBase by lazy { ObtenerMisEquiposBaseUseCase(delegadoRepository) }
     val inscribirEquipo by lazy { InscribirEquipoUseCase(delegadoRepository) }
+
+    // Plantel (MOV-0015)
+    val obtenerPlantel by lazy { ObtenerPlantelUseCase(delegadoRepository) }
+    val agregarJugador by lazy { AgregarJugadorUseCase(delegadoRepository) }
+    val cambiarCamiseta by lazy { CambiarCamisetaUseCase(delegadoRepository) }
+    val quitarDelPlantel by lazy { QuitarDelPlantelUseCase(delegadoRepository) }
     val abrirTorneoPorEnlace by lazy { AbrirTorneoPorEnlaceUseCase(torneosRepository) }
 
     // Inicio y Perfil (MOV-0004)

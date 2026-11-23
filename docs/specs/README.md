@@ -22,10 +22,12 @@
 | [MOV-0012](MOV-0012-revision-arbitraje.md) | Invitaciones recibidas, planilla solo con alineados y planilla del organizador | en-revision | F3 | David | MOV-0009, MOV-0011 · backend 0030 | `mov-0012-revision-arbitraje` |
 | [MOV-0013](MOV-0013-programar-partidos.md) | Programar los partidos (fecha, hora y lugar) y volver a generarlos | en-revision | F3 | David | MOV-0011, MOV-0012 · backend 0025 | `mov-0013-programar-partidos` |
 | [MOV-0014](MOV-0014-inscribir-equipo.md) | Inscribir un equipo en un torneo | en-revision | F1 | David | MOV-0004, MOV-0005 · backend 0026 y 0029 | `mov-0014-inscribir-equipo` |
+| [MOV-0015](MOV-0015-plantel-delegado.md) | Plantel del equipo para su delegado | en-revision | F1 | David | MOV-0005, MOV-0014 · backend 0018, 0022, 0023 y 0026 | `mov-0015-plantel-delegado` |
 
 - **MOV-0001 a MOV-0010 están en `main`** (16-nov-2026). **MOV-0011** está en su rama: falta probar en el emulador generar los partidos y asignar árbitros con un torneo que tenga dos equipos aprobados. MOV-0003 sigue `en-revision` solo porque falta probar el registro real con un correo propio.
 - **MOV-0012** sale de la revisión de la MOV-0011 y va en su rama, encima de ella. Necesita el **backend 0030** integrado y desplegado para verse completa en el emulador (invitaciones recibidas, expulsados y reabrir).
 - **MOV-0014** va encima de MOV-0013. Sin comprobantes: la cuota se informa y la inscripción queda pendiente.
+- **MOV-0015** va encima de MOV-0014. Solo usa backend que ya está en `main` (no necesita la 0030).
 - **MOV-0013** va encima de MOV-0012, en su propia rama. Solo usa backend que ya está en `main`.
 - **MOV-0005, 0007 y 0008 se pusieron al día el 16-nov:** sus specs eran borradores anteriores al backend real y ahora describen lo que hace el código.
 - **Pendiente de MOV-0009:** medir en la app si pasar lista sigue lento; si se confirma, va como spec de bug.
@@ -37,6 +39,6 @@ Salen del plan de UI ([`../plan-ui-impeccable.md`](../plan-ui-impeccable.md) §5
 | Título | Depende de |
 |---|---|
 | Inscribirme en un torneo individual (el backend aún responde `TORNEO_INDIVIDUAL`) | backend |
-| Delegado: plantel, solicitudes de ingreso e inscripciones | MOV-0004 |
+| Delegado: solicitudes de ingreso al equipo y "¿Este eres tú?" | MOV-0015 · backend (solicitudes y 0023) |
 | Comprobantes (inscripción y multa) y mis multas | backend: subida de multas por el jugador |
 | Configuración del torneo (formato, cuota, premios y multas) | MOV-0008 |

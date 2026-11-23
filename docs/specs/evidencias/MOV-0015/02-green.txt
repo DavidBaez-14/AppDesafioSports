@@ -1,0 +1,53 @@
+MOV-0015 · ./gradlew testDebugUnitTest assembleDebug (2026-11-23)
+Salida de Gradle: BUILD SUCCESSFUL (44 tareas); APK de debug generado
+Toda la suite: 455 pruebas, 0 fallos, 3 saltadas (las de humo, que solo corren con DESAFIO_HUMO=1)
+
+AgregarJugadorTest (5)
+  ✓ CA-4 con documento viaja el documento con su tipo, sin espacios de sobra
+  ✓ CA-4 sin documento viaja solo el nombre, sin tipo ni numero
+  ✓ CA-5 el numero de otro activo no viaja, y el de un retirado si
+  ✓ CA-5 lo que se sabe antes de enviar no viaja y cada motivo dice su campo
+  ✓ CA-5 un numero fuera de 0 a 99 no viaja
+AgregarJugadorViewModelTest (6)
+  ✓ CA-4 agregar avisa, vacia el formulario conservando el tipo y acumula los agregados
+  ✓ CA-4 sin documento ni nombre no se puede agregar
+  ✓ CA-5 el doble toque no agrega dos veces y mientras viaja no se cambia lo escrito
+  ✓ CA-5 el numero de otro activo sale bajo la camiseta y no viaja
+  ✓ CA-5 los codigos del backend van bajo su campo y el resto sobre el boton
+  ✓ CA-5 sin el documento que el torneo exige el motivo sale bajo el documento
+CamisetaYQuitarTest (4)
+  ✓ CA-6 cambiar el numero envia el nuevo, y vacio se lo quita
+  ✓ CA-6 el numero de otro activo o uno fuera de rango no viaja
+  ✓ CA-6 si el numero no cambio no viaja
+  ✓ CA-7 al delegado no se le quita, y a los demas si
+DelegadoRepositoryImplTest (11)
+  ✓ CA-2 el plantel trae activos y retirados, y el miembro sin persona se descarta
+  ✓ CA-2 mis equipos llegan en el orden del backend y el que no tiene id se descarta
+  ✓ CA-3 el 403 de quien no es el delegado llega con su codigo
+  ✓ CA-3 inscribir un equipo propio envia solo su id y lee la inscripcion
+  ✓ CA-4 agregar envia solo los campos escritos y lee al agregado
+  ✓ CA-4 un equipo nuevo viaja por su nombre y con el enlace del torneo
+  ✓ CA-5 los rechazos al agregar llegan con su codigo y su mensaje
+  ✓ CA-6 cambiar el numero usa PATCH, y sin numero envia un objeto vacio
+  ✓ CA-6 los rechazos llegan con su codigo y su mensaje
+  ✓ CA-7 quitar usa remover y lee al jugador ya retirado
+  ✓ CA-8 el plantel de un torneo finalizado llega marcado
+PlantelTest (4)
+  ✓ CA-2 los activos van por numero, los que no tienen al final y por nombre, y los retirados aparte
+  ✓ CA-4 un miembro nuevo se suma y uno que ya estaba se reemplaza en su lugar
+  ✓ CA-6 el dueno de un numero es un activo distinto del que se cambia
+  ✓ CA-8 con el torneo terminado el plantel no se puede cambiar
+PlantelViewModelTest (13)
+  ✓ CA-2 al abrir se pide el plantel y se ven los activos en orden y los retirados aparte
+  ✓ CA-3 si falla al refrescar se conserva lo que se ve y se avisa
+  ✓ CA-3 si no carga se ofrece reintentar y se recupera
+  ✓ CA-3 si no es su delegado se ofrece volver en vez de reintentar
+  ✓ CA-4 al volver de agregar se pide de nuevo sin indicador y se ve al agregado
+  ✓ CA-6 el doble toque en guardar envia una sola vez
+  ✓ CA-6 el rechazo del backend queda en el dialogo
+  ✓ CA-6 guardar un numero nuevo actualiza la fila y cierra el dialogo sin volver a pedir el plantel
+  ✓ CA-6 un numero de otro activo no viaja y el motivo queda en el dialogo
+  ✓ CA-7 al delegado no se le pide confirmar y no viaja nada
+  ✓ CA-7 quitar pide confirmacion, pasa a retirados y avisa
+  ✓ CA-7 si quitar falla vuelve al dialogo del jugador con el motivo
+  ✓ CA-8 con el torneo terminado tocar a un jugador no abre nada

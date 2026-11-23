@@ -1,0 +1,27 @@
+MOV-0015 · prueba de dientes (2026-11-23)
+Se rompieron a propósito 5 reglas y se corrieron las 43 pruebas del plantel:
+  1. Plantel.activos ordena solo por nombre, no por número
+  2. CambiarCamisetaUseCase envía el número aunque no haya cambiado
+  3. QuitarDelPlantelUseCase deja quitar al delegado
+  4. AgregarJugadorViewModel manda VALIDACION sobre el botón, no bajo el documento
+  5. DelegadoRepositoryImpl lee a los retirados como activos
+
+DelegadoRepositoryImplTest > CA-7 quitar usa remover y lee al jugador ya retirado FAILED
+    java.lang.AssertionError at DelegadoRepositoryImplTest.kt:213
+DelegadoRepositoryImplTest > CA-2 el plantel trae activos y retirados, y el miembro sin persona se descarta FAILED
+    java.lang.AssertionError at DelegadoRepositoryImplTest.kt:108
+CamisetaYQuitarTest > CA-7 al delegado no se le quita, y a los demas si FAILED
+CamisetaYQuitarTest > CA-6 si el numero no cambio no viaja FAILED
+    java.lang.AssertionError at CamisetaYQuitarTest.kt:39
+PlantelTest > CA-4 un miembro nuevo se suma y uno que ya estaba se reemplaza en su lugar FAILED
+    java.lang.AssertionError at PlantelTest.kt:39
+PlantelTest > CA-2 los activos van por numero, los que no tienen al final y por nombre, y los retirados aparte FAILED
+    java.lang.AssertionError at PlantelTest.kt:26
+AgregarJugadorViewModelTest > CA-5 los codigos del backend van bajo su campo y el resto sobre el boton FAILED
+    java.lang.AssertionError at AgregarJugadorViewModelTest.kt:116
+PlantelViewModelTest > CA-4 al volver de agregar se pide de nuevo sin indicador y se ve al agregado FAILED
+    java.lang.AssertionError at PlantelViewModelTest.kt:115
+43 tests completed, 8 failed
+> Task :app:testDebugUnitTest FAILED
+
+Después se restauró el código (md5 idéntico al de antes).

@@ -70,6 +70,7 @@ data class AccionesInscribir(
 @Composable
 fun InscribirEquipoScreen(
     onVolver: () -> Unit,
+    onAgregarJugadores: (InscripcionHecha) -> Unit = {},
     viewModel: InscribirEquipoViewModel = viewModel(factory = InscribirEquipoViewModel.Factory),
 ) {
     InscribirEquipoContenido(
@@ -82,6 +83,7 @@ fun InscribirEquipoScreen(
             onInscribir = viewModel::inscribir,
         ),
         onVolver = onVolver,
+        onAgregarJugadores = onAgregarJugadores,
     )
 }
 
@@ -92,6 +94,7 @@ fun InscribirEquipoContenido(
     acciones: AccionesInscribir,
     onVolver: () -> Unit,
     modifier: Modifier = Modifier,
+    onAgregarJugadores: (InscripcionHecha) -> Unit = {},
 ) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -112,7 +115,7 @@ fun InscribirEquipoContenido(
     ) { relleno ->
         val hecha = state.hecha
         when {
-            hecha != null -> Confirmacion(hecha, state.cuota, onVolver, Modifier.padding(relleno))
+            hecha != null -> Confirmacion(hecha, state.cuota, onVolver, { onAgregarJugadores(hecha) }, Modifier.padding(relleno))
             state.cargando -> Cargando(Modifier.padding(relleno))
             state.error != null -> EstadoError(state.error, acciones.onReintentar, Modifier.padding(relleno), testTagBoton = "inscribir_reintentar")
             else -> Formulario(state, acciones, Modifier.padding(relleno))
@@ -258,9 +261,18 @@ private fun OpcionDeEquipo(
     }
 }
 
-/** Ya quedó inscrito: qué sigue. "Listo" vuelve al torneo, que muestra la inscripción. */
+/**
+ * Ya quedó inscrito: qué sigue. "Agregar jugadores" abre el plantel (MOV-0015); "Listo" vuelve al
+ * torneo, que muestra la inscripción.
+ */
 @Composable
-private fun Confirmacion(hecha: InscripcionHecha, cuota: Long, onListo: () -> Unit, modifier: Modifier = Modifier) {
+private fun Confirmacion(
+    hecha: InscripcionHecha,
+    cuota: Long,
+    onListo: () -> Unit,
+    onAgregarJugadores: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val detalle = if (hecha.estado == EstadoInscripcion.APROBADO) {
         stringResource(R.string.inscribir_hecha_aprobada)
     } else if (cuota > 0) {
@@ -272,7 +284,19 @@ private fun Confirmacion(hecha: InscripcionHecha, cuota: Long, onListo: () -> Un
         icono = R.drawable.ic_check_circle,
         titulo = stringResource(R.string.inscribir_hecha_titulo, hecha.equipo),
         detalle = detalle,
-        accion = { BotonContorno(stringResource(R.string.accion_listo), onListo, Modifier.testTag("inscribir_listo")) },
+        accion = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                // Sin el id de la inscripción no hay plantel que abrir.
+                if (hecha.equipoTorneoId.isNotBlank()) {
+                    BotonPrimario(
+                        stringResource(R.string.inscribir_agregar_jugadores),
+                        onAgregarJugadores,
+                        Modifier.testTag("inscribir_agregar_jugadores"),
+                    )
+                }
+                BotonContorno(stringResource(R.string.accion_listo), onListo, Modifier.testTag("inscribir_listo"))
+            }
+        },
         modifier = modifier
             .padding(top = 32.dp)
             .testTag("inscribir_hecha"),

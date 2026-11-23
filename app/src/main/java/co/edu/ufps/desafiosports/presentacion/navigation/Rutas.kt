@@ -104,3 +104,23 @@ data class InscribirEquipo(
     val cuota: Long = 0,
     val exigeDocumento: Boolean = false,
 )
+
+/**
+ * El plantel de un equipo en un torneo, para su delegado (MOV-0015). Se llama así y no `Plantel`
+ * para no confundirse con el modelo del dominio.
+ */
+@Serializable
+data class PlantelEquipo(
+    val equipoTorneoId: String,
+    val equipo: String = "",
+    val torneo: String = "",
+    val exigeDocumento: Boolean = false,
+)
+
+/** Agregar jugadores al plantel (MOV-0015). */
+@Serializable
+data class AgregarJugador(
+    val equipoTorneoId: String,
+    val equipo: String = "",
+    val exigeDocumento: Boolean = false,
+)

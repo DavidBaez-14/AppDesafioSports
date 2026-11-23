@@ -2,7 +2,7 @@
 id: MOV-0014
 titulo: Inscribir un equipo en un torneo
 tipo: feature
-estado: en-revision
+estado: hecha
 prioridad: P1
 fase: F1
 modo: Jugador (delegado)
@@ -147,3 +147,4 @@ rama: mov-0014-inscribir-equipo
 | 2026-11-21 | Redactada e implementada por pedido de David ("Sí, realiza la primera"). Pasa a `en-revision` |
 | 2026-11-21 | 416 pruebas, 0 fallos (18 nuevas); `assembleDebug` en verde. Prueba de dientes: sin el chequeo del nombre repetido fallan 2 pruebas |
 | 2026-11-21 | Verificada en el emulador **hasta antes de enviar**, contra el backend de Render, con la sesión de Diana (sin equipos propios) en "Prueba 2029" (público, cuota de $1.000): la franja muestra "Inscribir mi equipo" (CA-1); la pantalla muestra el torneo, la cuota y arranca en el campo del nombre con el botón deshabilitado, que se habilita al escribir (CA-2). Capturas 01 a 03 (oscuro). **No se envió la inscripción** para no crear datos en el entorno compartido: falta el paso 3 de §8 en adelante (CA-3 a CA-7 en el emulador; cubiertos por pruebas), y claro con letra al 130 % (CA-8) |
+| 2026-11-23 | **Integrada a `main`** por decisión de David ("Sí, intégralo todo"), junto con MOV-0011 a MOV-0015 y el backend 0030, con 455 pruebas y 0 fallos. Pasa a `hecha`. Sigue sin verificar en el emulador: enviar la inscripción y lo que sigue (CA-3 a CA-7, cubiertos por pruebas), y claro con letra al 130 % (CA-8) |

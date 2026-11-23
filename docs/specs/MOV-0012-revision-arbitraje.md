@@ -2,7 +2,7 @@
 id: MOV-0012
 titulo: Invitaciones recibidas, planilla solo con alineados y planilla del organizador
 tipo: bug + feature
-estado: en-revision
+estado: hecha
 prioridad: P1
 fase: F3
 modo: Jugador · Árbitro · Creador
@@ -156,3 +156,4 @@ Revisión de David de la MOV-0011 en el emulador (16-nov-2026). Tres hallazgos:
 | 2026-11-16 | Redactada e implementada por la revisión de David de la MOV-0011. Pasa a `en-revision` |
 | 2026-11-16 | 374 pruebas, 0 fallos (19 nuevas); `assembleDebug` en verde |
 | 2026-11-16 | Verificada en el emulador **en parte**, contra el backend de Render, que aún **no tiene la 0030**, con la sesión que estaba abierta (árbitro y creadora de "Prueba MOV-0011"). **Visto:** Inicio carga sin el bloque de invitaciones y sin error; en un partido sin alineados, "Gol" abre la hoja con "Aún no hay nadie alineado" y "Pasar lista" abre la alineación de ese equipo (capturas 01 y 02, oscuro). **Sin ver en el emulador:** el bloque "Te invitaron" y aceptar sin enlace (CA-1), el expulsado (CA-3), los 409 nuevos (CA-4), "Abrir planilla" desde Partidos (CA-5: el torneo de esa cuenta no tiene partidos) y "Reabrir partido" (CA-6); tampoco claro ni letra al 130 % (CA-7). Quedan cubiertos por pruebas de dominio, ViewModel y red, y por las 10 del backend. Se completa cuando la 0030 esté desplegada |
+| 2026-11-23 | **Integrada a `main`** por decisión de David ("Sí, intégralo todo"), junto con MOV-0011 a MOV-0015 y el backend 0030, con 455 pruebas y 0 fallos. Pasa a `hecha`. Con la 0030 ya en `main`, queda por verificar en el emulador: "Te invitaron" y aceptar sin enlace (CA-1), el expulsado (CA-3), los 409 nuevos (CA-4), "Abrir planilla" desde Partidos (CA-5), "Reabrir partido" (CA-6), y claro con letra al 130 % (CA-7) |

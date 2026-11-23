@@ -2,7 +2,7 @@
 id: MOV-0013
 titulo: Programar los partidos (fecha, hora y lugar) y volver a generarlos
 tipo: feature
-estado: en-revision
+estado: hecha
 prioridad: P1
 fase: F3
 modo: Creador
@@ -142,3 +142,4 @@ Con una cuenta que organice un torneo con partidos sin jugar (por ejemplo `admin
 | 2026-11-21 | Redactada e implementada (pendiente de "Próximas" en el índice y de MOV-0011). Pasa a `en-revision` |
 | 2026-11-21 | 398 pruebas, 0 fallos (24 nuevas); `assembleDebug` en verde. Prueba de dientes: con `sePuedenRegenerar` roto a propósito fallan 2 pruebas |
 | 2026-11-21 | **Sin verificar en el emulador:** no había emulador encendido, y la sesión de la app (Diana) organiza un torneo sin partidos. Falta el recorrido de §8 con `admin01` |
+| 2026-11-23 | **Integrada a `main`** por decisión de David ("Sí, intégralo todo"), junto con MOV-0011 a MOV-0015 y el backend 0030, con 455 pruebas y 0 fallos. Pasa a `hecha`. Sigue sin verificar en el emulador: el recorrido de §8 con `admin01` |

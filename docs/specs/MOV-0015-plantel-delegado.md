@@ -2,7 +2,7 @@
 id: MOV-0015
 titulo: Plantel del equipo para su delegado
 tipo: feature
-estado: en-revision
+estado: hecha
 prioridad: P1
 fase: F1
 modo: Jugador (delegado)
@@ -217,3 +217,4 @@ En total son 39 pruebas nuevas: 13 de dominio, 7 de red y 19 de ViewModel. La li
 | 2026-11-23 | Retomada: la spec se redacta a partir del código y del contrato del backend, que se revisó contra `DelegadoController` y `DelegadoService` en `main` |
 | 2026-11-23 | 455 pruebas, 0 fallos (39 nuevas), y `assembleDebug` en verde (`evidencias/MOV-0015/02-green.txt`). Como el código ya existía, en vez de un RED previo se hizo la prueba de dientes de `sdd.md` §6: se rompieron 5 reglas a propósito y fallaron 8 pruebas, justo las que las cubren (`01-dientes.txt`). Pasa a `en-revision` |
 | 2026-11-23 | Verificada en el emulador (Pixel 8) contra el backend de Render, con `delegado01` en "Copa Prueba 2026": la franja muestra "Ver plantel" (CA-1); el plantel muestra 6 jugadores en orden de camiseta, el delegado marcado y los documentos (CA-2); el diálogo de un jugador ofrece "Quitar del plantel", y el del delegado no (CA-6, CA-7); "Agregar jugador" arranca con el botón deshabilitado, que se habilita al escribir un nombre (CA-4). Capturas 01 a 11, en oscuro, claro y con la letra al 130 % (CA-9). En el emulador apareció el tipo de documento cortado ("Cédula de"); se corrigió con las siglas y se volvió a verificar (captura 11). **No se envió nada** (agregar, cambiar número ni quitar) para no cambiar datos en el entorno compartido: eso queda cubierto por pruebas. Tampoco se probó en el emulador "Agregar jugadores" desde la confirmación de la inscripción (CA-1, segunda parte), porque exige inscribir un equipo, ni el estado de torneo finalizado (CA-8, cubierto por pruebas) |
+| 2026-11-23 | **Integrada a `main`** por decisión de David ("Sí, intégralo todo"), junto con MOV-0011 a MOV-0015 y el backend 0030, con 455 pruebas y 0 fallos. Pasa a `hecha`. Sigue sin verificar en el emulador: agregar, cambiar el número y quitar (CA-4 a CA-7), "Agregar jugadores" desde la confirmación de la inscripción (CA-1) y el torneo finalizado (CA-8). Todo está cubierto por pruebas |

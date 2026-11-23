@@ -18,17 +18,15 @@
 | [MOV-0008](MOV-0008-seccion-creador.md) | Sección Creador, mis torneos y por revisar | hecha | F3 | David | MOV-0007 · backend 0024 y 0029 | `mov-0007-crear-torneo` |
 | [MOV-0009](MOV-0009-seccion-arbitro-y-planilla.md) | Sección Árbitro y planilla del partido | hecha | F2 | David | MOV-0003 · backend 0025 y 0029 | `mov-0009-seccion-arbitro` |
 | [MOV-0010](MOV-0010-diseno-secciones.md) | Diseño de las secciones Árbitro y Creador, e Inicio provisional | hecha | F2 | David | MOV-0007, MOV-0008, MOV-0009 | `mov-0010-diseno-secciones` |
-| [MOV-0011](MOV-0011-arbitros-y-partidos.md) | Gestión del torneo, árbitros y partidos automáticos | en-revision | F3 | David | MOV-0004, MOV-0008, MOV-0009 · backend 0024 y 0025 | `mov-0011-arbitros-y-partidos` |
-| [MOV-0012](MOV-0012-revision-arbitraje.md) | Invitaciones recibidas, planilla solo con alineados y planilla del organizador | en-revision | F3 | David | MOV-0009, MOV-0011 · backend 0030 | `mov-0012-revision-arbitraje` |
-| [MOV-0013](MOV-0013-programar-partidos.md) | Programar los partidos (fecha, hora y lugar) y volver a generarlos | en-revision | F3 | David | MOV-0011, MOV-0012 · backend 0025 | `mov-0013-programar-partidos` |
-| [MOV-0014](MOV-0014-inscribir-equipo.md) | Inscribir un equipo en un torneo | en-revision | F1 | David | MOV-0004, MOV-0005 · backend 0026 y 0029 | `mov-0014-inscribir-equipo` |
-| [MOV-0015](MOV-0015-plantel-delegado.md) | Plantel del equipo para su delegado | en-revision | F1 | David | MOV-0005, MOV-0014 · backend 0018, 0022, 0023 y 0026 | `mov-0015-plantel-delegado` |
+| [MOV-0011](MOV-0011-arbitros-y-partidos.md) | Gestión del torneo, árbitros y partidos automáticos | hecha | F3 | David | MOV-0004, MOV-0008, MOV-0009 · backend 0024 y 0025 | `mov-0011-arbitros-y-partidos` |
+| [MOV-0012](MOV-0012-revision-arbitraje.md) | Invitaciones recibidas, planilla solo con alineados y planilla del organizador | hecha | F3 | David | MOV-0009, MOV-0011 · backend 0030 | `mov-0012-revision-arbitraje` |
+| [MOV-0013](MOV-0013-programar-partidos.md) | Programar los partidos (fecha, hora y lugar) y volver a generarlos | hecha | F3 | David | MOV-0011, MOV-0012 · backend 0025 | `mov-0013-programar-partidos` |
+| [MOV-0014](MOV-0014-inscribir-equipo.md) | Inscribir un equipo en un torneo | hecha | F1 | David | MOV-0004, MOV-0005 · backend 0026 y 0029 | `mov-0014-inscribir-equipo` |
+| [MOV-0015](MOV-0015-plantel-delegado.md) | Plantel del equipo para su delegado | hecha | F1 | David | MOV-0005, MOV-0014 · backend 0018, 0022, 0023 y 0026 | `mov-0015-plantel-delegado` |
 
-- **MOV-0001 a MOV-0010 están en `main`** (16-nov-2026). **MOV-0011** está en su rama: falta probar en el emulador generar los partidos y asignar árbitros con un torneo que tenga dos equipos aprobados. MOV-0003 sigue `en-revision` solo porque falta probar el registro real con un correo propio.
-- **MOV-0012** sale de la revisión de la MOV-0011 y va en su rama, encima de ella. Necesita el **backend 0030** integrado y desplegado para verse completa en el emulador (invitaciones recibidas, expulsados y reabrir).
-- **MOV-0014** va encima de MOV-0013. Sin comprobantes: la cuota se informa y la inscripción queda pendiente.
-- **MOV-0015** va encima de MOV-0014. Solo usa backend que ya está en `main` (no necesita la 0030).
-- **MOV-0013** va encima de MOV-0012, en su propia rama. Solo usa backend que ya está en `main`.
+- **MOV-0001 a MOV-0015 están en `main`** (23-nov-2026), junto con el **backend 0030**. MOV-0003 sigue `en-revision` solo porque falta probar el registro real con un correo propio.
+- **Pendiente en el emulador** (cubierto por pruebas, ver el registro de cada spec): generar partidos y asignar árbitros (MOV-0011); invitaciones recibidas, expulsados y reabrir (MOV-0012); programar partidos (MOV-0013); enviar una inscripción (MOV-0014); y agregar, cambiar números y quitar en el plantel (MOV-0015). Todo eso se prueba en un solo recorrido: inscribir dos equipos, aprobarlos, armar los planteles, generar y programar los partidos, y arbitrar uno.
+- **Sin comprobantes** (MOV-0014): la cuota se informa y la inscripción queda pendiente.
 - **MOV-0005, 0007 y 0008 se pusieron al día el 16-nov:** sus specs eran borradores anteriores al backend real y ahora describen lo que hace el código.
 - **Pendiente de MOV-0009:** medir en la app si pasar lista sigue lento; si se confirma, va como spec de bug.
 

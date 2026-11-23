@@ -2,7 +2,7 @@
 id: MOV-0011
 titulo: Gestión del torneo, árbitros y partidos automáticos
 tipo: feature
-estado: en-revision
+estado: hecha
 prioridad: P1
 fase: F3
 modo: Creador
@@ -284,3 +284,4 @@ Con el backend de desarrollo y las cuentas del seed:
 | 2026-11-16 | 355 tests, 0 fallos (`evidencias/MOV-0011/02-green.txt`). Prueba de dientes: con tres reglas rotas a propósito fallan 6 pruebas (`01-dientes.txt`) |
 | 2026-11-16 | Verificada en el emulador contra el backend desplegado, con la sesión de `arbitro02`: se creó el torneo "Prueba MOV-0011" (solo con enlace), se abrió su gestión, se invitó un árbitro por enlace (hoja de compartir), se aceptó la invitación desde Perfil, el árbitro apareció en la lista y se le dio "Arbitra todos los partidos". Partidos mostró el motivo y el botón deshabilitado con 0 equipos. Capturas 03 a 14 (oscuro, y claro con letra al 130 %). **Sin verificar en el emulador:** generar los partidos y asignar árbitros a un partido (CA-7 a CA-10), porque hacen falta dos equipos aprobados y no había a mano la clave de las cuentas del seed; quedan cubiertos por pruebas de dominio, de ViewModel y de red. Tampoco quitar un árbitro ni cancelar una invitación |
 | 2026-11-16 | Revisión de David: la invitación con correo no le aparece al invitado, la planilla deja anotar a quien no está alineado o ya fue expulsado, y el organizador no tiene por dónde abrir la planilla. Se resuelve en [MOV-0012](MOV-0012-revision-arbitraje.md) (cambia §2.3: un partido cerrado abre su planilla) |
+| 2026-11-23 | **Integrada a `main`** por decisión de David ("Sí, intégralo todo"), junto con MOV-0011 a MOV-0015 y el backend 0030, con 455 pruebas y 0 fallos. Pasa a `hecha`. Sigue sin verificar en el emulador: generar los partidos y asignar árbitros a un partido (CA-7 a CA-10), que necesitan un torneo con dos equipos aprobados |

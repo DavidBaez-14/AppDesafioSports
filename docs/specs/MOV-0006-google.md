@@ -105,6 +105,8 @@ rama: mov-0006-google
 
 - **Por qué `GetSignInWithGoogleOption` y no `GetGoogleIdOption`:** es el flujo para un botón explícito, que siempre deja elegir la cuenta. El otro es para la hoja automática al abrir la app.
 - **Sin el ID del cliente web, el botón no se muestra.** Es configuración del entorno, igual que las claves de Supabase.
+- **Una sola huella para el equipo (decisión de David):** el APK de prueba lo compila David, firmado con su llave de debug, y lo reparte. Los demás integrantes no registran su SHA-1 ni crean clientes Android: solo se agregan sus correos como Test users en Google Cloud. Si un integrante compila en su máquina, Google falla en esa compilación y entra con correo.
+- **Por qué el cliente web y no el Android en `GOOGLE_WEB_CLIENT_ID`:** el ID que recibe Credential Manager es el destinatario del token (el campo `aud`), y quien lo valida es Supabase, un servidor. Google exige que ese destinatario sea un cliente de tipo web. El cliente Android no se nombra en el código: Google lo consulta para confirmar que el paquete y la firma de la app están autorizados.
 
 ## 12. Registro
 
@@ -114,3 +116,4 @@ rama: mov-0006-google
 | 2026-11-09 | RED (10 tests fallando, `evidencias/MOV-0006/01-red.txt`) → GREEN (106 tests, 0 fallos). Capturas 02 a 05: el selector de Google abre y cancelar libera el login. Falta el cliente OAuth Android para entrar de verdad (`06-green.txt`) |
 | 2026-11-09 | Verificada por el usuario con su cuenta real de Google en el emulador (después de poner el ID del cliente web). Integrada a `main`: pasa a `hecha` |
 | 2026-11-14 | `DesafioSportsDev` pasa a ser el Supabase principal del equipo. Allí el proveedor Google está apagado (`/auth/v1/settings` → `google: false`), así que falta activarlo con el mismo cliente web y registrar la huella SHA-1 de cada integrante. Pasos por máquina en el `README.md`. Sin cambios de código: 11 tests de Google en verde. Falta la verificación manual contra `DesafioSportsDev` |
+| 2026-11-23 | **Google activo en `DesafioSportsDev`** (`/auth/v1/settings` → `google: true`) con el cliente web "Supabase CodeCup". El `local.properties` de David tenía el ID del cliente Android desde el 14-nov y lo cambió por el del cliente web. Su SHA-1 de debug sigue siendo la registrada. Se corrige lo del 14-nov: los integrantes no registran su huella, usan el APK de David y solo se agregan como Test users (§11). README actualizado. Sin cambios de código. Falta la verificación manual contra `DesafioSportsDev` |
